@@ -9,6 +9,11 @@ var map;
             map.fields[i][j] = 0;
         }
     }
+    function inner(pos) {
+        return pos.x >= 0 && pos.x < map.width &&
+            pos.y >= 0 && pos.y < map.height;
+    }
+    map.inner = inner;
     function field_at(pos) {
         return map.fields[pos.y][pos.x];
     }
@@ -17,6 +22,14 @@ var map;
         return model.tiles[map.entity_names[map.fields[pos.y][pos.x]]];
     }
     map.field_at_tile = field_at_tile;
+    function field_set(pos, value) {
+        map.fields[pos.y][pos.x] = value;
+    }
+    map.field_set = field_set;
+    function field_set_by_name(pos, name) {
+        map.fields[pos.y][pos.x] = map.entity_number[name];
+    }
+    map.field_set_by_name = field_set_by_name;
     /**
      * fields 上の番号 -> 名前
      */
@@ -24,6 +37,10 @@ var map;
         "floor",
         "wall"
     ];
+    map.entity_number = {
+        floor: 0,
+        wall: 1
+    };
     var minimap_usize = new utils.Pos(10, 10);
     /**
      * ランダムなマップの自動生成

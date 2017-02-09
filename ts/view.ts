@@ -39,6 +39,22 @@ namespace view{
     }
   }
 
+  export class AttackAnim implements Anim{
+    progress:number = 0
+    advance(){
+      this.progress += 0.2
+      if(this.progress >= 1) {
+        this.progress = 1
+        return true
+      }
+      return false
+    }
+    get_upos(current_upos:utils.Pos){
+      var theta = Math.PI * 2 * this.progress
+      return current_upos.add(new utils.Pos(Math.cos(theta),Math.sin(theta)).mul_bloadcast(0.4))
+    }
+  }
+
   export function print(ctx : CanvasRenderingContext2D){
     ctx.clearRect(0,0,
     window_usize.x * unit_size.x,

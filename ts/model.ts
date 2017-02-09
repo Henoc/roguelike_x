@@ -61,14 +61,24 @@ namespace model{
     move(udelta:utils.Pos){
       var moved = this.upos.add(udelta)
       if(
-        moved.x >= 0 && moved.x < map.width &&
-        moved.y >= 0 && moved.y < map.height &&
+        map.inner(moved) &&
         utils.all(get_entities_at(moved),e => !e.tile.isWall) &&
         !map.field_at_tile(moved).isWall
       ){
         this.anim_tasks.push(new view.MoveAnim(this.upos))
         this.upos = moved
       }
+    }
+
+    attack(){
+      // 壁を壊す
+      for(let v of dir_ary){
+        var directed = this.upos.add(v)
+        if(map.inner(directed) && map.field_at_tile(directed).isWall){
+          map.field_set_by_name(directed,"floor")
+        }
+      }
+      this.anim_tasks.push(new view.AttackAnim())
     }
   }
 
@@ -118,9 +128,19 @@ namespace model{
     none : new utils.Pos(0,0)
   }
 
+  export var dir_ary = [dir.down,dir.up,dir.left,dir.right]
+
   export function move(){
     player.move(keys.dir_key)
+    monsters_action()
+  }
 
+  export function attack(){
+    player.attack()
+    monsters_action()
+  }
+
+  function monsters_action(){
     // monsters をランダムに移動させる
     for(let ent of entities){
       if(ent == player) continue
@@ -146,7 +166,9 @@ namespace model{
  */
 namespace keys{
   export var dir_key = model.dir.none
+  export var z_key = false
   export function keyReset(){
     dir_key = model.dir.none
+    z_key = false
   }
 }

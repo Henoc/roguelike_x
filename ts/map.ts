@@ -9,12 +9,25 @@ namespace map{
     }
   }
 
+  export function inner(pos:utils.Pos):boolean {
+    return pos.x >= 0 && pos.x < map.width &&
+        pos.y >= 0 && pos.y < map.height
+  }
+
   export function field_at(pos : utils.Pos){
     return fields[pos.y][pos.x]
   }
 
   export function field_at_tile(pos : utils.Pos){
     return model.tiles[entity_names[fields[pos.y][pos.x]]]
+  }
+
+  export function field_set(pos:utils.Pos,value:number){
+    fields[pos.y][pos.x] = value
+  }
+
+  export function field_set_by_name(pos:utils.Pos,name:string){
+    fields[pos.y][pos.x] = entity_number[name]
   }
 
   /**
@@ -24,6 +37,11 @@ namespace map{
     "floor",
     "wall"
   ]
+
+  export var entity_number : { [key: string]: number; } = {
+    floor:0,
+    wall:1
+  }
 
   var minimap_usize = new utils.Pos(10,10)
 

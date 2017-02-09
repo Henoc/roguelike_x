@@ -50,8 +50,13 @@ function update(timestamp) {
     render();
 }
 function render() {
-    if (!view.action_lock && !keys.dir_key.equals(model.dir.none)) {
-        model.move();
+    if (!view.action_lock) {
+        if (!keys.dir_key.equals(model.dir.none)) {
+            model.move();
+        }
+        else if (keys.z_key) {
+            model.attack();
+        }
         keys.keyReset();
     }
     view.print(ctx);
@@ -72,6 +77,9 @@ function keydown(e) {
             break;
         case 40:
             keys.dir_key = model.dir.down;
+            break;
+        case 90:
+            keys.z_key = true;
             break;
         default:
             break;

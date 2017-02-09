@@ -43,13 +43,23 @@ var model;
          */
         Entity.prototype.move = function (udelta) {
             var moved = this.upos.add(udelta);
-            if (moved.x >= 0 && moved.x < map.width &&
-                moved.y >= 0 && moved.y < map.height &&
+            if (map.inner(moved) &&
                 utils.all(get_entities_at(moved), function (e) { return !e.tile.isWall; }) &&
                 !map.field_at_tile(moved).isWall) {
                 this.anim_tasks.push(new view.MoveAnim(this.upos));
                 this.upos = moved;
             }
+        };
+        Entity.prototype.attack = function () {
+            // 壁を壊す
+            for (var _i = 0; _i < model.dir_ary.length; _i++) {
+                var v = model.dir_ary[_i];
+                var directed = this.upos.add(v);
+                if (map.inner(directed) && map.field_at_tile(directed).isWall) {
+                    map.field_set_by_name(directed, "floor");
+                }
+            }
+            this.anim_tasks.push(new view.AttackAnim());
         };
         return Entity;
     })();
@@ -88,8 +98,18 @@ var model;
         right: new utils.Pos(1, 0),
         none: new utils.Pos(0, 0)
     };
+    model.dir_ary = [model.dir.down, model.dir.up, model.dir.left, model.dir.right];
     function move() {
         model.player.move(keys.dir_key);
+        monsters_action();
+    }
+    model.move = move;
+    function attack() {
+        model.player.attack();
+        monsters_action();
+    }
+    model.attack = attack;
+    function monsters_action() {
         // monsters をランダムに移動させる
         for (var _i = 0; _i < model.entities.length; _i++) {
             var ent = model.entities[_i];
@@ -98,7 +118,6 @@ var model;
             ent.move(new utils.Pos(utils.randInt(2) - 1, utils.randInt(2) - 1));
         }
     }
-    model.move = move;
     function get_entities_at(upos) {
         var ret = [];
         for (var _i = 0; _i < model.entities.length; _i++) {
@@ -117,8 +136,10 @@ var model;
 var keys;
 (function (keys) {
     keys.dir_key = model.dir.none;
+    keys.z_key = false;
     function keyReset() {
         keys.dir_key = model.dir.none;
+        keys.z_key = false;
     }
     keys.keyReset = keyReset;
 })(keys || (keys = {}));

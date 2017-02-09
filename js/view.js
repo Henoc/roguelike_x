@@ -27,6 +27,25 @@ var view;
         return MoveAnim;
     })();
     view.MoveAnim = MoveAnim;
+    var AttackAnim = (function () {
+        function AttackAnim() {
+            this.progress = 0;
+        }
+        AttackAnim.prototype.advance = function () {
+            this.progress += 0.2;
+            if (this.progress >= 1) {
+                this.progress = 1;
+                return true;
+            }
+            return false;
+        };
+        AttackAnim.prototype.get_upos = function (current_upos) {
+            var theta = Math.PI * 2 * this.progress;
+            return current_upos.add(new utils.Pos(Math.cos(theta), Math.sin(theta)).mul_bloadcast(0.4));
+        };
+        return AttackAnim;
+    })();
+    view.AttackAnim = AttackAnim;
     function print(ctx) {
         ctx.clearRect(0, 0, view.window_usize.x * view.unit_size.x, view.window_usize.y * view.unit_size.y);
         // 画面外は黒

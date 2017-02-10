@@ -40,6 +40,9 @@ namespace utils{
     equals(that:Pos){
       return this.x == that.x && this.y == that.y
     }
+    map(f:(n:number)=>number){
+      return new Pos(f(this.x),f(this.y))
+    }
   }
 
   export function all<T>(ary:T[],fn : (elem:T) => boolean){
@@ -47,5 +50,42 @@ namespace utils{
       if(!fn(v)) return false
     }
     return true
+  }
+  
+  export function limit(n:number,min:number,max:number){
+    return n < min ? min : (n > max ? max : n)
+  }
+
+  export abstract class Option<T>{
+    abstract get():T;
+    abstract foreach(fn:(e:T) => void):void
+  }
+
+  export class Some<T> extends Option<T>{
+    constructor(private t:T){
+      super()
+    }
+    get(){
+      return this.t
+    }
+    foreach(fn:(e:T) => void):void{
+      fn(this.t)
+    }
+  }
+
+  export class None<T> extends Option<T>{
+    get():T{
+      throw "get() call of none";
+    }
+    foreach(fn:(e:T) => void):void{
+    }
+  }
+
+  export function none<T>(){
+    return new None<T>()
+  }
+
+  export function some<T>(t:T){
+    return new Some(t)
   }
 }

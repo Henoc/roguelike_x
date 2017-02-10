@@ -9,10 +9,12 @@ namespace model{
     color:string
     type:string
     isWall:boolean
-    constructor(color:string, type:string, isWall:boolean){
+    status:utils.Option<battle.Status>
+    constructor(color:string, type:string, isWall:boolean, status:utils.Option<battle.Status>){
       this.color = color
       this.type = type
       this.isWall = isWall
+      this.status = status
     }
     print(ctx:CanvasRenderingContext2D, realPos: utils.Pos){
       ctx.fillStyle = this.color
@@ -36,23 +38,33 @@ namespace model{
 
   // タイルインスタンス
   export var tiles: { [key: string]: Tile; } = {}
-  tiles["floor"] = new Tile("rgba(20,40,40,1)","square",false)
-  tiles["wall"] = new Tile("rgba(50,30,10,1)","square",true)
-  tiles["player"] = new Tile("rgba(180,110,180,1)","minisq",true)
-  tiles["enemy1"] = new Tile("rgba(15,140,15,1)","minisq",true)
+  tiles["floor"] = new Tile("rgba(20,40,40,1)","square",false,utils.none<battle.Status>())
+  tiles["wall"] = new Tile("rgba(50,30,10,1)","square",true,utils.none<battle.Status>())
+  tiles["player"] = new Tile("rgba(180,110,180,1)","minisq",true,utils.some(new battle.Status(10,1,0)))
+  tiles["enemy1"] = new Tile("rgba(15,140,15,1)","minisq",true,utils.some(new battle.Status(2,1,0)))
 
   // 実際の配置物
   export class Entity{
     upos:utils.Pos // unit position
     tile:Tile
+    status:battle.Status
     anim_tasks:view.Anim[]
     constructor(ux:number, uy:number, tile:Tile){
       this.upos = new utils.Pos(ux,uy)
       this.tile = tile;
+      this.status = tile.status.get()
       this.anim_tasks = []
     }
     static of(upos:utils.Pos,tile:Tile){
       return new Entity(upos.x,upos.y,tile)
+    }
+
+    print(ctx:CanvasRenderingContext2D,realPos:utils.Pos){
+      this.tile.print(ctx,realPos)
+
+      ctx.fillStyle = this.status.hp != 0 ? "white" : "red"
+      ctx.font = "12pt Consolas"
+      ctx.fillText("" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y)
     }
 
     /**
@@ -62,7 +74,7 @@ namespace model{
       var moved = this.upos.add(udelta)
       if(
         map.inner(moved) &&
-        utils.all(get_entities_at(moved),e => !e.tile.isWall) &&
+        utils.all(get_entities_at(moved),e => !e.tile.isWall || e.status.hp == 0) &&
         !map.field_at_tile(moved).isWall
       ){
         this.anim_tasks.push(new view.MoveAnim(this.upos))
@@ -71,14 +83,31 @@ namespace model{
     }
 
     attack(){
-      // 壁を壊す
+      // 壁を壊す | 攻撃する
       for(let v of dir_ary){
         var directed = this.upos.add(v)
-        if(map.inner(directed) && map.field_at_tile(directed).isWall){
+        if(!map.inner(directed)) continue
+        if(map.field_at_tile(directed).isWall){
           map.field_set_by_name(directed,"floor")
+        }
+        // 誰かいれば当たる
+        for(let entity of get_entities_at(directed)){
+          entity.status = this.status.attackTo(entity.status)
+          console.log(entity.status)
         }
       }
       this.anim_tasks.push(new view.AttackAnim())
+    }
+
+    /**
+     * that が隣接しているか
+     */
+    reach(that:Entity){
+      for(let v of dir_ary){
+        var directed = this.upos.add(v)
+        if(that.upos.equals(directed)) return true
+      }
+      return false
     }
   }
 
@@ -131,8 +160,8 @@ namespace model{
   export var dir_ary = [dir.down,dir.up,dir.left,dir.right]
 
   export function move(){
-    player.move(keys.dir_key)
     monsters_action()
+    player.move(keys.dir_key)
   }
 
   export function attack(){
@@ -144,9 +173,14 @@ namespace model{
     // monsters をランダムに移動させる
     for(let ent of entities){
       if(ent == player) continue
-      ent.move(new utils.Pos(
-        utils.randInt(2) - 1,
-        utils.randInt(2) - 1))
+      if(ent.status.hp == 0) continue
+      if(ent.reach(player)){
+        ent.attack()
+      }else{
+        ent.move(new utils.Pos(
+          utils.randInt(3) - 1,
+          utils.randInt(3) - 1))
+      }
     }
   }
 

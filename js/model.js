@@ -2,10 +2,11 @@ var model;
 (function (model) {
     // 壁，床，キャラクター
     var Tile = (function () {
-        function Tile(color, type, isWall) {
+        function Tile(color, type, isWall, status) {
             this.color = color;
             this.type = type;
             this.isWall = isWall;
+            this.status = status;
         }
         Tile.prototype.print = function (ctx, realPos) {
             ctx.fillStyle = this.color;
@@ -21,22 +22,29 @@ var model;
             }
         };
         return Tile;
-    })();
+    }());
     // タイルインスタンス
     model.tiles = {};
-    model.tiles["floor"] = new Tile("rgba(20,40,40,1)", "square", false);
-    model.tiles["wall"] = new Tile("rgba(50,30,10,1)", "square", true);
-    model.tiles["player"] = new Tile("rgba(180,110,180,1)", "minisq", true);
-    model.tiles["enemy1"] = new Tile("rgba(15,140,15,1)", "minisq", true);
+    model.tiles["floor"] = new Tile("rgba(20,40,40,1)", "square", false, utils.none());
+    model.tiles["wall"] = new Tile("rgba(50,30,10,1)", "square", true, utils.none());
+    model.tiles["player"] = new Tile("rgba(180,110,180,1)", "minisq", true, utils.some(new battle.Status(10, 1, 0)));
+    model.tiles["enemy1"] = new Tile("rgba(15,140,15,1)", "minisq", true, utils.some(new battle.Status(2, 1, 0)));
     // 実際の配置物
     var Entity = (function () {
         function Entity(ux, uy, tile) {
             this.upos = new utils.Pos(ux, uy);
             this.tile = tile;
+            this.status = tile.status.get();
             this.anim_tasks = [];
         }
         Entity.of = function (upos, tile) {
             return new Entity(upos.x, upos.y, tile);
+        };
+        Entity.prototype.print = function (ctx, realPos) {
+            this.tile.print(ctx, realPos);
+            ctx.fillStyle = this.status.hp != 0 ? "white" : "red";
+            ctx.font = "12pt Consolas";
+            ctx.fillText("" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y);
         };
         /**
          * アニメーション挿入，当たり判定もここでやる
@@ -44,25 +52,45 @@ var model;
         Entity.prototype.move = function (udelta) {
             var moved = this.upos.add(udelta);
             if (map.inner(moved) &&
-                utils.all(get_entities_at(moved), function (e) { return !e.tile.isWall; }) &&
+                utils.all(get_entities_at(moved), function (e) { return !e.tile.isWall || e.status.hp == 0; }) &&
                 !map.field_at_tile(moved).isWall) {
                 this.anim_tasks.push(new view.MoveAnim(this.upos));
                 this.upos = moved;
             }
         };
         Entity.prototype.attack = function () {
-            // 壁を壊す
-            for (var _i = 0; _i < model.dir_ary.length; _i++) {
-                var v = model.dir_ary[_i];
+            // 壁を壊す | 攻撃する
+            for (var _i = 0, dir_ary_1 = model.dir_ary; _i < dir_ary_1.length; _i++) {
+                var v = dir_ary_1[_i];
                 var directed = this.upos.add(v);
-                if (map.inner(directed) && map.field_at_tile(directed).isWall) {
+                if (!map.inner(directed))
+                    continue;
+                if (map.field_at_tile(directed).isWall) {
                     map.field_set_by_name(directed, "floor");
+                }
+                // 誰かいれば当たる
+                for (var _a = 0, _b = get_entities_at(directed); _a < _b.length; _a++) {
+                    var entity = _b[_a];
+                    entity.status = this.status.attackTo(entity.status);
+                    console.log(entity.status);
                 }
             }
             this.anim_tasks.push(new view.AttackAnim());
         };
+        /**
+         * that が隣接しているか
+         */
+        Entity.prototype.reach = function (that) {
+            for (var _i = 0, dir_ary_2 = model.dir_ary; _i < dir_ary_2.length; _i++) {
+                var v = dir_ary_2[_i];
+                var directed = this.upos.add(v);
+                if (that.upos.equals(directed))
+                    return true;
+            }
+            return false;
+        };
         return Entity;
-    })();
+    }());
     model.Entity = Entity;
     // 実際の配置物のインスタンス
     model.entities = [];
@@ -100,8 +128,8 @@ var model;
     };
     model.dir_ary = [model.dir.down, model.dir.up, model.dir.left, model.dir.right];
     function move() {
-        model.player.move(keys.dir_key);
         monsters_action();
+        model.player.move(keys.dir_key);
     }
     model.move = move;
     function attack() {
@@ -111,17 +139,24 @@ var model;
     model.attack = attack;
     function monsters_action() {
         // monsters をランダムに移動させる
-        for (var _i = 0; _i < model.entities.length; _i++) {
-            var ent = model.entities[_i];
+        for (var _i = 0, entities_1 = model.entities; _i < entities_1.length; _i++) {
+            var ent = entities_1[_i];
             if (ent == model.player)
                 continue;
-            ent.move(new utils.Pos(utils.randInt(2) - 1, utils.randInt(2) - 1));
+            if (ent.status.hp == 0)
+                continue;
+            if (ent.reach(model.player)) {
+                ent.attack();
+            }
+            else {
+                ent.move(new utils.Pos(utils.randInt(3) - 1, utils.randInt(3) - 1));
+            }
         }
     }
     function get_entities_at(upos) {
         var ret = [];
-        for (var _i = 0; _i < model.entities.length; _i++) {
-            var v = model.entities[_i];
+        for (var _i = 0, entities_2 = model.entities; _i < entities_2.length; _i++) {
+            var v = entities_2[_i];
             if (v.upos.equals(upos)) {
                 ret.push(v);
             }

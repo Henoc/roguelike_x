@@ -3,6 +3,7 @@ var view;
     view.window_usize = new utils.Pos(16, 16);
     view.unit_size = new utils.Pos(32, 32);
     view.prefix_pos = new utils.Pos(0, 0);
+    var PROGRESS = 0.2;
     /**
      * animation 中なので key 入力をブロック
      * print() 内で更新する
@@ -14,7 +15,7 @@ var view;
             this.progress = 0;
         }
         MoveAnim.prototype.advance = function () {
-            this.progress += 0.2;
+            this.progress += PROGRESS;
             if (this.progress >= 1) {
                 this.progress = 1;
                 return true;
@@ -25,14 +26,14 @@ var view;
             return this.pre_upos.mul_bloadcast(1 - this.progress).add(current_upos.mul_bloadcast(this.progress));
         };
         return MoveAnim;
-    })();
+    }());
     view.MoveAnim = MoveAnim;
     var AttackAnim = (function () {
         function AttackAnim() {
             this.progress = 0;
         }
         AttackAnim.prototype.advance = function () {
-            this.progress += 0.2;
+            this.progress += PROGRESS;
             if (this.progress >= 1) {
                 this.progress = 1;
                 return true;
@@ -44,13 +45,16 @@ var view;
             return current_upos.add(new utils.Pos(Math.cos(theta), Math.sin(theta)).mul_bloadcast(0.4));
         };
         return AttackAnim;
-    })();
+    }());
     view.AttackAnim = AttackAnim;
     function print(ctx) {
         ctx.clearRect(0, 0, view.window_usize.x * view.unit_size.x, view.window_usize.y * view.unit_size.y);
         // 画面外は黒
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, view.window_usize.x * view.unit_size.x, view.window_usize.y * view.unit_size.y);
+        // player を中心とする画面にする
+        var tmp = model.player.upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5, 0.5)).mul(view.unit_size);
+        view.prefix_pos = tmp.sub(view.prefix_pos).map(function (d) { return utils.limit(d, -view.unit_size.x * PROGRESS, view.unit_size.x * PROGRESS); }).add(view.prefix_pos);
         // draw a map
         for (var i = 0; i < map.height; i++) {
             for (var j = 0; j < map.width; j++) {
@@ -76,7 +80,7 @@ var view;
                 entity_upos = firstAnim.get_upos(entity.upos);
             }
             var realEntityPos = entity_upos.mul(view.unit_size).sub(view.prefix_pos);
-            entity.tile.print(ctx, realEntityPos);
+            entity.print(ctx, realEntityPos);
         }
     }
     view.print = print;

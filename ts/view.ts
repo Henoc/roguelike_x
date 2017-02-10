@@ -3,6 +3,7 @@ namespace view{
   export var window_usize = new utils.Pos(16,16)
   export var unit_size = new utils.Pos(32,32)
   export var prefix_pos = new utils.Pos(0,0)
+  var PROGRESS = 0.2
 
   /**
    * animation 中なので key 入力をブロック
@@ -27,7 +28,7 @@ namespace view{
       this.progress = 0
     }
     advance(){
-      this.progress += 0.2
+      this.progress += PROGRESS
       if(this.progress >= 1) {
         this.progress = 1
         return true
@@ -42,7 +43,7 @@ namespace view{
   export class AttackAnim implements Anim{
     progress:number = 0
     advance(){
-      this.progress += 0.2
+      this.progress += PROGRESS
       if(this.progress >= 1) {
         this.progress = 1
         return true
@@ -65,6 +66,10 @@ namespace view{
     ctx.fillRect(0,0,
     window_usize.x * unit_size.x,
     window_usize.y * unit_size.y)
+
+    // player を中心とする画面にする
+    var tmp = model.player.upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5,0.5)).mul(view.unit_size)
+    prefix_pos = tmp.sub(prefix_pos).map(d => utils.limit(d,-unit_size.x * PROGRESS, unit_size.x * PROGRESS)).add(prefix_pos)
 
     // draw a map
     for(var i = 0; i < map.height; i++){
@@ -94,7 +99,7 @@ namespace view{
       }
 
       var realEntityPos = entity_upos.mul(unit_size).sub(prefix_pos)
-      entity.tile.print(ctx,realEntityPos)
+      entity.print(ctx,realEntityPos)
     }
   }
 }

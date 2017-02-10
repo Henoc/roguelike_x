@@ -71,8 +71,8 @@ var map;
         ];
         function patternTo2darray(pattern) {
             var ary = new Array();
-            for (var _i = 0; _i < pattern.length; _i++) {
-                var str = pattern[_i];
+            for (var _i = 0, pattern_1 = pattern; _i < pattern_1.length; _i++) {
+                var str = pattern_1[_i];
                 ary.push(strToArray(str));
             }
             return ary;

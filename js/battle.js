@@ -17,6 +17,9 @@ var battle;
             var copied = new Status(this.max_hp, this.hp, this.atk, this.def);
             return copied;
         };
+        Status.prototype.add = function (that) {
+            return new Status(this.max_hp + that.max_hp, utils.limit(this.hp + that.hp, 0, this.max_hp + that.max_hp + 1), this.atk + that.atk, this.def + that.def);
+        };
         /**
          * return new attacked status of that
          * 必ず1は毎回減る

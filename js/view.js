@@ -89,11 +89,26 @@ var view;
             var top_frame = new utils.Frame(0, 0, window_w, window_h, window_h * 0.05, "rgba(0,0,0,0)");
             top_frame.move_point_x(0.6);
             var item_top = top_frame.insert_subframe(utils.none(), utils.none(), "rgba(0,0,0,0.6)");
-            item_top.insert_text(window_h / 32, "white", "\u30A2\u30A4\u30C6\u30E0");
+            item_top.font_size = window_h / 32;
+            item_top.insert_text("\u30A2\u30A4\u30C6\u30E0");
             for (var i = 0; i < items.item_entities.length; i++) {
                 var itemEntity = items.item_entities[i];
-                item_top.insert_text(window_h / 32, "white", (main.cursor["items"] == i ? ">" : " ") + itemEntity.item.name);
+                item_top.insert_text((main.cursor["items"] == i ? ">" : " ") + itemEntity.item.name);
             }
+            top_frame.reset_point();
+            var status_frame = top_frame.insert_subframe(utils.some(window_w * 0.3), utils.some(window_h * 0.5), "rgba(0,0,0,0.6)");
+            status_frame.insert_text("\u30B9\u30C6\u30FC\u30BF\u30B9");
+            var add_status = items.item_entities[main.cursor["items"]].item.add_status;
+            var modified_status = model.player.status.add(add_status);
+            status_frame.insert_text("hp " + model.player.status.hp + "/" + model.player.status.max_hp
+                + (add_status.hp != 0 || add_status.max_hp != 0 ? " \u2192 " + modified_status.hp + "/" + modified_status.max_hp : ""));
+            status_frame.insert_text("atk " + model.player.status.atk
+                + (add_status.atk != 0 ? " \u2192 " + modified_status.atk : ""));
+            status_frame.insert_text("def " + model.player.status.def
+                + (add_status.def != 0 ? " \u2192 " + modified_status.def : ""));
+            top_frame.move_point_y(0.1);
+            var message = top_frame.insert_subframe(utils.some(window_w * 0.5), utils.none(), "rgba(0,0,0,0.6)");
+            message.insert_text(items.item_entities[main.cursor["items"]].item.text);
             top_frame.print(ctx);
         }
         // menu mode

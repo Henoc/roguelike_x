@@ -116,34 +116,42 @@ namespace utils{
      */
     start_points:Pos[]
     margin:number
+    font_size:number
+    text_color:string
     constructor(x:number,y:number,w:number,h:number,margin:number,color:string){
       this.pos = new Pos(x,y)
       this.wh = new Pos(w,h)
       this.color = color
       this.margin = margin
+      this.font_size = 14
+      this.text_color = "white"
       this.contents = []
       this.start_points = [this.pos.add(new Pos(margin,margin))]
     }
-    insert_text(font_size:number, color:string, text:string){
+    insert_text(text:string){
       this.contents.push({
         type:"text",
         text:text,
-        font_size:font_size,
-        color:color
+        font_size:this.font_size,
+        color:this.text_color
       })
       var last = this.start_points[this.start_points.length - 1]
-      this.start_points.push(last.add(new Pos(0,font_size * 1.2)))
+      this.start_points.push(last.add(new Pos(0,this.font_size * 1.2)))
     }
     insert_subframe(width:Option<number>,height:Option<number>,color:string){
       var last = this.start_points[this.start_points.length - 1]
       var width2 = width.get_or_else(this.pos.x + this.wh.x - last.x - this.margin)
       var height2 = height.get_or_else(this.pos.y + this.wh.y - last.y - this.margin)
+      // inherits parent frame properties
       var inner = new Frame(last.x,last.y,width2,height2,this.margin,color)
+      inner.font_size = this.font_size
+      inner.text_color = this.text_color
+      
       this.contents.push({
         type:"frame",
         frame:inner
       })
-      this.start_points.push(last.add(new Pos(0,width2)))
+      this.start_points.push(last.add(new Pos(0,height2)))
       return inner
     }
 
@@ -157,6 +165,19 @@ namespace utils{
       var last = this.start_points.length - 1
       this.start_points[last] = this.start_points[last].add(new Pos(inner_width * per,0))
     }
+
+    move_point_y(per:number){
+      var inner_height = this.wh.y - 2 * this.margin
+      var last = this.start_points.length - 1
+      this.start_points[last] = this.start_points[last].add(new Pos(0,inner_height * per))
+    }
+
+
+    reset_point(){
+      this.start_points.pop()
+      this.start_points.push(this.pos.add(new Pos(this.margin,this.margin)))
+    }
+
     print(ctx:CanvasRenderingContext2D){
       ctx.fillStyle = this.color
       ctx.fillRect(this.pos.x,this.pos.y,this.wh.x,this.wh.y)

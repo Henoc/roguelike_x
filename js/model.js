@@ -2,7 +2,8 @@ var model;
 (function (model) {
     // 壁，床，キャラクター
     var Tile = (function () {
-        function Tile(color, type, isWall, status) {
+        function Tile(name, color, type, isWall, status) {
+            this.name = name;
             this.color = color;
             this.type = type;
             this.isWall = isWall;
@@ -25,10 +26,10 @@ var model;
     }());
     // タイルインスタンス
     model.tiles = {};
-    model.tiles["floor"] = new Tile("rgba(20,40,40,1)", "square", false, utils.none());
-    model.tiles["wall"] = new Tile("rgba(50,30,10,1)", "square", true, utils.none());
-    model.tiles["player"] = new Tile("rgba(180,110,180,1)", "minisq", true, utils.some(new battle.Status(10, 1, 0)));
-    model.tiles["enemy1"] = new Tile("rgba(15,140,15,1)", "minisq", true, utils.some(new battle.Status(2, 1, 0)));
+    model.tiles["floor"] = new Tile("\u5e8a", "rgba(20,40,40,1)", "square", false, utils.none());
+    model.tiles["wall"] = new Tile("\u58c1", "rgba(50,30,10,1)", "square", true, utils.none());
+    model.tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc", "rgba(180,110,180,1)", "minisq", true, utils.some(new battle.Status(10, 10, 1, 0)));
+    model.tiles["enemy1"] = new Tile("\u6575", "rgba(15,140,15,1)", "minisq", true, utils.some(new battle.Status(2, 2, 1, 0)));
     // 実際の配置物
     var Entity = (function () {
         function Entity(ux, uy, tile) {
@@ -43,8 +44,9 @@ var model;
         Entity.prototype.print = function (ctx, realPos) {
             this.tile.print(ctx, realPos);
             ctx.fillStyle = this.status.hp != 0 ? "white" : "red";
-            ctx.font = "12pt Consolas";
-            ctx.fillText("" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y);
+            var font_size = view.window_usize.y * view.unit_size.y / 40;
+            ctx.font = "normal " + font_size + "px sans-serif";
+            utils.fillText_n(ctx, this.tile.name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y, font_size, font_size);
         };
         /**
          * アニメーション挿入，当たり判定もここでやる
@@ -72,7 +74,6 @@ var model;
                 for (var _a = 0, _b = get_entities_at(directed); _a < _b.length; _a++) {
                     var entity = _b[_a];
                     entity.status = this.status.attackTo(entity.status);
-                    console.log(entity.status);
                 }
             }
             this.anim_tasks.push(new view.AttackAnim());
@@ -107,6 +108,13 @@ var model;
         model.entities.push(model.player);
         // player を中心とする画面にする
         view.prefix_pos = player_upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5, 0.5)).mul(view.unit_size);
+        // items
+        items.item_entities = [
+            new items.ItemEntity(items.type.onigiri),
+            new items.ItemEntity(items.type.onigiri),
+            new items.ItemEntity(items.type.onigiri),
+            new items.ItemEntity(items.type.orange_juice),
+        ];
     }
     model.initEntities = initEntities;
     /**
@@ -172,9 +180,11 @@ var keys;
 (function (keys) {
     keys.dir_key = model.dir.none;
     keys.z_key = false;
+    keys.x_key = false;
     function keyReset() {
         keys.dir_key = model.dir.none;
         keys.z_key = false;
+        keys.x_key = false;
     }
     keys.keyReset = keyReset;
 })(keys || (keys = {}));

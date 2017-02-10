@@ -59,8 +59,11 @@ var utils;
         return true;
     }
     utils.all = all;
+    /**
+     * [min,max)
+     */
     function limit(n, min, max) {
-        return n < min ? min : (n > max ? max : n);
+        return n < min ? min : (n >= max ? max - 1 : n);
     }
     utils.limit = limit;
     var Option = (function () {
@@ -82,6 +85,9 @@ var utils;
         Some.prototype.foreach = function (fn) {
             fn(this.t);
         };
+        Some.prototype.get_or_else = function (e) {
+            return this.t;
+        };
         return Some;
     }(Option));
     utils.Some = Some;
@@ -95,6 +101,9 @@ var utils;
         };
         None.prototype.foreach = function (fn) {
         };
+        None.prototype.get_or_else = function (e) {
+            return e;
+        };
         return None;
     }(Option));
     utils.None = None;
@@ -106,4 +115,73 @@ var utils;
         return new Some(t);
     }
     utils.some = some;
+    function fillText_n(ctx, text, x, y, font_size, newline_size) {
+        var strs = text.split("\n");
+        for (var i = 0; i < strs.length; i++) {
+            ctx.fillText(strs[i], x, y + newline_size * i);
+        }
+    }
+    utils.fillText_n = fillText_n;
+    var Frame = (function () {
+        function Frame(x, y, w, h, margin, color) {
+            this.pos = new Pos(x, y);
+            this.wh = new Pos(w, h);
+            this.color = color;
+            this.margin = margin;
+            this.contents = [];
+            this.start_points = [this.pos.add(new Pos(margin, margin))];
+        }
+        Frame.prototype.insert_text = function (font_size, color, text) {
+            this.contents.push({
+                type: "text",
+                text: text,
+                font_size: font_size,
+                color: color
+            });
+            var last = this.start_points[this.start_points.length - 1];
+            this.start_points.push(last.add(new Pos(0, font_size * 1.2)));
+        };
+        Frame.prototype.insert_subframe = function (width, height, color) {
+            var last = this.start_points[this.start_points.length - 1];
+            var width2 = width.get_or_else(this.pos.x + this.wh.x - last.x - this.margin);
+            var height2 = height.get_or_else(this.pos.y + this.wh.y - last.y - this.margin);
+            var inner = new Frame(last.x, last.y, width2, height2, this.margin, color);
+            this.contents.push({
+                type: "frame",
+                frame: inner
+            });
+            this.start_points.push(last.add(new Pos(0, width2)));
+            return inner;
+        };
+        /**
+         * move a start point of next content to right
+         *
+         * @param per percentage of moving
+         */
+        Frame.prototype.move_point_x = function (per) {
+            var inner_width = this.wh.x - 2 * this.margin;
+            var last = this.start_points.length - 1;
+            this.start_points[last] = this.start_points[last].add(new Pos(inner_width * per, 0));
+        };
+        Frame.prototype.print = function (ctx) {
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.pos.x, this.pos.y, this.wh.x, this.wh.y);
+            for (var i = 0; i < this.contents.length; i++) {
+                var pos = this.start_points[i];
+                var content = this.contents[i];
+                switch (content["type"]) {
+                    case "text":
+                        ctx.font = "normal " + content["font_size"] + "px sans-serif";
+                        ctx.fillStyle = content["color"];
+                        ctx.fillText(content["text"], pos.x, pos.y);
+                        break;
+                    case "frame":
+                        content["frame"].print(ctx);
+                        break;
+                }
+            }
+        };
+        return Frame;
+    }());
+    utils.Frame = Frame;
 })(utils || (utils = {}));

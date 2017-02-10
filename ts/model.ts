@@ -1,16 +1,14 @@
 namespace model{
 
-  interface Print{
-    print():void
-  }
-
   // 壁，床，キャラクター
   class Tile{
+    name:string
     color:string
-    type:string
+    type:string  // 形 画像にするときはこれを Image オブジェクトにする？
     isWall:boolean
     status:utils.Option<battle.Status>
-    constructor(color:string, type:string, isWall:boolean, status:utils.Option<battle.Status>){
+    constructor(name:string, color:string, type:string, isWall:boolean, status:utils.Option<battle.Status>){
+      this.name = name
       this.color = color
       this.type = type
       this.isWall = isWall
@@ -38,10 +36,10 @@ namespace model{
 
   // タイルインスタンス
   export var tiles: { [key: string]: Tile; } = {}
-  tiles["floor"] = new Tile("rgba(20,40,40,1)","square",false,utils.none<battle.Status>())
-  tiles["wall"] = new Tile("rgba(50,30,10,1)","square",true,utils.none<battle.Status>())
-  tiles["player"] = new Tile("rgba(180,110,180,1)","minisq",true,utils.some(new battle.Status(10,1,0)))
-  tiles["enemy1"] = new Tile("rgba(15,140,15,1)","minisq",true,utils.some(new battle.Status(2,1,0)))
+  tiles["floor"] = new Tile("\u5e8a","rgba(20,40,40,1)","square",false,utils.none<battle.Status>())
+  tiles["wall"] = new Tile("\u58c1","rgba(50,30,10,1)","square",true,utils.none<battle.Status>())
+  tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","minisq",true,utils.some(new battle.Status(10,10,1,0)))
+  tiles["enemy1"] = new Tile("\u6575","rgba(15,140,15,1)","minisq",true,utils.some(new battle.Status(2,2,1,0)))
 
   // 実際の配置物
   export class Entity{
@@ -63,8 +61,9 @@ namespace model{
       this.tile.print(ctx,realPos)
 
       ctx.fillStyle = this.status.hp != 0 ? "white" : "red"
-      ctx.font = "12pt Consolas"
-      ctx.fillText("" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y)
+      var font_size = view.window_usize.y * view.unit_size.y / 40
+      ctx.font = "normal " + font_size + "px sans-serif"
+      utils.fillText_n(ctx,this.tile.name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y, font_size ,font_size)
     }
 
     /**
@@ -93,7 +92,6 @@ namespace model{
         // 誰かいれば当たる
         for(let entity of get_entities_at(directed)){
           entity.status = this.status.attackTo(entity.status)
-          console.log(entity.status)
         }
       }
       this.anim_tasks.push(new view.AttackAnim())
@@ -134,6 +132,14 @@ namespace model{
 
     // player を中心とする画面にする
     view.prefix_pos = player_upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5,0.5)).mul(view.unit_size)
+
+    // items
+    items.item_entities = [
+      new items.ItemEntity(items.type.onigiri),
+      new items.ItemEntity(items.type.onigiri),
+      new items.ItemEntity(items.type.onigiri),
+      new items.ItemEntity(items.type.orange_juice),
+    ]
   }
 
   /**
@@ -201,8 +207,10 @@ namespace model{
 namespace keys{
   export var dir_key = model.dir.none
   export var z_key = false
+  export var x_key = false
   export function keyReset(){
     dir_key = model.dir.none
     z_key = false
+    x_key = false
   }
 }

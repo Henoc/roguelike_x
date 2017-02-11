@@ -122,6 +122,22 @@ namespace model{
       }
       return false
     }
+
+    near(that:Entity, r:number){
+      return Math.sqrt(Math.pow(this.upos.x - that.upos.x,2)+Math.pow(this.upos.y-that.upos.y,2)) < r
+    }
+
+    dir_to(that:Entity):"left"|"right"|"up"|"down"{
+      if(that.upos.y > (that.upos.x - this.upos.x) + this.upos.y && that.upos.y > -(that.upos.x - this.upos.x) + this.upos.y) return "down"
+      if(that.upos.y < (that.upos.x - this.upos.x) + this.upos.y && that.upos.y < -(that.upos.x - this.upos.x) + this.upos.y)   return "up"
+      if(that.upos.y > (that.upos.x - this.upos.x) + this.upos.y && that.upos.y < -(that.upos.x - this.upos.x) + this.upos.y)  return "left"
+      if(that.upos.y < (that.upos.x - this.upos.x) + this.upos.y && that.upos.y > -(that.upos.x - this.upos.x) + this.upos.y)  return "right"
+      if(that.upos.y == (that.upos.x - this.upos.x) + this.upos.y && that.upos.y > -(that.upos.x - this.upos.x) + this.upos.y)  return utils.randInt(2) == 0 ? "down" : "right"
+      if(that.upos.y == (that.upos.x - this.upos.x) + this.upos.y && that.upos.y < -(that.upos.x - this.upos.x) + this.upos.y)  return utils.randInt(2) == 0 ? "up" : "left"
+      if(that.upos.y > (that.upos.x - this.upos.x) + this.upos.y && that.upos.y == -(that.upos.x - this.upos.x) + this.upos.y)  return utils.randInt(2) == 0 ? "down" : "left"
+      if(that.upos.y < (that.upos.x - this.upos.x) + this.upos.y && that.upos.y == -(that.upos.x - this.upos.x) + this.upos.y)  return utils.randInt(2) == 0 ? "up" : "right"
+      return "down"
+    }
   }
 
   // 実際の配置物のインスタンス
@@ -198,11 +214,12 @@ namespace model{
       if(ent == player) continue
       if(ent.status.hp == 0) continue
       if(ent.reach(player)){
+        ent.direction = ent.dir_to(player)
         ent.attack()
+      }else if(ent.near(player,4)){
+        ent.move(dir[ent.dir_to(player)])
       }else{
-        ent.move(new utils.Pos(
-          utils.randInt(3) - 1,
-          utils.randInt(3) - 1))
+        ent.move(dir_ary[utils.randInt(3)])
       }
     }
   }

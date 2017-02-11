@@ -17,8 +17,6 @@ var main;
     var Asset;
     (function (Asset) {
         Asset.assets = [
-            { type: "image", name: "back", src: "assets/back.png", frames: 1 },
-            { type: "image", name: "box", src: "assets/box.png", frames: 1 },
             { type: "image", name: "mame_mouse_left", src: "assets/mame_mouse_left.png", frames: 4 },
             { type: "image", name: "mame_mouse_right", src: "assets/mame_mouse_right.png", frames: 4 },
             { type: "image", name: "mame_mouse_up", src: "assets/mame_mouse_up.png", frames: 4 },

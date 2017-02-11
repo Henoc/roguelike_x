@@ -47,7 +47,7 @@ var view;
         return AttackAnim;
     }());
     view.AttackAnim = AttackAnim;
-    function print(ctx) {
+    function print(ctx, cnt) {
         ctx.clearRect(0, 0, view.window_usize.x * view.unit_size.x, view.window_usize.y * view.unit_size.y);
         // 画面外は黒
         ctx.fillStyle = "black";
@@ -61,7 +61,7 @@ var view;
                 var upos = new utils.Pos(j, i);
                 var realPos = upos.mul(view.unit_size).sub(view.prefix_pos);
                 var field_tile = map.field_at_tile(upos);
-                field_tile.print(ctx, realPos);
+                field_tile.print(ctx, realPos, "none", cnt);
             }
         }
         view.action_lock = false;
@@ -80,7 +80,7 @@ var view;
                 entity_upos = firstAnim.get_upos(entity.upos);
             }
             var realEntityPos = entity_upos.mul(view.unit_size).sub(view.prefix_pos);
-            entity.print(ctx, realEntityPos);
+            entity.print(ctx, realEntityPos, cnt);
         }
         // menu mode = items
         if (main.menu_mode[0] == "items") {

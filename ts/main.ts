@@ -16,17 +16,29 @@ namespace main{
    */
   export var cursor_max = {}
 
-  namespace Asset{
+  export namespace Asset{
     interface Ast{
       type:string;
       name:string;
       src:string;
+      frames:number
     }
     export var assets : Ast[] = [
-      {type: "image", name: "back", src: "assets/back.png"},
-      {type: "image", name: "box", src: "assets/box.png"}
+      {type: "image", name: "back", src: "assets/back.png", frames:1},
+      {type: "image", name: "box", src: "assets/box.png", frames:1},
+      {type: "image", name: "mame_mouse_left", src: "assets/mame_mouse_left.png", frames:4},
+      {type: "image", name: "mame_mouse_right", src: "assets/mame_mouse_right.png", frames:4},
+      {type: "image", name: "mame_mouse_up", src: "assets/mame_mouse_up.png", frames:4},
+      {type: "image", name: "mame_mouse_down", src: "assets/mame_mouse_down.png", frames:4},
+      {type: "image", name: "floor", src: "assets/floor.png", frames:1},
+      {type: "image", name: "wall", src: "assets/wall.png", frames:1},
+      {type: "image", name: "player_left", src: "assets/player_left.png", frames:1},
+      {type: "image", name: "player_right", src: "assets/player_right.png", frames:1},
+      {type: "image", name: "player_up", src: "assets/player_up.png", frames:1},
+      {type: "image", name: "player_down", src: "assets/player_down.png", frames:1},
     ];
-    export var images : HTMLImageElement[] = [];
+    export var images = {}
+    export var image_frames = {}
     export var loadAssets = (onComplete:() => void) => {
       var total = assets.length;
       var loadCount = 0;
@@ -48,9 +60,9 @@ namespace main{
     }
     function loadImage(asset : Ast, onLoad:() => void) {
         var image = new Image();
-        image.src = asset.src;
         image.onload = onLoad;
-        images[asset.name] = image;
+        image.src = asset.src;
+        images[asset.name] = image
     }
   }
 
@@ -62,12 +74,18 @@ namespace main{
 
     ctx.textBaseline = "top"
 
-    Asset.loadAssets(() => {
-      requestAnimationFrame(update)
+    // image_frames
+    Asset.assets.forEach(asset => {
+      Asset.image_frames[asset.name] = asset.frames
     })
 
     // エンティティの配置
     model.initEntities()
+
+    Asset.loadAssets(() => {
+      requestAnimationFrame(update)
+    })
+
   }
 
   var lastTimestamp = null
@@ -157,11 +175,10 @@ namespace main{
     render()
   }
 
+  var render_cnt = 0
   function render(){
-    view.print(ctx)
-
-    //ctx.drawImage(Asset.images["back"],0,0)
-    //ctx.drawImage(Asset.images["box"],mikanX,0)
+    view.print(ctx,render_cnt)
+    render_cnt++
   }
 
   export function keydown(e:KeyboardEvent){

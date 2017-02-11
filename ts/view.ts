@@ -56,7 +56,7 @@ namespace view{
     }
   }
 
-  export function print(ctx : CanvasRenderingContext2D){
+  export function print(ctx : CanvasRenderingContext2D, cnt:number){
     ctx.clearRect(0,0,
     window_usize.x * unit_size.x,
     window_usize.y * unit_size.y)
@@ -77,7 +77,7 @@ namespace view{
         var upos = new utils.Pos(j,i)
         var realPos = upos.mul(unit_size).sub(prefix_pos)
         var field_tile = map.field_at_tile(upos)
-        field_tile.print(ctx,realPos)
+        field_tile.print(ctx,realPos,"none",cnt)
       }
     }
 
@@ -99,7 +99,7 @@ namespace view{
       }
 
       var realEntityPos = entity_upos.mul(unit_size).sub(prefix_pos)
-      entity.print(ctx,realEntityPos)
+      entity.print(ctx,realEntityPos,cnt)
     }
 
     // menu mode = items

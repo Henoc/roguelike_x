@@ -2,34 +2,44 @@ var model;
 (function (model) {
     // 壁，床，キャラクター
     var Tile = (function () {
-        function Tile(name, color, type, isWall, status) {
+        function Tile(name, color, image_name, isWall, isDired, status) {
             this.name = name;
             this.color = color;
-            this.type = type;
+            this.image_name = image_name;
             this.isWall = isWall;
+            this.isDired = isDired;
             this.status = status;
         }
-        Tile.prototype.print = function (ctx, realPos) {
+        Tile.prototype.print = function (ctx, realPos, direction, cnt) {
             ctx.fillStyle = this.color;
-            switch (this.type) {
-                case "square":
-                    ctx.fillRect(realPos.x, realPos.y, view.unit_size.x, view.unit_size.y);
-                    break;
-                case "minisq":
-                    var uw02 = view.unit_size.x * 0.2;
-                    var uh02 = view.unit_size.y * 0.2;
-                    ctx.fillRect(realPos.x + uw02, realPos.y + uh02, view.unit_size.x * 0.6, view.unit_size.y * 0.6);
-                    break;
-            }
+            var dired_image_name = this.image_name;
+            if (direction != "none")
+                dired_image_name += "_" + direction;
+            var frms = main.Asset.image_frames[dired_image_name];
+            ctx.drawImage(main.Asset.images[dired_image_name], 0, (Math.floor(cnt / 4) % frms) * view.unit_size.y, 32, 32, realPos.x, realPos.y, view.unit_size.x, view.unit_size.y);
+            // switch(this.image_name){
+            //   case "square":
+            //   ctx.fillRect(realPos.x, realPos.y,
+            //     view.unit_size.x, view.unit_size.y
+            //   )
+            //   break;
+            //   case "minisq":
+            //   var uw02 = view.unit_size.x * 0.2
+            //   var uh02 = view.unit_size.y * 0.2
+            //   ctx.fillRect(realPos.x + uw02, realPos.y + uh02,
+            //     view.unit_size.x * 0.6, view.unit_size.y * 0.6
+            //   )
+            //   break;
+            // }
         };
         return Tile;
     }());
     // タイルインスタンス
     model.tiles = {};
-    model.tiles["floor"] = new Tile("\u5e8a", "rgba(20,40,40,1)", "square", false, utils.none());
-    model.tiles["wall"] = new Tile("\u58c1", "rgba(50,30,10,1)", "square", true, utils.none());
-    model.tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc", "rgba(180,110,180,1)", "minisq", true, utils.some(new battle.Status(10, 10, 1, 0)));
-    model.tiles["enemy1"] = new Tile("\u6575", "rgba(15,140,15,1)", "minisq", true, utils.some(new battle.Status(2, 2, 1, 0)));
+    model.tiles["floor"] = new Tile("\u5e8a", "rgba(20,40,40,1)", "floor", false, false, utils.none());
+    model.tiles["wall"] = new Tile("\u58c1", "rgba(50,30,10,1)", "wall", true, false, utils.none());
+    model.tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc", "rgba(180,110,180,1)", "player", true, true, utils.some(new battle.Status(10, 10, 1, 0)));
+    model.tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F", "rgba(15,140,15,1)", "mame_mouse", true, true, utils.some(new battle.Status(2, 2, 1, 0)));
     // 実際の配置物
     var Entity = (function () {
         function Entity(ux, uy, tile) {
@@ -37,21 +47,30 @@ var model;
             this.tile = tile;
             this.status = tile.status.get();
             this.anim_tasks = [];
+            this.direction = tile.isDired ? "down" : "none";
         }
         Entity.of = function (upos, tile) {
             return new Entity(upos.x, upos.y, tile);
         };
-        Entity.prototype.print = function (ctx, realPos) {
-            this.tile.print(ctx, realPos);
+        Entity.prototype.print = function (ctx, realPos, cnt) {
+            this.tile.print(ctx, realPos, this.direction, this.status.hp != 0 ? cnt : 0);
             ctx.fillStyle = this.status.hp != 0 ? "white" : "red";
             var font_size = view.window_usize.y * view.unit_size.y / 40;
             ctx.font = "normal " + font_size + "px sans-serif";
-            utils.fillText_n(ctx, this.tile.name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y, font_size, font_size);
+            utils.fillText_n(ctx, this.tile.name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y - view.unit_size.y, font_size, font_size);
         };
         /**
          * アニメーション挿入，当たり判定もここでやる
          */
         Entity.prototype.move = function (udelta) {
+            if (udelta.x > 0 && udelta.y == 0)
+                this.direction = "right";
+            if (udelta.x < 0 && udelta.y == 0)
+                this.direction = "left";
+            if (udelta.x == 0 && udelta.y < 0)
+                this.direction = "up";
+            if (udelta.x == 0 && udelta.y > 0)
+                this.direction = "down";
             var moved = this.upos.add(udelta);
             if (map.inner(moved) &&
                 utils.all(get_entities_at(moved), function (e) { return !e.tile.isWall || e.status.hp == 0; }) &&
@@ -100,7 +119,7 @@ var model;
         // enemy をランダムに数匹配置
         for (var i = 0; i < 5; i++) {
             var upos = randomUpos(function (n) { return !model.tiles[map.entity_names[n]].isWall; });
-            model.entities.push(model.Entity.of(upos, model.tiles["enemy1"]));
+            model.entities.push(model.Entity.of(upos, model.tiles["mame_mouse"]));
         }
         // player を壁でないところにランダム配置
         var player_upos = randomUpos(function (n) { return !model.tiles[map.entity_names[n]].isWall; });

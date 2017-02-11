@@ -17,10 +17,21 @@ var main;
     var Asset;
     (function (Asset) {
         Asset.assets = [
-            { type: "image", name: "back", src: "assets/back.png" },
-            { type: "image", name: "box", src: "assets/box.png" }
+            { type: "image", name: "back", src: "assets/back.png", frames: 1 },
+            { type: "image", name: "box", src: "assets/box.png", frames: 1 },
+            { type: "image", name: "mame_mouse_left", src: "assets/mame_mouse_left.png", frames: 4 },
+            { type: "image", name: "mame_mouse_right", src: "assets/mame_mouse_right.png", frames: 4 },
+            { type: "image", name: "mame_mouse_up", src: "assets/mame_mouse_up.png", frames: 4 },
+            { type: "image", name: "mame_mouse_down", src: "assets/mame_mouse_down.png", frames: 4 },
+            { type: "image", name: "floor", src: "assets/floor.png", frames: 1 },
+            { type: "image", name: "wall", src: "assets/wall.png", frames: 1 },
+            { type: "image", name: "player_left", src: "assets/player_left.png", frames: 1 },
+            { type: "image", name: "player_right", src: "assets/player_right.png", frames: 1 },
+            { type: "image", name: "player_up", src: "assets/player_up.png", frames: 1 },
+            { type: "image", name: "player_down", src: "assets/player_down.png", frames: 1 },
         ];
-        Asset.images = [];
+        Asset.images = {};
+        Asset.image_frames = {};
         Asset.loadAssets = function (onComplete) {
             var total = Asset.assets.length;
             var loadCount = 0;
@@ -40,22 +51,26 @@ var main;
         };
         function loadImage(asset, onLoad) {
             var image = new Image();
-            image.src = asset.src;
             image.onload = onLoad;
+            image.src = asset.src;
             Asset.images[asset.name] = image;
         }
-    })(Asset || (Asset = {}));
+    })(Asset = main.Asset || (main.Asset = {}));
     function init() {
         canvas = document.getElementById('maincanvas');
         ctx = canvas.getContext('2d');
         canvas.width = view.window_usize.x * view.unit_size.x;
         canvas.height = view.window_usize.y * view.unit_size.y;
         ctx.textBaseline = "top";
-        Asset.loadAssets(function () {
-            requestAnimationFrame(update);
+        // image_frames
+        Asset.assets.forEach(function (asset) {
+            Asset.image_frames[asset.name] = asset.frames;
         });
         // エンティティの配置
         model.initEntities();
+        Asset.loadAssets(function () {
+            requestAnimationFrame(update);
+        });
     }
     main.init = init;
     var lastTimestamp = null;
@@ -145,10 +160,10 @@ var main;
         keys.keyReset();
         render();
     }
+    var render_cnt = 0;
     function render() {
-        view.print(ctx);
-        //ctx.drawImage(Asset.images["back"],0,0)
-        //ctx.drawImage(Asset.images["box"],mikanX,0)
+        view.print(ctx, render_cnt);
+        render_cnt++;
     }
     function keydown(e) {
         var keyCode = e.keyCode;

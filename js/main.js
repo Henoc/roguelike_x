@@ -110,7 +110,9 @@ var main;
                                     main.menu_mode.pop();
                                     break;
                                 case "put":
-                                    console.log("put is selected");
+                                    items.item_entities.splice(main.cursor["items"], 1);
+                                    main.cursor_max["items"]--;
+                                    main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
                                     main.menu_mode.pop();
                                     break;
                                 case "equip":

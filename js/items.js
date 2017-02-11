@@ -22,7 +22,7 @@ var items;
     };
     items.commands = {
         use: "\u4F7F\u3046",
-        put: "\u7F6E\u304F",
+        put: "\u6368\u3066\u308B",
         equip: "\u88C5\u5099"
     };
     var ItemEntity = (function () {

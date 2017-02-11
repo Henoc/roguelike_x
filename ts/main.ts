@@ -122,7 +122,9 @@ namespace main{
             menu_mode.pop()
             break
             case "put":
-            console.log("put is selected")
+            items.item_entities.splice(cursor["items"],1)
+            cursor_max["items"]--
+            cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
             menu_mode.pop()
             break
             case "equip":

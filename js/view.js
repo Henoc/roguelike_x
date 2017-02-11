@@ -86,7 +86,7 @@ var view;
         if (main.menu_mode[0] == "items") {
             var window_w = view.window_usize.x * view.unit_size.x;
             var window_h = view.window_usize.y * view.unit_size.y;
-            var top_frame = new utils.Frame(0, 0, window_w, window_h, window_h * 0.05, "rgba(0,0,0,0)");
+            var top_frame = new utils.Frame(0, 0, window_w, window_h, window_h * 0.03, "rgba(0,0,0,0)");
             top_frame.move_point_x(0.6);
             var item_top = top_frame.insert_subframe(utils.none(), utils.none(), "rgba(0,0,0,0.6)");
             item_top.font_size = window_h / 32;
@@ -106,9 +106,22 @@ var view;
                 + (add_status.atk != 0 ? " \u2192 " + modified_status.atk : ""));
             status_frame.insert_text("def " + model.player.status.def
                 + (add_status.def != 0 ? " \u2192 " + modified_status.def : ""));
-            top_frame.move_point_y(0.1);
+            status_frame.insert_text("");
+            status_frame.insert_text("\u88C5\u5099");
+            status_frame.insert_text("\u982D " + items.equips.head.map(function (e) { return e.item.name; }).get_or_else(""));
+            status_frame.insert_text("\u4F53 " + items.equips.body.map(function (e) { return e.item.name; }).get_or_else(""));
+            status_frame.insert_text("\u5DE6 " + items.equips.hand1.map(function (e) { return e.item.name; }).get_or_else(""));
+            status_frame.insert_text("\u53F3 " + items.equips.hand2.map(function (e) { return e.item.name; }).get_or_else(""));
+            top_frame.move_point_y(0.2);
             var message = top_frame.insert_subframe(utils.some(window_w * 0.5), utils.none(), "rgba(0,0,0,0.6)");
             message.insert_text(items.item_entities[main.cursor["items"]].item.text);
+            if (main.menu_mode[1] == "command") {
+                var command = message.insert_subframe(utils.none(), utils.none(), "rgba(100,0,0,0.6)");
+                for (var i = 0; i < items.item_entities[main.cursor["items"]].item.commands.length; i++) {
+                    var command_name = items.item_entities[main.cursor["items"]].item.commands[i];
+                    command.insert_text((main.cursor["items>command"] == i ? ">" : " ") + items.commands[command_name]);
+                }
+            }
             top_frame.print(ctx);
         }
         // menu mode

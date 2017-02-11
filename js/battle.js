@@ -13,6 +13,9 @@ var battle;
         Status.of_drink = function (hp) {
             return new Status(0, hp, 0, 0);
         };
+        Status.of_knife = function (atk) {
+            return new Status(0, 0, atk, 0);
+        };
         Status.prototype.copy = function () {
             var copied = new Status(this.max_hp, this.hp, this.atk, this.def);
             return copied;

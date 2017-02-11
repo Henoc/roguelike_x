@@ -63,6 +63,7 @@ namespace utils{
     abstract get():T;
     abstract foreach(fn:(e:T) => void):void
     abstract get_or_else(e:T):T
+    abstract map<U>(fn:(e:T)=>U):Option<U>
   }
 
   export class Some<T> extends Option<T>{
@@ -75,6 +76,9 @@ namespace utils{
     foreach(fn:(e:T) => void):void{
       fn(this.t)
     }
+    map<U>(fn:(e:T) => U):Option<U>{
+      return some(fn(this.t))
+    }
     get_or_else(e:T):T{
       return this.t
     }
@@ -85,6 +89,9 @@ namespace utils{
       throw "get() call of none";
     }
     foreach(fn:(e:T) => void):void{
+    }
+    map<U>(fn:(e:T)=>U):Option<U>{
+      return none<U>()
     }
     get_or_else(e:T):T{
       return e
@@ -146,7 +153,7 @@ namespace utils{
       var inner = new Frame(last.x,last.y,width2,height2,this.margin,color)
       inner.font_size = this.font_size
       inner.text_color = this.text_color
-      
+
       this.contents.push({
         type:"frame",
         frame:inner

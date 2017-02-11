@@ -20,6 +20,10 @@ namespace battle{
       return new Status(0,hp,0,0)
     }
 
+    static of_knife(atk){
+      return new Status(0,0,atk,0)
+    }
+
     copy(){
       var copied = new Status(this.max_hp,this.hp,this.atk,this.def)
       return copied

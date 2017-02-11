@@ -101,6 +101,33 @@ namespace main{
       if(keys.x_key){
         menu_mode.pop()
         if(menu_mode.length == 0) menu_mode = ["explore"]
+      }else if(keys.z_key){
+        switch(menu_mode.join(">")){
+          case "items":
+          menu_mode.push("command")
+          var mode = menu_mode.join(">")
+          cursor[mode] = 0
+          cursor_max[mode] = items.item_entities[cursor["items"]].item.commands.length
+          break
+          case "items>command":
+          var selected = items.item_entities[cursor["items"]]
+          switch(selected.item.commands[cursor["items>command"]]){
+            case "use":
+            model.player.status = model.player.status.add(selected.item.add_status)
+            items.item_entities.splice(cursor["items"],1)
+            menu_mode.pop()
+            break
+            case "put":
+            console.log("put is selected")
+            menu_mode.pop()
+            break
+            case "equip":
+            console.log("equip is selected")
+            menu_mode.pop()
+            break
+          }
+          break
+        }
       }else if(keys.dir_key.equals(model.dir.down)){
         var mode = menu_mode.join(">")
         cursor[mode] = utils.limit(cursor[mode] + 1, 0, cursor_max[mode])

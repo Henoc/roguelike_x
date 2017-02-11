@@ -89,6 +89,34 @@ var main;
                     if (main.menu_mode.length == 0)
                         main.menu_mode = ["explore"];
                 }
+                else if (keys.z_key) {
+                    switch (main.menu_mode.join(">")) {
+                        case "items":
+                            main.menu_mode.push("command");
+                            var mode = main.menu_mode.join(">");
+                            main.cursor[mode] = 0;
+                            main.cursor_max[mode] = items.item_entities[main.cursor["items"]].item.commands.length;
+                            break;
+                        case "items>command":
+                            var selected = items.item_entities[main.cursor["items"]];
+                            switch (selected.item.commands[main.cursor["items>command"]]) {
+                                case "use":
+                                    model.player.status = model.player.status.add(selected.item.add_status);
+                                    items.item_entities.splice(main.cursor["items"], 1);
+                                    main.menu_mode.pop();
+                                    break;
+                                case "put":
+                                    console.log("put is selected");
+                                    main.menu_mode.pop();
+                                    break;
+                                case "equip":
+                                    console.log("equip is selected");
+                                    main.menu_mode.pop();
+                                    break;
+                            }
+                            break;
+                    }
+                }
                 else if (keys.dir_key.equals(model.dir.down)) {
                     var mode = main.menu_mode.join(">");
                     main.cursor[mode] = utils.limit(main.cursor[mode] + 1, 0, main.cursor_max[mode]);

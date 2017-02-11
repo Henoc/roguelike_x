@@ -85,6 +85,9 @@ var utils;
         Some.prototype.foreach = function (fn) {
             fn(this.t);
         };
+        Some.prototype.map = function (fn) {
+            return some(fn(this.t));
+        };
         Some.prototype.get_or_else = function (e) {
             return this.t;
         };
@@ -100,6 +103,9 @@ var utils;
             throw "get() call of none";
         };
         None.prototype.foreach = function (fn) {
+        };
+        None.prototype.map = function (fn) {
+            return none();
         };
         None.prototype.get_or_else = function (e) {
             return e;

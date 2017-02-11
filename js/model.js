@@ -115,6 +115,7 @@ var model;
             new items.ItemEntity(items.type.onigiri),
             new items.ItemEntity(items.type.orange_juice),
             new items.ItemEntity(items.type.knife),
+            new items.ItemEntity(items.type.flying_pan),
         ];
     }
     model.initEntities = initEntities;

@@ -64,6 +64,7 @@ namespace utils{
     abstract foreach(fn:(e:T) => void):void
     abstract get_or_else(e:T):T
     abstract map<U>(fn:(e:T)=>U):Option<U>
+    abstract exist():boolean
   }
 
   export class Some<T> extends Option<T>{
@@ -82,6 +83,9 @@ namespace utils{
     get_or_else(e:T):T{
       return this.t
     }
+    exist(){
+      return true
+    }
   }
 
   export class None<T> extends Option<T>{
@@ -95,6 +99,9 @@ namespace utils{
     }
     get_or_else(e:T):T{
       return e
+    }
+    exist(){
+      return false
     }
   }
 

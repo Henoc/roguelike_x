@@ -121,24 +121,37 @@ namespace view{
       top_frame.reset_point()
       var status_frame = top_frame.insert_subframe(utils.some(window_w * 0.3),utils.some(window_h * 0.5),"rgba(0,0,0,0.6)")
       status_frame.insert_text("\u30B9\u30C6\u30FC\u30BF\u30B9")
-      var add_status = items.item_entities[main.cursor["items"]].item.add_status
-      var modified_status = model.player.status.add(add_status)
+      
+      // 装備品と食べ物でステータス変動の計算が異なる（装備品は付け替えることがある）
+      var modified_status = new battle.Status(0,0,0,0)
+      var delta_status = new battle.Status(0,0,0,0)
+      if(main.cursor_max["items"] != 0){
+        if(items.item_entities[main.cursor["items"]].item.equip_region == "none"){
+          delta_status = items.item_entities[main.cursor["items"]].item.delta_status
+          modified_status = model.player.status.add(delta_status)
+        }else{
+          var item_entity = items.item_entities[main.cursor["items"]]
+          delta_status = item_entity.item.delta_status
+          modified_status = model.player.tile.status.get().add(items.equips_status_sum_replace(item_entity))
+        }
+      }
+
       status_frame.insert_text("hp " + model.player.status.hp + "/" + model.player.status.max_hp 
-        + (add_status.hp != 0 || add_status.max_hp != 0 ? " \u2192 " + modified_status.hp + "/" + modified_status.max_hp : "") )
+        + (delta_status.hp != 0 || delta_status.max_hp != 0 ? " \u2192 " + modified_status.hp + "/" + modified_status.max_hp : "") )
       status_frame.insert_text("atk " + model.player.status.atk
-        + (add_status.atk != 0 ? " \u2192 " + modified_status.atk : ""))
+        + (delta_status.atk != 0 ? " \u2192 " + modified_status.atk : ""))
       status_frame.insert_text("def " + model.player.status.def
-        + (add_status.def != 0 ? " \u2192 " + modified_status.def : ""))
+        + (delta_status.def != 0 ? " \u2192 " + modified_status.def : ""))
       status_frame.insert_text("")
       status_frame.insert_text("\u88C5\u5099")
-      status_frame.insert_text("\u982D " + items.equips.head.map(e => e.item.name).get_or_else(""))
-      status_frame.insert_text("\u4F53 " + items.equips.body.map(e => e.item.name).get_or_else(""))
-      status_frame.insert_text("\u5DE6 " + items.equips.hand1.map(e => e.item.name).get_or_else(""))
-      status_frame.insert_text("\u53F3 " + items.equips.hand2.map(e => e.item.name).get_or_else(""))
+      status_frame.insert_text("\u982D " + items.equips["head"].map(e => e.item.name).get_or_else(""))
+      status_frame.insert_text("\u4F53 " + items.equips["body"].map(e => e.item.name).get_or_else(""))
+      status_frame.insert_text("\u624B " + items.equips["hand"].map(e => e.item.name).get_or_else(""))
+      status_frame.insert_text("\u8DB3 " + items.equips["foot"].map(e => e.item.name).get_or_else(""))
 
       top_frame.move_point_y(0.2)
       var message = top_frame.insert_subframe(utils.some(window_w * 0.5),utils.none<number>(),"rgba(0,0,0,0.6)")
-      message.insert_text(items.item_entities[main.cursor["items"]].item.text)
+      if(main.cursor_max["items"] != 0) message.insert_text(items.item_entities[main.cursor["items"]].item.text)
       
       if(main.menu_mode[1] == "command"){
         var command = message.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(100,0,0,0.6)")

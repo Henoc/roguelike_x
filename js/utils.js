@@ -91,6 +91,9 @@ var utils;
         Some.prototype.get_or_else = function (e) {
             return this.t;
         };
+        Some.prototype.exist = function () {
+            return true;
+        };
         return Some;
     }(Option));
     utils.Some = Some;
@@ -109,6 +112,9 @@ var utils;
         };
         None.prototype.get_or_else = function (e) {
             return e;
+        };
+        None.prototype.exist = function () {
+            return false;
         };
         return None;
     }(Option));

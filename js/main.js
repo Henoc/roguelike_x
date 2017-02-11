@@ -92,17 +92,21 @@ var main;
                 else if (keys.z_key) {
                     switch (main.menu_mode.join(">")) {
                         case "items":
-                            main.menu_mode.push("command");
-                            var mode = main.menu_mode.join(">");
-                            main.cursor[mode] = 0;
-                            main.cursor_max[mode] = items.item_entities[main.cursor["items"]].item.commands.length;
+                            if (main.cursor_max["items"] != 0) {
+                                main.menu_mode.push("command");
+                                var mode = main.menu_mode.join(">");
+                                main.cursor[mode] = 0;
+                                main.cursor_max[mode] = items.item_entities[main.cursor["items"]].item.commands.length;
+                            }
                             break;
                         case "items>command":
                             var selected = items.item_entities[main.cursor["items"]];
                             switch (selected.item.commands[main.cursor["items>command"]]) {
                                 case "use":
-                                    model.player.status = model.player.status.add(selected.item.add_status);
+                                    model.player.status = model.player.status.add(selected.item.delta_status);
                                     items.item_entities.splice(main.cursor["items"], 1);
+                                    main.cursor_max["items"]--;
+                                    main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
                                     main.menu_mode.pop();
                                     break;
                                 case "put":
@@ -110,7 +114,16 @@ var main;
                                     main.menu_mode.pop();
                                     break;
                                 case "equip":
-                                    console.log("equip is selected");
+                                    var old_eq = items.equips[selected.item.equip_region];
+                                    if (old_eq.exist()) {
+                                        items.item_entities.push(old_eq.get());
+                                        main.cursor_max["items"]++;
+                                    }
+                                    items.equips[selected.item.equip_region] = utils.some(selected);
+                                    model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum());
+                                    items.item_entities.splice(main.cursor["items"], 1);
+                                    main.cursor_max["items"]--;
+                                    main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
                                     main.menu_mode.pop();
                                     break;
                             }

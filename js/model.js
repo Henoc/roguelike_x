@@ -38,7 +38,7 @@ var model;
     model.tiles = {};
     model.tiles["floor"] = new Tile("\u5e8a", "rgba(20,40,40,1)", "floor", false, false, utils.none());
     model.tiles["wall"] = new Tile("\u58c1", "rgba(50,30,10,1)", "wall", true, false, utils.none());
-    model.tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc", "rgba(180,110,180,1)", "player", true, true, utils.some(new battle.Status(10, 10, 1, 0)));
+    model.tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc", "rgba(180,110,180,1)", "player", true, true, utils.some(new battle.Status(10, 10, 1, 0, 30, 10)));
     model.tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F", "rgba(15,140,15,1)", "mame_mouse", true, true, utils.some(new battle.Status(2, 2, 1, 0)));
     // 実際の配置物
     var Entity = (function () {
@@ -193,13 +193,35 @@ var model;
     function move() {
         monsters_action();
         model.player.move(keys.dir_key);
+        on_each_actions();
     }
     model.move = move;
     function attack() {
         model.player.attack();
         monsters_action();
+        on_each_actions();
     }
     model.attack = attack;
+    model.action_counters = {
+        effi: 0,
+        heal: 0
+    };
+    /**
+     * hungry
+     */
+    function on_each_actions() {
+        if (model.action_counters.effi >= model.player.status.effi) {
+            model.player.status.max_hp = utils.limit(model.player.status.max_hp - 1, 0, model.player.status.max_hp);
+            model.player.status.hp = utils.limit(model.player.status.hp, 0, model.player.status.max_hp + 1);
+            model.action_counters.effi = 0;
+        }
+        if (model.action_counters.heal >= model.player.status.heal) {
+            model.player.status.hp = utils.limit(model.player.status.hp + 1, 0, model.player.status.max_hp + 1);
+            model.action_counters.heal = 0;
+        }
+        model.action_counters.effi++;
+        model.action_counters.heal++;
+    }
     function monsters_action() {
         // monsters をランダムに移動させる
         for (var _i = 0, entities_1 = model.entities; _i < entities_1.length; _i++) {

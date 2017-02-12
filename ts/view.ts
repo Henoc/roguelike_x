@@ -132,7 +132,12 @@ namespace view{
     var top_frame = new utils.Frame(0,0,window_w,window_h,window_h * 0.03,"rgba(0,0,0,0)")
 
     if(main.menu_mode[0] == "explore"){
-      // something if frame is needed
+      // hp gage
+      top_frame.font_size = window_h / 32
+      top_frame.insert_text("HP " + model.player.status.hp + "/" + model.player.status.max_hp)
+      var max_hp_frame_w = window_w * model.player.status.max_hp / 100
+      var max_hp_frame = top_frame.insert_subframe(utils.some(max_hp_frame_w),utils.some(window_h * 0.03), "rgba(0,0,0,1)", window_h * 0.002)
+      max_hp_frame.insert_subframe(utils.some((max_hp_frame_w - max_hp_frame.margin * 2) * model.player.status.hp / model.player.status.max_hp),utils.none<number>(), "rgba(0,200,50,1)")
     }
     // menu mode = items
     else if(main.menu_mode[0] == "items"){
@@ -170,6 +175,8 @@ namespace view{
         + (delta_status.atk != 0 ? " \u2192 " + modified_status.atk : ""))
       status_frame.insert_text("def " + model.player.status.def
         + (delta_status.def != 0 ? " \u2192 " + modified_status.def : ""))
+      status_frame.insert_text("eff " + model.player.status.effi
+        + (delta_status.effi != 0 ? " \u2192 " + modified_status.effi : ""))
       status_frame.insert_text("")
       status_frame.insert_text("\u88C5\u5099")
       status_frame.insert_text("\u982D " + items.equips["head"].map(e => e.item.name).get_or_else(""))

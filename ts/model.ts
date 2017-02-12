@@ -46,7 +46,7 @@ namespace model{
   export var tiles: { [key: string]: Tile; } = {}
   tiles["floor"] = new Tile("\u5e8a","rgba(20,40,40,1)","floor",false,false,utils.none<battle.Status>())
   tiles["wall"] = new Tile("\u58c1","rgba(50,30,10,1)","wall",true,false,utils.none<battle.Status>())
-  tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","player",true,true,utils.some(new battle.Status(10,10,1,0)))
+  tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","player",true,true,utils.some(new battle.Status(10,10,1,0,30,10)))
   tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F","rgba(15,140,15,1)","mame_mouse",true,true,utils.some(new battle.Status(2,2,1,0)))
 
   // 実際の配置物
@@ -211,11 +211,34 @@ namespace model{
   export function move(){
     monsters_action()
     player.move(keys.dir_key)
+    on_each_actions()
   }
 
   export function attack(){
     player.attack()
     monsters_action()
+    on_each_actions()
+  }
+
+  export var action_counters = {
+    effi:0,
+    heal:0
+  }
+  /**
+   * hungry
+   */
+  function on_each_actions(){
+    if(action_counters.effi >= player.status.effi) {
+      player.status.max_hp = utils.limit(player.status.max_hp - 1,0,player.status.max_hp)
+      player.status.hp = utils.limit(player.status.hp, 0, player.status.max_hp + 1)
+      action_counters.effi = 0
+    }
+    if(action_counters.heal >= player.status.heal) {
+      player.status.hp = utils.limit(player.status.hp + 1, 0, player.status.max_hp + 1)
+      action_counters.heal = 0
+    }
+    action_counters.effi++
+    action_counters.heal++
   }
 
   function monsters_action(){

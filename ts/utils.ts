@@ -152,12 +152,13 @@ namespace utils{
       var last = this.start_points[this.start_points.length - 1]
       this.start_points.push(last.add(new Pos(0,this.font_size * 1.2)))
     }
-    insert_subframe(width:Option<number>,height:Option<number>,color:string){
+    insert_subframe(width:Option<number>,height:Option<number>,color:string,margin?:number){
+      if(margin == undefined) margin = this.margin
       var last = this.start_points[this.start_points.length - 1]
       var width2 = width.get_or_else(this.pos.x + this.wh.x - last.x - this.margin)
       var height2 = height.get_or_else(this.pos.y + this.wh.y - last.y - this.margin)
       // inherits parent frame properties
-      var inner = new Frame(last.x,last.y,width2,height2,this.margin,color)
+      var inner = new Frame(last.x,last.y,width2,height2,margin,color)
       inner.font_size = this.font_size
       inner.text_color = this.text_color
 

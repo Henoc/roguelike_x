@@ -2,16 +2,16 @@ namespace model{
 
   // 壁，床，キャラクター
   class Tile{
-    name:string
+    jp_name:string
     color:string
-    image_name:string  // 形 画像にするときはこれを Image オブジェクトにする？
+    name:string  // 形 画像にするときはこれを Image オブジェクトにする？
     isWall:boolean
     isDired:boolean
     status:utils.Option<battle.Status>
-    constructor(name:string, color:string, image_name:string, isWall:boolean, isDired:boolean, status:utils.Option<battle.Status>){
-      this.name = name
+    constructor(jp_name:string, color:string, name:string, isWall:boolean, isDired:boolean, status:utils.Option<battle.Status>){
+      this.jp_name = jp_name
       this.color = color
-      this.image_name = image_name
+      this.name = name
       this.isWall = isWall
       this.isDired = isDired
       this.status = status
@@ -19,7 +19,7 @@ namespace model{
     print(ctx:CanvasRenderingContext2D, realPos: utils.Pos, direction:"left"|"right"|"up"|"down"|"none", cnt:number){
       ctx.fillStyle = this.color
 
-      var dired_image_name = this.image_name
+      var dired_image_name = this.name
       if(direction != "none") dired_image_name += "_" + direction
       var frms = main.Asset.image_frames[dired_image_name]
       ctx.drawImage(main.Asset.images[dired_image_name],
@@ -73,13 +73,14 @@ namespace model{
       ctx.fillStyle = this.status.hp != 0 ? "white" : "red"
       var font_size = view.window_usize.y * view.unit_size.y / 40
       ctx.font = "normal " + font_size + "px sans-serif"
-      utils.fillText_n(ctx,this.tile.name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y - view.unit_size.y, font_size ,font_size)
+      utils.fillText_n(ctx,this.tile.jp_name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y - view.unit_size.y, font_size ,font_size)
     }
 
     /**
      * アニメーション挿入，当たり判定もここでやる
      */
     move(udelta:utils.Pos){
+      // change character direction
       if(udelta.x > 0 && udelta.y == 0) this.direction = "right"
       if(udelta.x < 0 && udelta.y == 0) this.direction = "left"
       if(udelta.x == 0 && udelta.y < 0) this.direction = "up"
@@ -93,6 +94,10 @@ namespace model{
       ){
         this.anim_tasks.push(new view.MoveAnim(this.upos))
         this.upos = moved
+        // 落ちているものを拾う
+        for(let dead of delete_entities_at(moved, ent => ent.status.hp == 0)){
+          items.item_entities.push(new items.ItemEntity(items.type["dead_" + dead.tile.name]))
+        }
       }
     }
 
@@ -229,6 +234,18 @@ namespace model{
     for(let v of entities){
       if(v.upos.equals(upos)){
         ret.push(v)
+      }
+    }
+    return ret
+  }
+
+  export function delete_entities_at(upos:utils.Pos, cond: (entity:Entity) => boolean){
+    var ret : Entity[] = []
+    for(var i = 0; i< entities.length; i++){
+      if(entities[i].upos.equals(upos) && cond(entities[i])){
+        ret.push(entities[i])
+        entities.splice(i,1)
+        i--
       }
     }
     return ret

@@ -2,17 +2,17 @@ var model;
 (function (model) {
     // 壁，床，キャラクター
     var Tile = (function () {
-        function Tile(name, color, image_name, isWall, isDired, status) {
-            this.name = name;
+        function Tile(jp_name, color, name, isWall, isDired, status) {
+            this.jp_name = jp_name;
             this.color = color;
-            this.image_name = image_name;
+            this.name = name;
             this.isWall = isWall;
             this.isDired = isDired;
             this.status = status;
         }
         Tile.prototype.print = function (ctx, realPos, direction, cnt) {
             ctx.fillStyle = this.color;
-            var dired_image_name = this.image_name;
+            var dired_image_name = this.name;
             if (direction != "none")
                 dired_image_name += "_" + direction;
             var frms = main.Asset.image_frames[dired_image_name];
@@ -57,12 +57,13 @@ var model;
             ctx.fillStyle = this.status.hp != 0 ? "white" : "red";
             var font_size = view.window_usize.y * view.unit_size.y / 40;
             ctx.font = "normal " + font_size + "px sans-serif";
-            utils.fillText_n(ctx, this.tile.name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y - view.unit_size.y, font_size, font_size);
+            utils.fillText_n(ctx, this.tile.jp_name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y - view.unit_size.y, font_size, font_size);
         };
         /**
          * アニメーション挿入，当たり判定もここでやる
          */
         Entity.prototype.move = function (udelta) {
+            // change character direction
             if (udelta.x > 0 && udelta.y == 0)
                 this.direction = "right";
             if (udelta.x < 0 && udelta.y == 0)
@@ -77,6 +78,12 @@ var model;
                 !map.field_at_tile(moved).isWall) {
                 this.anim_tasks.push(new view.MoveAnim(this.upos));
                 this.upos = moved;
+                // 落ちているものを拾う
+                for (var _i = 0, _a = delete_entities_at(moved, function (ent) { return ent.status.hp == 0; }); _i < _a.length; _i++) {
+                    var dead = _a[_i];
+                    items.item_entities.push(new items.ItemEntity(items.type["dead_" + dead.tile.name]));
+                    console.log(dead.tile.jp_name);
+                }
             }
         };
         Entity.prototype.attack = function () {
@@ -219,6 +226,18 @@ var model;
         return ret;
     }
     model.get_entities_at = get_entities_at;
+    function delete_entities_at(upos, cond) {
+        var ret = [];
+        for (var i = 0; i < model.entities.length; i++) {
+            if (model.entities[i].upos.equals(upos) && cond(model.entities[i])) {
+                ret.push(model.entities[i]);
+                model.entities.splice(i, 1);
+                i--;
+            }
+        }
+        return ret;
+    }
+    model.delete_entities_at = delete_entities_at;
 })(model || (model = {}));
 /**
  * keyboard の状態を管理する singleton

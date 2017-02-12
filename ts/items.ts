@@ -27,6 +27,7 @@ namespace items{
     `\u30B5\u30D0\u30A4\u30D0\u30EB\u751F\u6D3B\u3067\u5F79\u7ACB\u3064`),
     flying_pan: new Item("\u30D5\u30E9\u30A4\u30D1\u30F3", ["equip","put"], battle.Status.of_knife(1),"hand",
     `\u53E4\u4EE3\u306E\u920D\u5668\u3060\u304C\u8ABF\u7406\u306B\u3082\u4F7F\u7528\u3067\u304D\u308B`),
+    dead_mame_mouse: new Item("\u8C46\u306D\u305A\u307F\u306E\u8089",["use","put"],battle.Status.of_food(1),"none",`\u8C46\u306E\u5473\u304C\u3059\u308B`),
   }
 
   export var commands = {

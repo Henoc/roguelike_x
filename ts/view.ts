@@ -169,13 +169,13 @@ namespace view{
         }
       }
 
-      status_frame.insert_text("hp " + model.player.status.hp + "/" + model.player.status.max_hp 
+      status_frame.insert_text("HP " + model.player.status.hp + "/" + model.player.status.max_hp 
         + (delta_status.hp != 0 || delta_status.max_hp != 0 ? " \u2192 " + modified_status.hp + "/" + modified_status.max_hp : "") )
-      status_frame.insert_text("atk " + model.player.status.atk
+      status_frame.insert_text("\u653B\u6483 " + model.player.status.atk
         + (delta_status.atk != 0 ? " \u2192 " + modified_status.atk : ""))
-      status_frame.insert_text("def " + model.player.status.def
+      status_frame.insert_text("\u9632\u5FA1 " + model.player.status.def
         + (delta_status.def != 0 ? " \u2192 " + modified_status.def : ""))
-      status_frame.insert_text("eff " + model.player.status.effi
+      status_frame.insert_text("\u71C3\u8CBB " + model.player.status.effi
         + (delta_status.effi != 0 ? " \u2192 " + modified_status.effi : ""))
       status_frame.insert_text("")
       status_frame.insert_text("\u88C5\u5099")

@@ -2,13 +2,14 @@ var model;
 (function (model) {
     // 壁，床，キャラクター
     var Tile = (function () {
-        function Tile(jp_name, color, name, isWall, isDired, status) {
+        function Tile(jp_name, color, name, isWall, isDired, status, drop_list) {
             this.jp_name = jp_name;
             this.color = color;
             this.name = name;
             this.isWall = isWall;
             this.isDired = isDired;
             this.status = status;
+            this.drop_list = drop_list;
         }
         Tile.prototype.print = function (ctx, realPos, direction, cnt) {
             ctx.fillStyle = this.color;
@@ -17,29 +18,15 @@ var model;
                 dired_image_name += "_" + direction;
             var frms = main.Asset.image_frames[dired_image_name];
             ctx.drawImage(main.Asset.images[dired_image_name], 0, (Math.floor(cnt / 4) % frms) * view.unit_size.y, 32, 32, realPos.x, realPos.y, view.unit_size.x, view.unit_size.y);
-            // switch(this.image_name){
-            //   case "square":
-            //   ctx.fillRect(realPos.x, realPos.y,
-            //     view.unit_size.x, view.unit_size.y
-            //   )
-            //   break;
-            //   case "minisq":
-            //   var uw02 = view.unit_size.x * 0.2
-            //   var uh02 = view.unit_size.y * 0.2
-            //   ctx.fillRect(realPos.x + uw02, realPos.y + uh02,
-            //     view.unit_size.x * 0.6, view.unit_size.y * 0.6
-            //   )
-            //   break;
-            // }
         };
         return Tile;
     }());
     // タイルインスタンス
     model.tiles = {};
-    model.tiles["floor"] = new Tile("\u5e8a", "rgba(20,40,40,1)", "floor", false, false, utils.none());
-    model.tiles["wall"] = new Tile("\u58c1", "rgba(50,30,10,1)", "wall", true, false, utils.none());
-    model.tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc", "rgba(180,110,180,1)", "player", true, true, utils.some(new battle.Status(10, 10, 1, 0, 30, 10)));
-    model.tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F", "rgba(15,140,15,1)", "mame_mouse", true, true, utils.some(new battle.Status(2, 2, 1, 0)));
+    model.tiles["floor"] = new Tile("\u5e8a", "rgba(20,40,40,1)", "floor", false, false, utils.none(), []);
+    model.tiles["wall"] = new Tile("\u58c1", "rgba(50,30,10,1)", "wall", true, false, utils.none(), []);
+    model.tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc", "rgba(180,110,180,1)", "player", true, true, utils.some(new battle.Status(10, 10, 1, 0, 30, 10)), []);
+    model.tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F", "rgba(15,140,15,1)", "mame_mouse", true, true, utils.some(new battle.Status(2, 2, 1, 0)), [{ name: "knife", per: 0.5 }, { name: "flying_pan", per: 0.05 }]);
     // 実際の配置物
     var Entity = (function () {
         function Entity(ux, uy, tile) {
@@ -82,9 +69,15 @@ var model;
                 var picked_names = [];
                 for (var _i = 0, _a = delete_entities_at(moved, function (ent) { return ent.status.hp == 0; }); _i < _a.length; _i++) {
                     var dead = _a[_i];
-                    var picked = new items.ItemEntity(items.type["dead_" + dead.tile.name]);
-                    items.item_entities.push(picked);
-                    picked_names.push(picked.item.name);
+                    var pickeds = [new items.ItemEntity(items.type["dead_" + dead.tile.name])];
+                    dead.tile.drop_list.forEach(function (obj) {
+                        if (Math.random() < obj.per)
+                            pickeds.push(new items.ItemEntity(items.type[obj.name]));
+                    });
+                    pickeds.forEach(function (picked) {
+                        items.item_entities.push(picked);
+                        picked_names.push(picked.item.name);
+                    });
                 }
                 // tmp frame で記述
                 if (picked_names.length != 0)

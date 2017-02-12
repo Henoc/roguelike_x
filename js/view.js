@@ -9,6 +9,31 @@ var view;
      * print() 内で更新する
      */
     view.action_lock = false;
+    /**
+     * use only when item dropped
+     */
+    var TmpFrame = (function () {
+        function TmpFrame(texts) {
+            this.live = 60;
+            var window_w = view.window_usize.x * view.unit_size.x;
+            var window_h = view.window_usize.y * view.unit_size.y;
+            this.frame = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.2, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)");
+            this.frame.font_size = window_h / 32;
+            for (var _i = 0, texts_1 = texts; _i < texts_1.length; _i++) {
+                var v = texts_1[_i];
+                this.frame.insert_text(v);
+            }
+        }
+        TmpFrame.prototype.print = function (ctx) {
+            this.frame.print(ctx);
+            this.live--;
+            if (this.live == 0)
+                view.tmp_frame = utils.none();
+        };
+        return TmpFrame;
+    }());
+    view.TmpFrame = TmpFrame;
+    view.tmp_frame = utils.none();
     var MoveAnim = (function () {
         function MoveAnim(pre_upos) {
             this.pre_upos = pre_upos;
@@ -82,11 +107,12 @@ var view;
             var realEntityPos = entity_upos.mul(view.unit_size).sub(view.prefix_pos);
             entity.print(ctx, realEntityPos, cnt);
         }
-        // menu mode = items
-        if (main.menu_mode[0] == "items") {
-            var window_w = view.window_usize.x * view.unit_size.x;
-            var window_h = view.window_usize.y * view.unit_size.y;
-            var top_frame = new utils.Frame(0, 0, window_w, window_h, window_h * 0.03, "rgba(0,0,0,0)");
+        var window_w = view.window_usize.x * view.unit_size.x;
+        var window_h = view.window_usize.y * view.unit_size.y;
+        var top_frame = new utils.Frame(0, 0, window_w, window_h, window_h * 0.03, "rgba(0,0,0,0)");
+        if (main.menu_mode[0] == "explore") {
+        }
+        else if (main.menu_mode[0] == "items") {
             top_frame.move_point_x(0.6);
             var item_top = top_frame.insert_subframe(utils.none(), utils.none(), "rgba(0,0,0,0.6)");
             item_top.font_size = window_h / 32;
@@ -135,8 +161,10 @@ var view;
                     command.insert_text((main.cursor["items>command"] == i ? ">" : " ") + items.commands[command_name]);
                 }
             }
-            top_frame.print(ctx);
         }
+        top_frame.print(ctx);
+        // tmp frame
+        view.tmp_frame.foreach(function (f) { return f.print(ctx); });
         // menu mode
         ctx.fillStyle = "white";
         ctx.fillText(main.menu_mode.join(" > "), 0, 0);

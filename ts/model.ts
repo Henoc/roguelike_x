@@ -95,9 +95,14 @@ namespace model{
         this.anim_tasks.push(new view.MoveAnim(this.upos))
         this.upos = moved
         // 落ちているものを拾う
+        var picked_names:string[] = []
         for(let dead of delete_entities_at(moved, ent => ent.status.hp == 0)){
-          items.item_entities.push(new items.ItemEntity(items.type["dead_" + dead.tile.name]))
+          var picked = new items.ItemEntity(items.type["dead_" + dead.tile.name])
+          items.item_entities.push(picked)
+          picked_names.push(picked.item.name)
         }
+        // tmp frame で記述
+        if(picked_names.length != 0) view.tmp_frame = utils.some(new view.TmpFrame(picked_names))
       }
     }
 

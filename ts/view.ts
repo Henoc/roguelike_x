@@ -11,6 +11,30 @@ namespace view{
    */
   export var action_lock = false
 
+  /**
+   * use only when item dropped
+   */
+  export class TmpFrame{
+    live:number
+    frame:utils.Frame
+    constructor(texts:string[]){
+      this.live = 60
+      var window_w = window_usize.x * unit_size.x
+      var window_h = window_usize.y * unit_size.y
+      this.frame = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.2, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)")
+      this.frame.font_size = window_h / 32
+      for(let v of texts){
+        this.frame.insert_text(v)
+      }
+    }
+    print(ctx:CanvasRenderingContext2D){
+        this.frame.print(ctx)
+        this.live--
+        if(this.live == 0) tmp_frame = utils.none<TmpFrame>()
+    }
+  }
+  export var tmp_frame : utils.Option<TmpFrame> = utils.none<TmpFrame>()
+
   export interface Anim{
     /**
      * animation の1進捗
@@ -102,12 +126,16 @@ namespace view{
       entity.print(ctx,realEntityPos,cnt)
     }
 
-    // menu mode = items
-    if(main.menu_mode[0] == "items"){
-      var window_w = window_usize.x * unit_size.x
-      var window_h = window_usize.y * unit_size.y
 
-      var top_frame = new utils.Frame(0,0,window_w,window_h,window_h * 0.03,"rgba(0,0,0,0)")
+    var window_w = window_usize.x * unit_size.x
+    var window_h = window_usize.y * unit_size.y
+    var top_frame = new utils.Frame(0,0,window_w,window_h,window_h * 0.03,"rgba(0,0,0,0)")
+
+    if(main.menu_mode[0] == "explore"){
+      // something if frame is needed
+    }
+    // menu mode = items
+    else if(main.menu_mode[0] == "items"){
       top_frame.move_point_x(0.6)
       var item_top = top_frame.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(0,0,0,0.6)")
       
@@ -160,9 +188,11 @@ namespace view{
           command.insert_text((main.cursor["items>command"] == i ? ">" : " ") + items.commands[command_name])
         }
       }
-
-      top_frame.print(ctx)
     }
+    top_frame.print(ctx)
+
+    // tmp frame
+    tmp_frame.foreach(f => f.print(ctx))
 
     // menu mode
     ctx.fillStyle = "white"

@@ -79,11 +79,16 @@ var model;
                 this.anim_tasks.push(new view.MoveAnim(this.upos));
                 this.upos = moved;
                 // 落ちているものを拾う
+                var picked_names = [];
                 for (var _i = 0, _a = delete_entities_at(moved, function (ent) { return ent.status.hp == 0; }); _i < _a.length; _i++) {
                     var dead = _a[_i];
-                    items.item_entities.push(new items.ItemEntity(items.type["dead_" + dead.tile.name]));
-                    console.log(dead.tile.jp_name);
+                    var picked = new items.ItemEntity(items.type["dead_" + dead.tile.name]);
+                    items.item_entities.push(picked);
+                    picked_names.push(picked.item.name);
                 }
+                // tmp frame で記述
+                if (picked_names.length != 0)
+                    view.tmp_frame = utils.some(new view.TmpFrame(picked_names));
             }
         };
         Entity.prototype.attack = function () {

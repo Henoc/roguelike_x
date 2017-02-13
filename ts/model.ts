@@ -8,14 +8,16 @@ namespace model{
     isWall:boolean
     isDired:boolean
     status:utils.Option<battle.Status>
+    level:number
     drop_list:{name:string,per:number}[]
-    constructor(jp_name:string, color:string, name:string, isWall:boolean, isDired:boolean, status:utils.Option<battle.Status>, drop_list:{name:string,per:number}[]){
+    constructor(jp_name:string, color:string, name:string, isWall:boolean, isDired:boolean, status:utils.Option<battle.Status>, level:number, drop_list:{name:string,per:number}[]){
       this.jp_name = jp_name
       this.color = color
       this.name = name
       this.isWall = isWall
       this.isDired = isDired
       this.status = status
+      this.level = level
       this.drop_list = drop_list
     }
     print(ctx:CanvasRenderingContext2D, realPos: utils.Pos, direction:"left"|"right"|"up"|"down"|"none", cnt:number){
@@ -31,23 +33,25 @@ namespace model{
 
   // タイルインスタンス
   export var tiles: { [key: string]: Tile; } = {}
-  tiles["floor"] = new Tile("\u5e8a","rgba(20,40,40,1)","floor",false,false,utils.none<battle.Status>(),[])
-  tiles["wall"] = new Tile("\u58c1","rgba(50,30,10,1)","wall",true,false,utils.none<battle.Status>(),[])
-  tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","player",true,true,utils.some(new battle.Status(10,10,1,0,30,10)),[])
-  tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F","rgba(15,140,15,1)","mame_mouse",true,true,utils.some(new battle.Status(2,2,1,0)),[{name:"soramame_head",per:0.2},{name:"mame_mouse_ibukuro",per:0.05}])
-  tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC","","lang_dog",true,true,utils.some(new battle.Status(3,3,1,0)),[])
+  tiles["floor"] = new Tile("\u5e8a","rgba(20,40,40,1)","floor",false,false,utils.none<battle.Status>(),0,[])
+  tiles["wall"] = new Tile("\u58c1","rgba(50,30,10,1)","wall",true,false,utils.none<battle.Status>(),0,[])
+  tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","player",true,true,utils.some(new battle.Status(10,10,1,0,20,10)),1,[])
+  tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F","rgba(15,140,15,1)","mame_mouse",true,true,utils.some(new battle.Status(2,2,1,0)),1,[{name:"soramame_head",per:0.2},{name:"mame_mouse_ibukuro",per:0.05}])
+  tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC","","lang_dog",true,true,utils.some(new battle.Status(3,3,1,0)),2,[])
 
   // 実際の配置物
   export class Entity{
     upos:utils.Pos // unit position
     tile:Tile
     status:battle.Status
+    level:number
     anim_tasks:view.Anim[]
     direction:"left"|"right"|"up"|"down"|"none"
     constructor(ux:number, uy:number, tile:Tile){
       this.upos = new utils.Pos(ux,uy)
       this.tile = tile;
       this.status = tile.status.get()
+      this.level = tile.level
       this.anim_tasks = []
       this.direction = tile.isDired ? "down" : "none"
     }
@@ -110,7 +114,9 @@ namespace model{
         }
         // 誰かいれば当たる
         for(let entity of get_entities_at(directed)){
+          if(entity.status.hp == 0) continue
           entity.status = this.status.attackTo(entity.status)
+          if(entity.status.hp == 0) battle.add_exp(Math.floor(1 * Math.pow(1.2,entity.level)))
         }
       }
       this.anim_tasks.push(new view.AttackAnim())
@@ -249,7 +255,7 @@ namespace model{
       }else if(ent.near(player,4)){
         ent.move(dir[ent.dir_to(player)])
       }else{
-        ent.move(dir_ary[utils.randInt(3)])
+        ent.move(dir_ary[utils.randInt(4)])
       }
     }
   }
@@ -291,10 +297,12 @@ namespace keys{
   export var dir_key2 = model.dir.none
   export var z_key = false
   export var x_key = false
+  export var c_key = false
   export function keyReset(){
     //dir_key = model.dir.none
     dir_key2 = model.dir.none
     z_key = false
     x_key = false
+    c_key = false
   }
 }

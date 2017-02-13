@@ -41,4 +41,19 @@ var battle;
         return Status;
     }());
     battle.Status = Status;
+    battle.player_exp = 0;
+    battle.dist_point = 0;
+    function add_exp(exp) {
+        battle.player_exp += exp;
+        while (battle.player_exp >= max_exp()) {
+            battle.player_exp -= max_exp();
+            model.player.level++;
+            battle.dist_point++;
+        }
+    }
+    battle.add_exp = add_exp;
+    function max_exp() {
+        return Math.floor(5 * Math.pow(1.2, model.player.level));
+    }
+    battle.max_exp = max_exp;
 })(battle || (battle = {}));

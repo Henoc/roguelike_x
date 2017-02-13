@@ -134,6 +134,7 @@ namespace view{
     if(main.menu_mode[0] == "explore"){
       // hp gage
       top_frame.font_size = window_h / 32
+      top_frame.insert_text("level " + model.player.level + "  next " + Math.floor(battle.player_exp) + "/" + battle.max_exp())
       top_frame.insert_text("HP " + model.player.status.hp + "/" + model.player.status.max_hp)
       var max_hp_frame_w = window_w * model.player.status.max_hp / 100
       var max_hp_frame = top_frame.insert_subframe(utils.some(max_hp_frame_w),utils.some(window_h * 0.03), "rgba(0,0,0,1)", window_h * 0.002)
@@ -195,6 +196,19 @@ namespace view{
           command.insert_text((main.cursor["items>command"] == i ? ">" : " ") + items.commands[command_name])
         }
       }
+    }else if(main.menu_mode[0] == "dist"){
+      top_frame.move_point_x(0.2)
+      top_frame.move_point_y(0.2)
+      var dist_frame = top_frame.insert_subframe(utils.some((window_w - top_frame.margin * 2) * 0.6), utils.some((window_h - top_frame.margin * 2) * 0.6), "rgba(0,0,0,0.6)", window_h * 0.05)
+      dist_frame.font_size = window_h / 32
+      dist_frame.insert_text("\u30B9\u30C6\u30FC\u30BF\u30B9\u632F\u308A\u5206\u3051")
+      dist_frame.insert_text("")
+      dist_frame.insert_text("\u632F\u308A\u5206\u3051\u53EF\u80FD\u30DD\u30A4\u30F3\u30C8 " + main.point_distributed.rest)
+      dist_frame.insert_text((main.cursor["dist"] == 0 ? ">" : " ") + "\u653B\u6483 " + model.player.status.atk + " + " + main.point_distributed.atk)
+      dist_frame.insert_text((main.cursor["dist"] == 1 ? ">" : " ") + "\u9632\u5FA1 " + model.player.status.def + " + " + main.point_distributed.def)
+      dist_frame.insert_text((main.cursor["dist"] == 2 ? ">" : " ") + "\u71C3\u8CBB " + model.player.status.effi + " + " + main.point_distributed.effi)
+      dist_frame.insert_text("")
+      dist_frame.insert_text("\u2190\u2192\u30AD\u30FC\u3067\u632F\u308A\u5206\u3051 Z\u30AD\u30FC\u3067\u6C7A\u5B9A")
     }
     top_frame.print(ctx)
 

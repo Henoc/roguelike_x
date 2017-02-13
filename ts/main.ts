@@ -16,6 +16,16 @@ namespace main{
    */
   export var cursor_max = {}
 
+  /**
+   * for status distribution
+   */
+  export var point_distributed: {
+    atk:number, def:number, effi:number, rest:number
+  }
+  var point_dist_rate = {
+    atk:1,def:1,effi:2
+  }
+
   export namespace Asset{
     interface Ast{
       type:string;
@@ -115,6 +125,11 @@ namespace main{
           menu_mode = ["items"]
           cursor["items"] = 0
           cursor_max["items"] = items.item_entities.length
+        }else if(keys.c_key){
+          menu_mode = ["dist"]
+          cursor["dist"] = 0
+          cursor_max["dist"] = 3
+          point_distributed = {atk:0,def:0,effi:0,rest:battle.dist_point}
         }
       }
       break
@@ -174,6 +189,34 @@ namespace main{
         cursor[mode] = utils.limit(cursor[mode] - 1, 0, cursor_max[mode])
       }
       break
+      case "dist":
+      var mode = menu_mode.join(">")
+      var dist_props = ["atk","def","effi"]
+      if(keys.x_key || keys.c_key){
+        menu_mode.pop()
+        if(menu_mode.length == 0) menu_mode = ["explore"]
+      }else if(keys.z_key){
+        model.player.status.atk += point_distributed.atk
+        model.player.status.def += point_distributed.def
+        model.player.status.effi += point_distributed.effi
+        point_distributed = {atk:0,def:0,effi:0,rest:point_distributed.rest}
+        battle.dist_point = point_distributed.rest
+      }else if(keys.dir_key2.equals(model.dir.down)){
+        cursor[mode] = utils.limit(cursor[mode] + 1, 0, cursor_max[mode])
+      }else if(keys.dir_key2.equals(model.dir.up)){
+        cursor[mode] = utils.limit(cursor[mode] - 1, 0, cursor_max[mode])
+      }else if(keys.dir_key2.equals(model.dir.left)){
+        if(point_distributed[dist_props[cursor[mode]]] > 0) {
+          point_distributed[dist_props[cursor[mode]]] -= point_dist_rate[dist_props[cursor[mode]]]
+          point_distributed.rest++
+        }
+      }else if(keys.dir_key2.equals(model.dir.right)){
+        if(point_distributed.rest > 0){
+          point_distributed.rest--
+          point_distributed[dist_props[cursor[mode]]]+=point_dist_rate[dist_props[cursor[mode]]]
+        }
+      }
+      break
       default:
       throw "default reached"
     }
@@ -212,6 +255,8 @@ namespace main{
         break
       case 88:
         keys.x_key = true
+      case 67:
+        keys.c_key = true
     
       default:
         break;

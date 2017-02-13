@@ -2,13 +2,14 @@ var model;
 (function (model) {
     // 壁，床，キャラクター
     var Tile = (function () {
-        function Tile(jp_name, color, name, isWall, isDired, status, drop_list) {
+        function Tile(jp_name, color, name, isWall, isDired, status, level, drop_list) {
             this.jp_name = jp_name;
             this.color = color;
             this.name = name;
             this.isWall = isWall;
             this.isDired = isDired;
             this.status = status;
+            this.level = level;
             this.drop_list = drop_list;
         }
         Tile.prototype.print = function (ctx, realPos, direction, cnt) {
@@ -23,17 +24,18 @@ var model;
     }());
     // タイルインスタンス
     model.tiles = {};
-    model.tiles["floor"] = new Tile("\u5e8a", "rgba(20,40,40,1)", "floor", false, false, utils.none(), []);
-    model.tiles["wall"] = new Tile("\u58c1", "rgba(50,30,10,1)", "wall", true, false, utils.none(), []);
-    model.tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc", "rgba(180,110,180,1)", "player", true, true, utils.some(new battle.Status(10, 10, 1, 0, 30, 10)), []);
-    model.tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F", "rgba(15,140,15,1)", "mame_mouse", true, true, utils.some(new battle.Status(2, 2, 1, 0)), [{ name: "soramame_head", per: 0.2 }, { name: "mame_mouse_ibukuro", per: 0.05 }]);
-    model.tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC", "", "lang_dog", true, true, utils.some(new battle.Status(3, 3, 1, 0)), []);
+    model.tiles["floor"] = new Tile("\u5e8a", "rgba(20,40,40,1)", "floor", false, false, utils.none(), 0, []);
+    model.tiles["wall"] = new Tile("\u58c1", "rgba(50,30,10,1)", "wall", true, false, utils.none(), 0, []);
+    model.tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc", "rgba(180,110,180,1)", "player", true, true, utils.some(new battle.Status(10, 10, 1, 0, 20, 10)), 1, []);
+    model.tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F", "rgba(15,140,15,1)", "mame_mouse", true, true, utils.some(new battle.Status(2, 2, 1, 0)), 1, [{ name: "soramame_head", per: 0.2 }, { name: "mame_mouse_ibukuro", per: 0.05 }]);
+    model.tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC", "", "lang_dog", true, true, utils.some(new battle.Status(3, 3, 1, 0)), 2, []);
     // 実際の配置物
     var Entity = (function () {
         function Entity(ux, uy, tile) {
             this.upos = new utils.Pos(ux, uy);
             this.tile = tile;
             this.status = tile.status.get();
+            this.level = tile.level;
             this.anim_tasks = [];
             this.direction = tile.isDired ? "down" : "none";
         }
@@ -98,7 +100,11 @@ var model;
                 // 誰かいれば当たる
                 for (var _a = 0, _b = get_entities_at(directed); _a < _b.length; _a++) {
                     var entity = _b[_a];
+                    if (entity.status.hp == 0)
+                        continue;
                     entity.status = this.status.attackTo(entity.status);
+                    if (entity.status.hp == 0)
+                        battle.add_exp(Math.floor(1 * Math.pow(1.2, entity.level)));
                 }
             }
             this.anim_tasks.push(new view.AttackAnim());
@@ -235,7 +241,7 @@ var model;
                 ent.move(model.dir[ent.dir_to(model.player)]);
             }
             else {
-                ent.move(model.dir_ary[utils.randInt(3)]);
+                ent.move(model.dir_ary[utils.randInt(4)]);
             }
         }
     }
@@ -278,11 +284,13 @@ var keys;
     keys.dir_key2 = model.dir.none;
     keys.z_key = false;
     keys.x_key = false;
+    keys.c_key = false;
     function keyReset() {
         //dir_key = model.dir.none
         keys.dir_key2 = model.dir.none;
         keys.z_key = false;
         keys.x_key = false;
+        keys.c_key = false;
     }
     keys.keyReset = keyReset;
 })(keys || (keys = {}));

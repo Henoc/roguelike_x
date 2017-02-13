@@ -14,6 +14,9 @@ var main;
      * max
      */
     main.cursor_max = {};
+    var point_dist_rate = {
+        atk: 1, def: 1, effi: 2
+    };
     var Asset;
     (function (Asset) {
         Asset.assets = [
@@ -98,6 +101,12 @@ var main;
                         main.cursor["items"] = 0;
                         main.cursor_max["items"] = items.item_entities.length;
                     }
+                    else if (keys.c_key) {
+                        main.menu_mode = ["dist"];
+                        main.cursor["dist"] = 0;
+                        main.cursor_max["dist"] = 3;
+                        main.point_distributed = { atk: 0, def: 0, effi: 0, rest: battle.dist_point };
+                    }
                 }
                 break;
             case "items":
@@ -160,6 +169,40 @@ var main;
                     main.cursor[mode] = utils.limit(main.cursor[mode] - 1, 0, main.cursor_max[mode]);
                 }
                 break;
+            case "dist":
+                var mode = main.menu_mode.join(">");
+                var dist_props = ["atk", "def", "effi"];
+                if (keys.x_key || keys.c_key) {
+                    main.menu_mode.pop();
+                    if (main.menu_mode.length == 0)
+                        main.menu_mode = ["explore"];
+                }
+                else if (keys.z_key) {
+                    model.player.status.atk += main.point_distributed.atk;
+                    model.player.status.def += main.point_distributed.def;
+                    model.player.status.effi += main.point_distributed.effi;
+                    main.point_distributed = { atk: 0, def: 0, effi: 0, rest: main.point_distributed.rest };
+                    battle.dist_point = main.point_distributed.rest;
+                }
+                else if (keys.dir_key2.equals(model.dir.down)) {
+                    main.cursor[mode] = utils.limit(main.cursor[mode] + 1, 0, main.cursor_max[mode]);
+                }
+                else if (keys.dir_key2.equals(model.dir.up)) {
+                    main.cursor[mode] = utils.limit(main.cursor[mode] - 1, 0, main.cursor_max[mode]);
+                }
+                else if (keys.dir_key2.equals(model.dir.left)) {
+                    if (main.point_distributed[dist_props[main.cursor[mode]]] > 0) {
+                        main.point_distributed[dist_props[main.cursor[mode]]] -= point_dist_rate[dist_props[main.cursor[mode]]];
+                        main.point_distributed.rest++;
+                    }
+                }
+                else if (keys.dir_key2.equals(model.dir.right)) {
+                    if (main.point_distributed.rest > 0) {
+                        main.point_distributed.rest--;
+                        main.point_distributed[dist_props[main.cursor[mode]]] += point_dist_rate[dist_props[main.cursor[mode]]];
+                    }
+                }
+                break;
             default:
                 throw "default reached";
         }
@@ -195,6 +238,8 @@ var main;
                 break;
             case 88:
                 keys.x_key = true;
+            case 67:
+                keys.c_key = true;
             default:
                 break;
         }

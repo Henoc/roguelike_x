@@ -54,4 +54,18 @@ namespace battle{
     }
   }
 
+  export var player_exp = 0
+  export var dist_point = 0
+  export function add_exp(exp:number){
+    player_exp += exp
+    while(player_exp >= max_exp()){
+      player_exp -= max_exp()
+      model.player.level++
+      dist_point++
+    }
+  }
+  export function max_exp(){
+    return Math.floor(5 * Math.pow(1.2, model.player.level))
+  }
+
 }

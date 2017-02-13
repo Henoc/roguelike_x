@@ -151,11 +151,11 @@ var main;
                             throw "default reached";
                     }
                 }
-                else if (keys.dir_key.equals(model.dir.down)) {
+                else if (keys.dir_key2.equals(model.dir.down)) {
                     var mode = main.menu_mode.join(">");
                     main.cursor[mode] = utils.limit(main.cursor[mode] + 1, 0, main.cursor_max[mode]);
                 }
-                else if (keys.dir_key.equals(model.dir.up)) {
+                else if (keys.dir_key2.equals(model.dir.up)) {
                     var mode = main.menu_mode.join(">");
                     main.cursor[mode] = utils.limit(main.cursor[mode] - 1, 0, main.cursor_max[mode]);
                 }
@@ -176,15 +176,19 @@ var main;
         switch (keyCode) {
             case 37:
                 keys.dir_key = model.dir.left;
+                keys.dir_key2 = model.dir.left;
                 break;
             case 38:
                 keys.dir_key = model.dir.up;
+                keys.dir_key2 = model.dir.up;
                 break;
             case 39:
                 keys.dir_key = model.dir.right;
+                keys.dir_key2 = model.dir.right;
                 break;
             case 40:
                 keys.dir_key = model.dir.down;
+                keys.dir_key2 = model.dir.down;
                 break;
             case 90:
                 keys.z_key = true;

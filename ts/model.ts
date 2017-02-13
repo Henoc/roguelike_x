@@ -281,11 +281,19 @@ namespace model{
  * keyboard の状態を管理する singleton
  */
 namespace keys{
+  /**
+   * continuouse key press looking by keydown & keyup
+   */
   export var dir_key = model.dir.none
+  /**
+   * original keydown
+   */
+  export var dir_key2 = model.dir.none
   export var z_key = false
   export var x_key = false
   export function keyReset(){
     //dir_key = model.dir.none
+    dir_key2 = model.dir.none
     z_key = false
     x_key = false
   }

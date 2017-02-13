@@ -268,11 +268,19 @@ var model;
  */
 var keys;
 (function (keys) {
+    /**
+     * continuouse key press looking by keydown & keyup
+     */
     keys.dir_key = model.dir.none;
+    /**
+     * original keydown
+     */
+    keys.dir_key2 = model.dir.none;
     keys.z_key = false;
     keys.x_key = false;
     function keyReset() {
         //dir_key = model.dir.none
+        keys.dir_key2 = model.dir.none;
         keys.z_key = false;
         keys.x_key = false;
     }

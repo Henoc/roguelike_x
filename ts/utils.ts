@@ -214,4 +214,45 @@ namespace utils{
       }
     }
   }
+
+  export function shallow_copy(obj:any):any {
+    var clone = {}
+    for(var str in obj){
+      clone[str] = obj[str]
+    }
+    return clone
+  }
+
+  class Animation{
+    name:string
+    counter:number
+    fps:number
+    pos:Pos
+    src_wh:Pos
+    constructor(name:string, fps:number, pos:Pos,src_wh:Pos){
+      this.name = name
+      this.counter = 0
+      this.fps = fps
+      this.pos = pos
+      this.src_wh = src_wh
+    }
+    print(ctx:CanvasRenderingContext2D){
+      var cnt = Math.floor(this.counter / this.fps)
+      ctx.drawImage(main.Asset.images[this.name],0,this.src_wh.y * cnt,this.src_wh.x,this.src_wh.y,this.pos.x,this.pos.y,this.src_wh.x,this.src_wh.y)
+      this.counter++
+    }
+  }
+  var animations:Animation[] = []
+  export function start_anim(name:string, fps:number, pos:Pos, src_wh:Pos){
+    animations.push(new Animation(name,fps,pos,src_wh))
+  }
+  export function print_anims(ctx:CanvasRenderingContext2D){
+    for(var i = 0; i < animations.length; i++){
+      animations[i].print(ctx)
+      if(animations[i].counter / animations[i].fps >= main.Asset.image_frames[animations[i].name]) {
+        animations.splice(i,1)
+        i--
+      }
+    }
+  }
 }

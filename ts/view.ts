@@ -215,8 +215,11 @@ namespace view{
     // tmp frame
     tmp_frame.foreach(f => f.print(ctx))
 
+    // draw temporal animations
+    utils.print_anims(ctx)
+
     // menu mode
-    ctx.fillStyle = "white"
-    ctx.fillText(main.menu_mode.join(" > "),0,0)
+    // ctx.fillStyle = "white"
+    // ctx.fillText(main.menu_mode.join(" > "),0,0)
   }
 }

@@ -214,4 +214,42 @@ var utils;
         return Frame;
     }());
     utils.Frame = Frame;
+    function shallow_copy(obj) {
+        var clone = {};
+        for (var str in obj) {
+            clone[str] = obj[str];
+        }
+        return clone;
+    }
+    utils.shallow_copy = shallow_copy;
+    var Animation = (function () {
+        function Animation(name, fps, pos, src_wh) {
+            this.name = name;
+            this.counter = 0;
+            this.fps = fps;
+            this.pos = pos;
+            this.src_wh = src_wh;
+        }
+        Animation.prototype.print = function (ctx) {
+            var cnt = Math.floor(this.counter / this.fps);
+            ctx.drawImage(main.Asset.images[this.name], 0, this.src_wh.y * cnt, this.src_wh.x, this.src_wh.y, this.pos.x, this.pos.y, this.src_wh.x, this.src_wh.y);
+            this.counter++;
+        };
+        return Animation;
+    }());
+    var animations = [];
+    function start_anim(name, fps, pos, src_wh) {
+        animations.push(new Animation(name, fps, pos, src_wh));
+    }
+    utils.start_anim = start_anim;
+    function print_anims(ctx) {
+        for (var i = 0; i < animations.length; i++) {
+            animations[i].print(ctx);
+            if (animations[i].counter / animations[i].fps >= main.Asset.image_frames[animations[i].name]) {
+                animations.splice(i, 1);
+                i--;
+            }
+        }
+    }
+    utils.print_anims = print_anims;
 })(utils || (utils = {}));

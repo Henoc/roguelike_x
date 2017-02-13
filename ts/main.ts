@@ -42,6 +42,10 @@ namespace main{
       {type: "image", name: "lang_dog_right", src: "assets/lang_dog_right.png", frames:8},
       {type: "image", name: "lang_dog_up", src: "assets/lang_dog_up.png", frames:4},
       {type: "image", name: "lang_dog_down", src: "assets/lang_dog_down.png", frames:4},
+      {type: "image", name: "sacred_slime_left", src: "assets/sacred_slime_left.png", frames:2},
+      {type: "image", name: "sacred_slime_right", src: "assets/sacred_slime_right.png", frames:2},
+      {type: "image", name: "sacred_slime_up", src: "assets/sacred_slime_up.png", frames:2},
+      {type: "image", name: "sacred_slime_down", src: "assets/sacred_slime_down.png", frames:2},
 
       {type: "image", name: "floor", src: "assets/floor.png", frames:1},
       {type: "image", name: "wall", src: "assets/wall.png", frames:1},
@@ -49,6 +53,7 @@ namespace main{
       {type: "image", name: "player_right", src: "assets/player_right.png", frames:1},
       {type: "image", name: "player_up", src: "assets/player_up.png", frames:1},
       {type: "image", name: "player_down", src: "assets/player_down.png", frames:1},
+      {type: "image", name: "level_up", src: "assets/level_up.png", frames:20},
     ];
     export var images = {}
     export var image_frames = {}

@@ -66,6 +66,7 @@ namespace battle{
       player_exp -= max_exp()
       model.player.level++
       dist_point++
+      utils.start_anim("level_up", 4, model.player.upos.sub(new utils.Pos(1,2)).mul(view.unit_size).sub(view.prefix_pos), new utils.Pos(96,96))
     }
   }
   export function max_exp(){

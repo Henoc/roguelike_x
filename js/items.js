@@ -25,7 +25,8 @@ var items;
         mame_mouse_ibukuro: new Item("\u8C46\u306D\u305A\u307F\u306E\u80C3\u888B", ["use", "put"], new battle.Status(0, 0, 0, 0, 1), "none", "\u98DF\u3079\u308B\u3068\u6D88\u5316\u3092\u7269\u7406\u7684\u306B\u52A9\u3051\u3066\u304F\u308C\u308B\u3068\u3044\u3046"),
         dead_lang_dog: new Item("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC\u306E\u8089", ["use", "put"], battle.Status.of_food(1), "none", "\u72AC\u3068\u4EBA\u3068\u306E\u30AD\u30E1\u30E9\u3060\u3068\u3044\u3046\u8AAC\u304C\u3042\u308B"),
         lang_dog_shoes: new Item("\u72AC\u306E\u9774", ["equip", "put"], new battle.Status(0, 0, 0, 0, 2), "foot", "\u77E5\u6027\u3092\u611F\u3058\u3055\u305B\u308B\u5E03\u88FD\u306E\u9774"),
-        lang_dog_paper: new Item("\u6570\u5F0F\u306E\u30E1\u30E2", ["decode", "put"], battle.Status.zero(), "none", "\u7D19\u4E00\u9762\u306B\u3073\u3063\u3057\u308A\u3068\u8A18\u53F7\u304C\u66F8\u3044\u3066\u3042\u308B", { exp: 50 })
+        lang_dog_paper: new Item("\u6570\u5F0F\u306E\u30E1\u30E2", ["decode", "put"], battle.Status.zero(), "none", "\u7D19\u4E00\u9762\u306B\u3073\u3063\u3057\u308A\u3068\u8A18\u53F7\u304C\u66F8\u3044\u3066\u3042\u308B", { exp: 50 }),
+        dead_sacred_slime: new Item("\u8056\u30B9\u30E9\u30A4\u30E0\u306E\u8089", ["use", "put"], battle.Status.of_food(1), "none", "\u8B0E\u591A\u304D\u4E0D\u6B7B\u8EAB\u306E\u30B9\u30E9\u30A4\u30E0")
     };
     items.commands = {
         use: "\u4F7F\u3046",
@@ -36,6 +37,7 @@ var items;
     var ItemEntity = (function () {
         function ItemEntity(item) {
             this.item = item;
+            this.more_props = utils.shallow_copy(item.more_props);
         }
         return ItemEntity;
     }());

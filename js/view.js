@@ -188,9 +188,11 @@ var view;
         top_frame.print(ctx);
         // tmp frame
         view.tmp_frame.foreach(function (f) { return f.print(ctx); });
+        // draw temporal animations
+        utils.print_anims(ctx);
         // menu mode
-        ctx.fillStyle = "white";
-        ctx.fillText(main.menu_mode.join(" > "), 0, 0);
+        // ctx.fillStyle = "white"
+        // ctx.fillText(main.menu_mode.join(" > "),0,0)
     }
     view.print = print;
 })(view || (view = {}));

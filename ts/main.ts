@@ -176,6 +176,15 @@ namespace main{
             cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
             menu_mode.pop()
             break
+            case "decode":
+            battle.add_exp(selected.item.more_props["exp"])
+            items.item_entities.splice(cursor["items"],1)
+            cursor_max["items"]--
+            cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
+            menu_mode.pop()
+            break
+            default:
+            throw "default reached"
           }
           break
           default:

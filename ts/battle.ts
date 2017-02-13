@@ -17,6 +17,10 @@ namespace battle{
       this.heal = heal == undefined ? 0 : heal
     }
 
+    static zero(){
+      return new Status(0,0,0,0)
+    }
+
     static of_food(max_hp){
       return new Status(max_hp,0,0,0)
     }

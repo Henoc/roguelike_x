@@ -37,7 +37,7 @@ namespace model{
   tiles["wall"] = new Tile("\u58c1","rgba(50,30,10,1)","wall",true,false,utils.none<battle.Status>(),0,[])
   tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","player",true,true,utils.some(new battle.Status(10,10,1,0,20,10)),1,[])
   tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F","rgba(15,140,15,1)","mame_mouse",true,true,utils.some(new battle.Status(2,2,1,0)),1,[{name:"soramame_head",per:0.2},{name:"mame_mouse_ibukuro",per:0.05}])
-  tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC","","lang_dog",true,true,utils.some(new battle.Status(3,3,1,0)),2,[])
+  tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC","","lang_dog",true,true,utils.some(new battle.Status(3,3,1,0)),2,[{name:"lang_dog_shoes",per:0.2},{name:"lang_dog_paper",per:0.03}])
 
   // 実際の配置物
   export class Entity{

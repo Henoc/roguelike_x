@@ -9,6 +9,9 @@ var battle;
             this.effi = effi == undefined ? 0 : effi;
             this.heal = heal == undefined ? 0 : heal;
         }
+        Status.zero = function () {
+            return new Status(0, 0, 0, 0);
+        };
         Status.of_food = function (max_hp) {
             return new Status(max_hp, 0, 0, 0);
         };

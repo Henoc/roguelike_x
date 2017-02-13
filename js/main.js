@@ -154,6 +154,14 @@ var main;
                                     main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
                                     main.menu_mode.pop();
                                     break;
+                                case "decode":
+                                    battle.add_exp(selected.item.more_props["exp"]);
+                                    items.item_entities.splice(main.cursor["items"], 1);
+                                    main.cursor_max["items"]--;
+                                    main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
+                                    main.menu_mode.pop();
+                                default:
+                                    throw "default reached";
                             }
                             break;
                         default:

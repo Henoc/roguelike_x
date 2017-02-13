@@ -208,6 +208,8 @@ namespace utils{
           case "frame":
           (<Frame>content["frame"]).print(ctx)
           break
+          default:
+          throw "default reached"
         }
       }
     }

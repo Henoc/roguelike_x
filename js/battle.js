@@ -18,6 +18,9 @@ var battle;
         Status.of_knife = function (atk) {
             return new Status(0, 0, atk, 0);
         };
+        Status.of_guard = function (def) {
+            return new Status(0, 0, 0, def);
+        };
         Status.prototype.copy = function () {
             var copied = new Status(this.max_hp, this.hp, this.atk, this.def, this.effi, this.heal);
             return copied;

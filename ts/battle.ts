@@ -29,6 +29,10 @@ namespace battle{
       return new Status(0,0,atk,0)
     }
 
+    static of_guard(def){
+      return new Status(0,0,0,def)
+    }
+
     copy(){
       var copied = new Status(this.max_hp,this.hp,this.atk,this.def,this.effi,this.heal)
       return copied

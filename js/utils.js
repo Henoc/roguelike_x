@@ -206,6 +206,8 @@ var utils;
                     case "frame":
                         content["frame"].print(ctx);
                         break;
+                    default:
+                        throw "default reached";
                 }
             }
         };

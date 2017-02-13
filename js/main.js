@@ -21,6 +21,10 @@ var main;
             { type: "image", name: "mame_mouse_right", src: "assets/mame_mouse_right.png", frames: 4 },
             { type: "image", name: "mame_mouse_up", src: "assets/mame_mouse_up.png", frames: 4 },
             { type: "image", name: "mame_mouse_down", src: "assets/mame_mouse_down.png", frames: 4 },
+            { type: "image", name: "lang_dog_left", src: "assets/lang_dog_left.png", frames: 8 },
+            { type: "image", name: "lang_dog_right", src: "assets/lang_dog_right.png", frames: 8 },
+            { type: "image", name: "lang_dog_up", src: "assets/lang_dog_up.png", frames: 4 },
+            { type: "image", name: "lang_dog_down", src: "assets/lang_dog_down.png", frames: 4 },
             { type: "image", name: "floor", src: "assets/floor.png", frames: 1 },
             { type: "image", name: "wall", src: "assets/wall.png", frames: 1 },
             { type: "image", name: "player_left", src: "assets/player_left.png", frames: 1 },
@@ -143,6 +147,8 @@ var main;
                                     break;
                             }
                             break;
+                        default:
+                            throw "default reached";
                     }
                 }
                 else if (keys.dir_key.equals(model.dir.down)) {
@@ -154,6 +160,8 @@ var main;
                     main.cursor[mode] = utils.limit(main.cursor[mode] - 1, 0, main.cursor_max[mode]);
                 }
                 break;
+            default:
+                throw "default reached";
         }
         keys.keyReset();
         render();
@@ -188,6 +196,31 @@ var main;
         }
     }
     main.keydown = keydown;
+    function keyup(e) {
+        var keyCode = e.keyCode;
+        switch (keyCode) {
+            case 37:
+                if (keys.dir_key.equals(model.dir.left))
+                    keys.dir_key = model.dir.none;
+                break;
+            case 38:
+                if (keys.dir_key.equals(model.dir.up))
+                    keys.dir_key = model.dir.none;
+                break;
+            case 39:
+                if (keys.dir_key.equals(model.dir.right))
+                    keys.dir_key = model.dir.none;
+                break;
+            case 40:
+                if (keys.dir_key.equals(model.dir.down))
+                    keys.dir_key = model.dir.none;
+                break;
+            default:
+                break;
+        }
+    }
+    main.keyup = keyup;
 })(main || (main = {}));
 window.addEventListener('load', main.init);
 window.addEventListener("keydown", main.keydown);
+window.addEventListener("keyup", main.keyup);

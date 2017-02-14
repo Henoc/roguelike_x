@@ -195,6 +195,8 @@ var view;
         view.tmp_frame.foreach(function (f) { return f.print(ctx); });
         // draw temporal animations
         utils.print_anims(ctx);
+        // draw temporal damage animations
+        utils.print_tmp_num(ctx);
         // menu mode
         // ctx.fillStyle = "white"
         // ctx.fillText(main.menu_mode.join(" > "),0,0)

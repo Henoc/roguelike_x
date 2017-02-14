@@ -223,7 +223,7 @@ namespace utils{
     return clone
   }
 
-  class Animation{
+  class TmpAnim{
     name:string
     counter:number
     fps:number
@@ -242,15 +242,50 @@ namespace utils{
       this.counter++
     }
   }
-  var animations:Animation[] = []
+  var tmp_anim_tasks:TmpAnim[] = []
   export function start_anim(name:string, fps:number, pos:Pos, src_wh:Pos){
-    animations.push(new Animation(name,fps,pos,src_wh))
+    tmp_anim_tasks.push(new TmpAnim(name,fps,pos,src_wh))
   }
   export function print_anims(ctx:CanvasRenderingContext2D){
-    for(var i = 0; i < animations.length; i++){
-      animations[i].print(ctx)
-      if(animations[i].counter / animations[i].fps >= main.Asset.image_frames[animations[i].name]) {
-        animations.splice(i,1)
+    for(var i = 0; i < tmp_anim_tasks.length; i++){
+      tmp_anim_tasks[i].print(ctx)
+      if(tmp_anim_tasks[i].counter / tmp_anim_tasks[i].fps >= main.Asset.image_frames[tmp_anim_tasks[i].name]) {
+        tmp_anim_tasks.splice(i,1)
+        i--
+      }
+    }
+  }
+
+  var tmp_num_tasks:{number:number,color:string,font_size:number,pos:Pos,counter:number}[] = []
+  /**
+   * damage expression
+   */
+  export function start_tmp_num(n:number,color:string,font_size:number,pos:Pos){
+    tmp_num_tasks.push({number:n, color:color, font_size:font_size, pos:pos, counter:80})
+  }
+  export function print_tmp_num(ctx:CanvasRenderingContext2D){
+    function print_number(k:string, pos:Pos, cnt:number):Pos{
+      if(cnt >= 0){
+        cnt = limit(cnt, 0, 10)
+        var delta = view.window_usize.y * view.unit_size.y / 240
+        ctx.fillText(k, pos.x, pos.y - (10 - cnt) * delta)
+      }
+      var w = ctx.measureText(k).width
+      return pos.add(new Pos(w,0))
+    }
+
+    for(var i = 0; i < tmp_num_tasks.length; i++){
+      var tmp_num_task = tmp_num_tasks[i]
+      ctx.font = "normal " + tmp_num_task.font_size + "px sans-serif"
+      ctx.fillStyle = tmp_num_task.color
+      var num_text = tmp_num_task.number + ""
+      var pos = tmp_num_task.pos
+      for(var j = 0; j < num_text.length; j++){
+        pos = print_number(num_text[j],pos,80 - tmp_num_task.counter - j * 10)
+      }
+      tmp_num_task.counter--
+      if(tmp_num_task.counter <= 0) {
+        tmp_num_tasks.splice(i,1)
         i--
       }
     }

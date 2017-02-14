@@ -67,10 +67,12 @@ namespace model{
     print(ctx:CanvasRenderingContext2D,realPos:utils.Pos,cnt:number){
       this.tile.print(ctx,realPos,this.direction,this.status.hp != 0 ? cnt : 0)
 
-      ctx.fillStyle = this.status.hp != 0 ? "white" : "red"
-      var font_size = view.window_usize.y * view.unit_size.y / 40
-      ctx.font = "normal " + font_size + "px sans-serif"
-      utils.fillText_n(ctx,this.tile.jp_name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y - view.unit_size.y, font_size ,font_size)
+      if(this.status.hp != 0){
+        ctx.fillStyle ="white" 
+        var font_size = view.window_usize.y * view.unit_size.y / 40
+        ctx.font = "normal " + font_size + "px sans-serif"
+        utils.fillText_n(ctx,this.tile.jp_name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y - view.unit_size.y, font_size ,font_size)
+      }
     }
 
     /**
@@ -121,7 +123,7 @@ namespace model{
         // 誰かいれば当たる
         for(let entity of get_entities_at(directed)){
           if(entity.status.hp == 0) continue
-          entity.status = this.status.attackTo(entity.status)
+          entity.status = this.status.attackTo(entity)
           if(entity.status.hp == 0) battle.add_exp(Math.floor(1 * Math.pow(1.2,entity.level)))
         }
       }

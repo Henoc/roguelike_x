@@ -36,10 +36,13 @@ var battle;
          * 必ず1は毎回減る
          */
         Status.prototype.attackTo = function (that) {
-            var that2 = that.copy();
-            // [0, hp - 1]
-            that2.hp = utils.limit(that2.hp + that.def - this.atk, 0, that2.hp);
-            return that2;
+            var that_status = that.status;
+            var that_status2 = that_status.copy();
+            var damage = this.atk - that_status.def <= 0 ? 1 : this.atk - that_status.def;
+            // damage expression
+            utils.start_tmp_num(damage, "red", view.window_usize.y * view.unit_size.y / 40, that.upos.mul(view.unit_size).sub(view.prefix_pos));
+            that_status2.hp = that_status2.hp - damage <= 0 ? 0 : that_status2.hp - damage;
+            return that_status2;
         };
         return Status;
     }());

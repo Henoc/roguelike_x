@@ -29,7 +29,7 @@ namespace model{
       if(direction != "none") dired_image_name += "_" + direction
       var frms = main.Asset.image_frames[dired_image_name]
       ctx.drawImage(main.Asset.images[dired_image_name],
-        0,(Math.floor(cnt/(32/frms))%frms) * view.unit_size.y,32,32,realPos.x,realPos.y,view.unit_size.x,view.unit_size.y,)
+        0,(Math.floor(cnt/Math.floor(64/frms))%frms) * view.unit_size.y,32,32,realPos.x,realPos.y,view.unit_size.x,view.unit_size.y,)
     }
   }
 
@@ -40,7 +40,7 @@ namespace model{
   tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","player",true,true,utils.some(new battle.Status(10,10,1,0,20,10)),1,[],{})
   tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F","rgba(15,140,15,1)","mame_mouse",true,true,utils.some(new battle.Status(2,2,1,0)),1,[{name:"soramame_head",per:0.2},{name:"mame_mouse_ibukuro",per:0.05}],{})
   tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC","","lang_dog",true,true,utils.some(new battle.Status(3,3,1,0)),2,[{name:"lang_dog_shoes",per:0.2},{name:"lang_dog_paper",per:0.03}],{})
-  tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0","","sacred_slime",true,true,utils.some(new battle.Status(4,4,2,1)),3,[],{revive:5})
+  tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0","","sacred_slime",true,true,utils.some(new battle.Status(4,4,2,1)),3,[{name:"potion",per:0.1}],{revive:5})
 
   // 実際の配置物
   export class Entity{
@@ -94,6 +94,7 @@ namespace model{
         // 落ちているものを拾う
         var picked_names:string[] = []
         for(let dead of delete_entities_at(moved, ent => ent.status.hp == 0)){
+          if(dead.tile.name == "player") continue
           var pickeds = [new items.ItemEntity(items.type["dead_" + dead.tile.name])]
           dead.tile.drop_list.forEach(obj => {
             if(Math.random() < obj.per) pickeds.push(new items.ItemEntity(items.type[obj.name]))
@@ -188,7 +189,7 @@ namespace model{
       new items.ItemEntity(items.type.onigiri),
       new items.ItemEntity(items.type.onigiri),
       new items.ItemEntity(items.type.onigiri),
-      new items.ItemEntity(items.type.orange_juice),
+      new items.ItemEntity(items.type.potion),
       new items.ItemEntity(items.type.knife),
       new items.ItemEntity(items.type.flying_pan),
     ]
@@ -248,6 +249,7 @@ namespace model{
     }
     action_counters.effi++
     action_counters.heal++
+    if(player.status.hp == 0) main.menu_mode = ["dead"]
   }
 
   function monsters_action(){

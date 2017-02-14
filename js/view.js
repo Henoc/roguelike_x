@@ -185,6 +185,11 @@ var view;
             dist_frame.insert_text("");
             dist_frame.insert_text("\u2190\u2192\u30AD\u30FC\u3067\u632F\u308A\u5206\u3051 Z\u30AD\u30FC\u3067\u6C7A\u5B9A");
         }
+        else if (main.menu_mode[0] == "dead") {
+            var dead_frame = top_frame.insert_subframe(utils.none(), utils.none(), "rgba(0,0,0,0.6)");
+            dead_frame.font_size = window_h / 32;
+            dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F");
+        }
         top_frame.print(ctx);
         // tmp frame
         view.tmp_frame.foreach(function (f) { return f.print(ctx); });

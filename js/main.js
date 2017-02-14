@@ -34,10 +34,10 @@ var main;
             { type: "image", name: "sacred_slime_down", src: "assets/sacred_slime_down.png", frames: 2 },
             { type: "image", name: "floor", src: "assets/floor.png", frames: 1 },
             { type: "image", name: "wall", src: "assets/wall.png", frames: 1 },
-            { type: "image", name: "player_left", src: "assets/player_left.png", frames: 1 },
-            { type: "image", name: "player_right", src: "assets/player_right.png", frames: 1 },
-            { type: "image", name: "player_up", src: "assets/player_up.png", frames: 1 },
-            { type: "image", name: "player_down", src: "assets/player_down.png", frames: 1 },
+            { type: "image", name: "player_left", src: "assets/player_left.png", frames: 7 },
+            { type: "image", name: "player_right", src: "assets/player_right.png", frames: 7 },
+            { type: "image", name: "player_up", src: "assets/player_up.png", frames: 7 },
+            { type: "image", name: "player_down", src: "assets/player_down.png", frames: 7 },
             { type: "image", name: "level_up", src: "assets/level_up.png", frames: 20 },
         ];
         Asset.images = {};
@@ -88,6 +88,8 @@ var main;
         requestAnimationFrame(update);
         // key inputs
         switch (main.menu_mode[0]) {
+            case "dead":
+                break;
             case "explore":
                 if (!view.action_lock) {
                     var moved = keys.dir_key.add(model.player.upos);

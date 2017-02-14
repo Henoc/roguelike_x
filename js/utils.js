@@ -256,8 +256,8 @@ var utils;
     /**
      * damage expression
      */
-    function start_tmp_num(n, color, font_size, pos) {
-        tmp_num_tasks.push({ number: n, color: color, font_size: font_size, pos: pos, counter: 80 });
+    function start_tmp_num(n, color, pos) {
+        tmp_num_tasks.push({ number: n, color: color, pos: pos, counter: 80 });
     }
     utils.start_tmp_num = start_tmp_num;
     function print_tmp_num(ctx) {
@@ -272,7 +272,7 @@ var utils;
         }
         for (var i = 0; i < tmp_num_tasks.length; i++) {
             var tmp_num_task = tmp_num_tasks[i];
-            ctx.font = "normal " + tmp_num_task.font_size + "px sans-serif";
+            ctx.font = "normal " + (view.window_usize.y * view.unit_size.y / 40) + "px sans-serif";
             ctx.fillStyle = tmp_num_task.color;
             var num_text = tmp_num_task.number + "";
             var pos = tmp_num_task.pos;

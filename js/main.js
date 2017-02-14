@@ -136,6 +136,8 @@ var main;
                             var selected = items.item_entities[main.cursor["items"]];
                             switch (selected.item.commands[main.cursor["items>command"]]) {
                                 case "use":
+                                    if (selected.item.delta_status.hp > 0)
+                                        utils.start_tmp_num(selected.item.delta_status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos));
                                     model.player.status = model.player.status.add(selected.item.delta_status);
                                     items.item_entities.splice(main.cursor["items"], 1);
                                     main.cursor_max["items"]--;

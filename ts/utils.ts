@@ -256,12 +256,12 @@ namespace utils{
     }
   }
 
-  var tmp_num_tasks:{number:number,color:string,font_size:number,pos:Pos,counter:number}[] = []
+  var tmp_num_tasks:{number:number,color:string,pos:Pos,counter:number}[] = []
   /**
    * damage expression
    */
-  export function start_tmp_num(n:number,color:string,font_size:number,pos:Pos){
-    tmp_num_tasks.push({number:n, color:color, font_size:font_size, pos:pos, counter:80})
+  export function start_tmp_num(n:number,color:string,pos:Pos){
+    tmp_num_tasks.push({number:n, color:color, pos:pos, counter:80})
   }
   export function print_tmp_num(ctx:CanvasRenderingContext2D){
     function print_number(k:string, pos:Pos, cnt:number):Pos{
@@ -276,7 +276,7 @@ namespace utils{
 
     for(var i = 0; i < tmp_num_tasks.length; i++){
       var tmp_num_task = tmp_num_tasks[i]
-      ctx.font = "normal " + tmp_num_task.font_size + "px sans-serif"
+      ctx.font = "normal " + (view.window_usize.y * view.unit_size.y / 40) + "px sans-serif"
       ctx.fillStyle = tmp_num_task.color
       var num_text = tmp_num_task.number + ""
       var pos = tmp_num_task.pos

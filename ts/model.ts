@@ -29,7 +29,7 @@ namespace model{
       if(direction != "none") dired_image_name += "_" + direction
       var frms = main.Asset.image_frames[dired_image_name]
       ctx.drawImage(main.Asset.images[dired_image_name],
-        0,(Math.floor(cnt/Math.floor(64/frms))%frms) * view.unit_size.y,32,32,realPos.x,realPos.y,view.unit_size.x,view.unit_size.y,)
+        0,(Math.floor(cnt/utils.limit(Math.floor(utils.limit(64/frms/main.sp60f,1,64)),1,64))%frms) * view.unit_size.y,32,32,realPos.x,realPos.y,view.unit_size.x,view.unit_size.y,)
     }
   }
 

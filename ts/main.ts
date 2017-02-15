@@ -26,6 +26,11 @@ namespace main{
     atk:1,def:1,effi:2
   }
 
+  /**
+   * second per 60 frames
+   */
+  export var sp60f = 1
+
   export namespace Asset{
     interface Ast{
       type:string;
@@ -110,6 +115,10 @@ namespace main{
 
   function update(timestamp : number){
     requestAnimationFrame(update)
+    if (lastTimestamp != null) {
+      sp60f = (timestamp - lastTimestamp) / 1000 * 60;
+    }
+    lastTimestamp = timestamp;
 
     // key inputs
     switch(menu_mode[0]){

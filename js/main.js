@@ -17,6 +17,10 @@ var main;
     var point_dist_rate = {
         atk: 1, def: 1, effi: 2
     };
+    /**
+     * second per 60 frames
+     */
+    main.sp60f = 1;
     var Asset;
     (function (Asset) {
         Asset.assets = [
@@ -86,6 +90,10 @@ var main;
     var lastTimestamp = null;
     function update(timestamp) {
         requestAnimationFrame(update);
+        if (lastTimestamp != null) {
+            main.sp60f = (timestamp - lastTimestamp) / 1000 * 60;
+        }
+        lastTimestamp = timestamp;
         // key inputs
         switch (main.menu_mode[0]) {
             case "dead":

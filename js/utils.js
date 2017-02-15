@@ -257,15 +257,15 @@ var utils;
      * damage expression
      */
     function start_tmp_num(n, color, pos) {
-        tmp_num_tasks.push({ number: n, color: color, pos: pos, counter: 80 });
+        tmp_num_tasks.push({ number: n, color: color, pos: pos, counter: 80 / main.sp60f });
     }
     utils.start_tmp_num = start_tmp_num;
     function print_tmp_num(ctx) {
         function print_number(k, pos, cnt) {
             if (cnt >= 0) {
-                cnt = limit(cnt, 0, 10);
+                cnt = limit(cnt, 0, 10 / main.sp60f);
                 var delta = view.window_usize.y * view.unit_size.y / 240;
-                ctx.fillText(k, pos.x, pos.y - (10 - cnt) * delta);
+                ctx.fillText(k, pos.x, pos.y - (10 / main.sp60f - cnt) * delta);
             }
             var w = ctx.measureText(k).width;
             return pos.add(new Pos(w, 0));
@@ -277,7 +277,7 @@ var utils;
             var num_text = tmp_num_task.number + "";
             var pos = tmp_num_task.pos;
             for (var j = 0; j < num_text.length; j++) {
-                pos = print_number(num_text[j], pos, 80 - tmp_num_task.counter - j * 10);
+                pos = print_number(num_text[j], pos, 80 / main.sp60f - tmp_num_task.counter - j * 10 / main.sp60f);
             }
             tmp_num_task.counter--;
             if (tmp_num_task.counter <= 0) {

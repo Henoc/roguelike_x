@@ -3,7 +3,10 @@ var view;
     view.window_usize = new utils.Pos(640 / 32, 480 / 32);
     view.unit_size = new utils.Pos(32, 32);
     view.prefix_pos = new utils.Pos(0, 0);
-    var PROGRESS = 0.2;
+    function progress_rate() {
+        return 0.2 * main.sp60f;
+    }
+    view.progress_rate = progress_rate;
     /**
      * animation 中なので key 入力をブロック
      * print() 内で更新する
@@ -14,7 +17,7 @@ var view;
      */
     var TmpFrame = (function () {
         function TmpFrame(texts) {
-            this.live = 60;
+            this.live = 60 / main.sp60f;
             var window_w = view.window_usize.x * view.unit_size.x;
             var window_h = view.window_usize.y * view.unit_size.y;
             this.frame = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.2, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)");
@@ -27,7 +30,7 @@ var view;
         TmpFrame.prototype.print = function (ctx) {
             this.frame.print(ctx);
             this.live--;
-            if (this.live == 0)
+            if (this.live <= 0)
                 view.tmp_frame = utils.none();
         };
         return TmpFrame;
@@ -40,7 +43,7 @@ var view;
             this.progress = 0;
         }
         MoveAnim.prototype.advance = function () {
-            this.progress += PROGRESS;
+            this.progress += progress_rate();
             if (this.progress >= 1) {
                 this.progress = 1;
                 return true;
@@ -58,7 +61,7 @@ var view;
             this.progress = 0;
         }
         AttackAnim.prototype.advance = function () {
-            this.progress += PROGRESS;
+            this.progress += progress_rate();
             if (this.progress >= 1) {
                 this.progress = 1;
                 return true;
@@ -79,7 +82,7 @@ var view;
         ctx.fillRect(0, 0, view.window_usize.x * view.unit_size.x, view.window_usize.y * view.unit_size.y);
         // player を中心とする画面にする
         var tmp = model.player.upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5, 0.5)).mul(view.unit_size);
-        view.prefix_pos = tmp.sub(view.prefix_pos).map(function (d) { return utils.limit(d, -view.unit_size.x * PROGRESS, view.unit_size.x * PROGRESS); }).add(view.prefix_pos);
+        view.prefix_pos = tmp.sub(view.prefix_pos).map(function (d) { return utils.limit(d, -view.unit_size.x * progress_rate(), view.unit_size.x * progress_rate()); }).add(view.prefix_pos);
         // draw a map
         for (var i = 0; i < map.height; i++) {
             for (var j = 0; j < map.width; j++) {

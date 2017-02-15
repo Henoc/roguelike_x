@@ -3,7 +3,10 @@ namespace view{
   export var window_usize = new utils.Pos(640 / 32, 480 / 32)
   export var unit_size = new utils.Pos(32,32)
   export var prefix_pos = new utils.Pos(0,0)
-  var PROGRESS = 0.2
+
+  export function progress_rate(){
+    return 0.2 * main.sp60f
+  }
 
   /**
    * animation 中なので key 入力をブロック
@@ -18,7 +21,7 @@ namespace view{
     live:number
     frame:utils.Frame
     constructor(texts:string[]){
-      this.live = 60
+      this.live = 60 / main.sp60f
       var window_w = window_usize.x * unit_size.x
       var window_h = window_usize.y * unit_size.y
       this.frame = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.2, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)")
@@ -30,7 +33,7 @@ namespace view{
     print(ctx:CanvasRenderingContext2D){
         this.frame.print(ctx)
         this.live--
-        if(this.live == 0) tmp_frame = utils.none<TmpFrame>()
+        if(this.live <= 0) tmp_frame = utils.none<TmpFrame>()
     }
   }
   export var tmp_frame : utils.Option<TmpFrame> = utils.none<TmpFrame>()
@@ -52,7 +55,7 @@ namespace view{
       this.progress = 0
     }
     advance(){
-      this.progress += PROGRESS
+      this.progress += progress_rate()
       if(this.progress >= 1) {
         this.progress = 1
         return true
@@ -67,7 +70,7 @@ namespace view{
   export class AttackAnim implements Anim{
     progress:number = 0
     advance(){
-      this.progress += PROGRESS
+      this.progress += progress_rate()
       if(this.progress >= 1) {
         this.progress = 1
         return true
@@ -93,7 +96,7 @@ namespace view{
 
     // player を中心とする画面にする
     var tmp = model.player.upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5,0.5)).mul(view.unit_size)
-    prefix_pos = tmp.sub(prefix_pos).map(d => utils.limit(d,-unit_size.x * PROGRESS, unit_size.x * PROGRESS)).add(prefix_pos)
+    prefix_pos = tmp.sub(prefix_pos).map(d => utils.limit(d,-unit_size.x * progress_rate(), unit_size.x * progress_rate())).add(prefix_pos)
 
     // draw a map
     for(var i = 0; i < map.height; i++){

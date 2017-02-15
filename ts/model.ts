@@ -51,6 +51,7 @@ namespace model{
     anim_tasks:view.Anim[]
     direction:"left"|"right"|"up"|"down"|"none"
     more_props:any
+    treasures:string[]
     constructor(ux:number, uy:number, tile:Tile){
       this.upos = new utils.Pos(ux,uy)
       this.tile = tile;
@@ -59,19 +60,24 @@ namespace model{
       this.anim_tasks = []
       this.direction = tile.isDired ? "down" : "none"
       this.more_props = utils.shallow_copy(tile.more_props)
+      this.treasures = []
+      tile.drop_list.forEach(t => {
+        if(t.per > Math.random()) this.treasures.push(t.name)
+      })
     }
     static of(upos:utils.Pos,tile:Tile){
       return new Entity(upos.x,upos.y,tile)
     }
 
     print(ctx:CanvasRenderingContext2D,realPos:utils.Pos,cnt:number){
-      this.tile.print(ctx,realPos,this.direction,this.status.hp != 0 ? cnt : 0)
-
       if(this.status.hp != 0){
+        this.tile.print(ctx,realPos,this.direction,cnt)
         ctx.fillStyle ="white" 
         var font_size = view.window_usize.y * view.unit_size.y / 40
         ctx.font = "normal " + font_size + "px sans-serif"
         utils.fillText_n(ctx,this.tile.jp_name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y - view.unit_size.y, font_size ,font_size)
+      }else{
+        ctx.drawImage(main.Asset.images["treasure"],0,0,32,32,realPos.x,realPos.y,view.unit_size.x,view.unit_size.y,)
       }
     }
 
@@ -97,14 +103,9 @@ namespace model{
         var picked_names:string[] = []
         for(let dead of delete_entities_at(moved, ent => ent.status.hp == 0)){
           if(dead.tile.name == "player") continue
-          var pickeds = [new items.ItemEntity(items.type["dead_" + dead.tile.name])]
-          dead.tile.drop_list.forEach(obj => {
-            if(Math.random() < obj.per) pickeds.push(new items.ItemEntity(items.type[obj.name]))
-          })
-
-          pickeds.forEach(picked => {
-            items.item_entities.push(picked)
-            picked_names.push(picked.item.name)
+          dead.treasures.forEach(t => {
+            items.item_entities.push(new items.ItemEntity(items.type[t]))
+            picked_names.push(items.type[t].name)
           })
         }
         // tmp frame で記述
@@ -252,6 +253,12 @@ namespace model{
     action_counters.effi++
     action_counters.heal++
     if(player.status.hp == 0) main.menu_mode = ["dead"]
+    for(var i = 0; i < entities.length; i++){
+      if(entities[i].status.hp == 0 && entities[i].treasures.length == 0){
+        entities.splice(i,1)
+        i--
+      }
+    }
   }
 
   function monsters_action(){

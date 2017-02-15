@@ -34,6 +34,7 @@ var model;
     // 実際の配置物
     var Entity = (function () {
         function Entity(ux, uy, tile) {
+            var _this = this;
             this.upos = new utils.Pos(ux, uy);
             this.tile = tile;
             this.status = tile.status.get();
@@ -41,17 +42,25 @@ var model;
             this.anim_tasks = [];
             this.direction = tile.isDired ? "down" : "none";
             this.more_props = utils.shallow_copy(tile.more_props);
+            this.treasures = [];
+            tile.drop_list.forEach(function (t) {
+                if (t.per > Math.random())
+                    _this.treasures.push(t.name);
+            });
         }
         Entity.of = function (upos, tile) {
             return new Entity(upos.x, upos.y, tile);
         };
         Entity.prototype.print = function (ctx, realPos, cnt) {
-            this.tile.print(ctx, realPos, this.direction, this.status.hp != 0 ? cnt : 0);
             if (this.status.hp != 0) {
+                this.tile.print(ctx, realPos, this.direction, cnt);
                 ctx.fillStyle = "white";
                 var font_size = view.window_usize.y * view.unit_size.y / 40;
                 ctx.font = "normal " + font_size + "px sans-serif";
                 utils.fillText_n(ctx, this.tile.jp_name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y - view.unit_size.y, font_size, font_size);
+            }
+            else {
+                ctx.drawImage(main.Asset.images["treasure"], 0, 0, 32, 32, realPos.x, realPos.y, view.unit_size.x, view.unit_size.y);
             }
         };
         /**
@@ -79,14 +88,9 @@ var model;
                     var dead = _a[_i];
                     if (dead.tile.name == "player")
                         continue;
-                    var pickeds = [new items.ItemEntity(items.type["dead_" + dead.tile.name])];
-                    dead.tile.drop_list.forEach(function (obj) {
-                        if (Math.random() < obj.per)
-                            pickeds.push(new items.ItemEntity(items.type[obj.name]));
-                    });
-                    pickeds.forEach(function (picked) {
-                        items.item_entities.push(picked);
-                        picked_names.push(picked.item.name);
+                    dead.treasures.forEach(function (t) {
+                        items.item_entities.push(new items.ItemEntity(items.type[t]));
+                        picked_names.push(items.type[t].name);
                     });
                 }
                 // tmp frame で記述
@@ -234,6 +238,12 @@ var model;
         model.action_counters.heal++;
         if (model.player.status.hp == 0)
             main.menu_mode = ["dead"];
+        for (var i = 0; i < model.entities.length; i++) {
+            if (model.entities[i].status.hp == 0 && model.entities[i].treasures.length == 0) {
+                model.entities.splice(i, 1);
+                i--;
+            }
+        }
     }
     function monsters_action() {
         // monsters をランダムに移動させる

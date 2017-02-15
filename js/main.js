@@ -43,6 +43,7 @@ var main;
             { type: "image", name: "player_up", src: "assets/player_up.png", frames: 7 },
             { type: "image", name: "player_down", src: "assets/player_down.png", frames: 7 },
             { type: "image", name: "level_up", src: "assets/level_up.png", frames: 20 },
+            { type: "image", name: "treasure", src: "assets/treasure.png", frames: 1 },
         ];
         Asset.images = {};
         Asset.image_frames = {};

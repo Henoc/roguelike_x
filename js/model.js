@@ -94,9 +94,18 @@ var model;
                         picked_names.push(items.type[t].name);
                     });
                 }
-                // tmp frame で記述
-                if (picked_names.length != 0)
-                    view.tmp_frame = utils.some(new view.TmpFrame(picked_names));
+                // tmp frame
+                if (picked_names.length != 0) {
+                    var window_w = view.window_usize.x * view.unit_size.x;
+                    var window_h = view.window_usize.y * view.unit_size.y;
+                    var tmp_frame = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.2, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)", 60);
+                    tmp_frame.font_size = window_h / 32;
+                    for (var _b = 0, picked_names_1 = picked_names; _b < picked_names_1.length; _b++) {
+                        var v = picked_names_1[_b];
+                        tmp_frame.insert_text(v);
+                    }
+                    utils.frame_tasks.push(tmp_frame);
+                }
             }
         };
         Entity.prototype.attack = function () {
@@ -235,6 +244,7 @@ var model;
         model.action_counters.effi++;
         model.action_counters.heal++;
         if (model.player.status.hp == 0) {
+            // item property: revive
             for (var i = 0; i < items.item_entities.length; i++) {
                 var ent = items.item_entities[i];
                 if ("revive" in ent.more_props) {

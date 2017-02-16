@@ -139,7 +139,8 @@ namespace utils{
     margin:number
     font_size:number
     text_color:string
-    constructor(x:number,y:number,w:number,h:number,margin:number,color:string){
+    life:number
+    constructor(x:number,y:number,w:number,h:number,margin:number,color:string,life?:number){
       this.pos = new Pos(x,y)
       this.wh = new Pos(w,h)
       this.color = color
@@ -148,6 +149,7 @@ namespace utils{
       this.text_color = "white"
       this.contents = []
       this.start_points = [this.pos.add(new Pos(margin,margin))]
+      this.life = life
     }
     insert_text(text:string){
       this.contents.push({
@@ -213,11 +215,26 @@ namespace utils{
           ctx.fillText(content["text"],pos.x,pos.y)
           break
           case "frame":
-          (<Frame>content["frame"]).print(ctx)
+          var sub_frame = (<Frame>content["frame"])
+          if(sub_frame.life == undefined || sub_frame.life >=0 ) sub_frame.print(ctx)
           break
           default:
           throw "default reached"
         }
+      }
+      if(this.life != undefined && this.life >= 0){
+        this.life -= main.sp60f
+      }
+    }
+  }
+
+  export var frame_tasks :Frame[] = []
+  export function print_frame(ctx:CanvasRenderingContext2D){
+    for(var i = 0; i < frame_tasks.length; i++){
+      frame_tasks[i].print(ctx)
+      if(frame_tasks[i].life != undefined && frame_tasks[i].life < 0) {
+        frame_tasks.splice(i,1)
+        i--
       }
     }
   }

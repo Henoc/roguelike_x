@@ -144,7 +144,7 @@ var utils;
     }
     utils.fillText_n = fillText_n;
     var Frame = (function () {
-        function Frame(x, y, w, h, margin, color) {
+        function Frame(x, y, w, h, margin, color, life) {
             this.pos = new Pos(x, y);
             this.wh = new Pos(w, h);
             this.color = color;
@@ -153,6 +153,7 @@ var utils;
             this.text_color = "white";
             this.contents = [];
             this.start_points = [this.pos.add(new Pos(margin, margin))];
+            this.life = life;
         }
         Frame.prototype.insert_text = function (text) {
             this.contents.push({
@@ -213,16 +214,32 @@ var utils;
                         ctx.fillText(content["text"], pos.x, pos.y);
                         break;
                     case "frame":
-                        content["frame"].print(ctx);
+                        var sub_frame = content["frame"];
+                        if (sub_frame.life == undefined || sub_frame.life >= 0)
+                            sub_frame.print(ctx);
                         break;
                     default:
                         throw "default reached";
                 }
             }
+            if (this.life != undefined && this.life >= 0) {
+                this.life -= main.sp60f;
+            }
         };
         return Frame;
     }());
     utils.Frame = Frame;
+    utils.frame_tasks = [];
+    function print_frame(ctx) {
+        for (var i = 0; i < utils.frame_tasks.length; i++) {
+            utils.frame_tasks[i].print(ctx);
+            if (utils.frame_tasks[i].life != undefined && utils.frame_tasks[i].life < 0) {
+                utils.frame_tasks.splice(i, 1);
+                i--;
+            }
+        }
+    }
+    utils.print_frame = print_frame;
     function shallow_copy(obj) {
         var clone = {};
         for (var str in obj) {

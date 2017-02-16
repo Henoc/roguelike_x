@@ -12,31 +12,6 @@ var view;
      * print() 内で更新する
      */
     view.action_lock = false;
-    /**
-     * use only when item dropped
-     */
-    var TmpFrame = (function () {
-        function TmpFrame(texts) {
-            this.live = 60 / main.sp60f;
-            var window_w = view.window_usize.x * view.unit_size.x;
-            var window_h = view.window_usize.y * view.unit_size.y;
-            this.frame = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.2, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)");
-            this.frame.font_size = window_h / 32;
-            for (var _i = 0, texts_1 = texts; _i < texts_1.length; _i++) {
-                var v = texts_1[_i];
-                this.frame.insert_text(v);
-            }
-        }
-        TmpFrame.prototype.print = function (ctx) {
-            this.frame.print(ctx);
-            this.live--;
-            if (this.live <= 0)
-                view.tmp_frame = utils.none();
-        };
-        return TmpFrame;
-    }());
-    view.TmpFrame = TmpFrame;
-    view.tmp_frame = utils.none();
     var MoveAnim = (function () {
         function MoveAnim(pre_upos) {
             this.pre_upos = pre_upos;
@@ -112,7 +87,8 @@ var view;
         }
         var window_w = view.window_usize.x * view.unit_size.x;
         var window_h = view.window_usize.y * view.unit_size.y;
-        var top_frame = new utils.Frame(0, 0, window_w, window_h, window_h * 0.03, "rgba(0,0,0,0)");
+        var top_frame = new utils.Frame(0, 0, window_w, window_h, window_h * 0.03, "rgba(0,0,0,0)", 1);
+        utils.frame_tasks.push(top_frame);
         if (main.menu_mode[0] == "explore") {
             // hp gage
             top_frame.font_size = window_h / 32;
@@ -194,9 +170,7 @@ var view;
             dead_frame.font_size = window_h / 32;
             dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F");
         }
-        top_frame.print(ctx);
-        // tmp frame
-        view.tmp_frame.foreach(function (f) { return f.print(ctx); });
+        utils.print_frame(ctx);
         // draw temporal animations
         utils.print_anims(ctx);
         // draw temporal damage animations

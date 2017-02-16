@@ -14,30 +14,6 @@ namespace view{
    */
   export var action_lock = false
 
-  /**
-   * use only when item dropped
-   */
-  export class TmpFrame{
-    live:number
-    frame:utils.Frame
-    constructor(texts:string[]){
-      this.live = 60 / main.sp60f
-      var window_w = window_usize.x * unit_size.x
-      var window_h = window_usize.y * unit_size.y
-      this.frame = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.2, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)")
-      this.frame.font_size = window_h / 32
-      for(let v of texts){
-        this.frame.insert_text(v)
-      }
-    }
-    print(ctx:CanvasRenderingContext2D){
-        this.frame.print(ctx)
-        this.live--
-        if(this.live <= 0) tmp_frame = utils.none<TmpFrame>()
-    }
-  }
-  export var tmp_frame : utils.Option<TmpFrame> = utils.none<TmpFrame>()
-
   export interface Anim{
     /**
      * animation の1進捗
@@ -132,7 +108,8 @@ namespace view{
 
     var window_w = window_usize.x * unit_size.x
     var window_h = window_usize.y * unit_size.y
-    var top_frame = new utils.Frame(0,0,window_w,window_h,window_h * 0.03,"rgba(0,0,0,0)")
+    var top_frame = new utils.Frame(0,0,window_w,window_h,window_h * 0.03,"rgba(0,0,0,0)",1)
+    utils.frame_tasks.push(top_frame)
 
     if(main.menu_mode[0] == "explore"){
       // hp gage
@@ -218,10 +195,8 @@ namespace view{
       dead_frame.font_size = window_h / 32
       dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F")
     }
-    top_frame.print(ctx)
-
-    // tmp frame
-    tmp_frame.foreach(f => f.print(ctx))
+    
+    utils.print_frame(ctx)
 
     // draw temporal animations
     utils.print_anims(ctx)

@@ -109,8 +109,17 @@ namespace model{
             picked_names.push(items.type[t].name)
           })
         }
-        // tmp frame で記述
-        if(picked_names.length != 0) view.tmp_frame = utils.some(new view.TmpFrame(picked_names))
+        // tmp frame
+        if(picked_names.length != 0) {
+          var window_w = view.window_usize.x * view.unit_size.x
+          var window_h = view.window_usize.y * view.unit_size.y
+          var tmp_frame = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.2, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)",60)
+          tmp_frame.font_size = window_h / 32
+          for(let v of picked_names){
+            tmp_frame.insert_text(v)
+          }
+          utils.frame_tasks.push(tmp_frame)
+        }
       }
     }
 

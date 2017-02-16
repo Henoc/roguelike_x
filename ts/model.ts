@@ -42,6 +42,7 @@ namespace model{
   tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F","rgba(15,140,15,1)","mame_mouse",true,true,utils.some(new battle.Status(2,2,1,0)),1,[{name:"soramame_head",per:0.2},{name:"mame_mouse_ibukuro",per:0.05}],{})
   tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC","","lang_dog",true,true,utils.some(new battle.Status(3,3,1,0)),2,[{name:"lang_dog_shoes",per:0.2},{name:"lang_dog_paper",per:0.03}],{})
   tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0","","sacred_slime",true,true,utils.some(new battle.Status(4,4,2,1)),3,[{name:"dead_sacred_slime",per:1},{name:"potion",per:0.1},{name:"revival",per:0.01}],{revive:5})
+  tiles["violent_ghost"] = new Tile("\u66B4\u308C\u30B4\u30FC\u30B9\u30C8","","violent_ghost",true,true,utils.some(new battle.Status(4,4,3,0)),4,[],{hide:true})
 
   // 実際の配置物
   export class Entity{
@@ -71,7 +72,9 @@ namespace model{
     }
 
     print(ctx:CanvasRenderingContext2D,realPos:utils.Pos,cnt:number){
-      if(this.status.hp != 0){
+      if("hide" in this.more_props && this.more_props["hide"]){
+        // nothing to show
+      }else if(this.status.hp != 0){
         this.tile.print(ctx,realPos,this.direction,cnt)
         ctx.fillStyle ="white" 
         var font_size = view.window_usize.y * view.unit_size.y / 40
@@ -184,8 +187,9 @@ namespace model{
       ptn[0] = "mame_mouse"
       ptn[1] = "lang_dog"
       ptn[2] = "sacred_slime"
+      ptn[3] = "violent_ghost"
       entities.push(
-        model.Entity.of(upos,model.tiles[ptn[utils.randInt(3)]])
+        model.Entity.of(upos,model.tiles[ptn[utils.randInt(4)]])
       )
     }
 
@@ -305,9 +309,12 @@ namespace model{
         }
         continue
       }
+      // property: hide
+      if("hide" in ent.more_props) ent.more_props["hide"] = true
       if(ent.reach(player)){
         ent.direction = ent.dir_to(player)
         ent.attack()
+        if("hide" in ent.more_props) ent.more_props["hide"] = false
       }else if(ent.near(player,4)){
         ent.move(dir[ent.dir_to(player)])
       }else{

@@ -31,7 +31,7 @@ var model;
     model.tiles["goal"] = new Tile("\u30B4\u30FC\u30EB", "", "goal", false, false, utils.some(new battle.Status(1, 1, 0, 0)), 0, [], { no_attack: true, no_damage: true });
     model.tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F", "rgba(15,140,15,1)", "mame_mouse", true, true, utils.some(new battle.Status(2, 2, 1, 0)), 1, [{ name: "soramame_head", per: 0.2 }, { name: "mame_mouse_ibukuro", per: 0.05 }], {});
     model.tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC", "", "lang_dog", true, true, utils.some(new battle.Status(3, 3, 1, 0)), 2, [{ name: "lang_dog_shoes", per: 0.2 }, { name: "lang_dog_paper", per: 0.03 }], {});
-    model.tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0", "", "sacred_slime", true, true, utils.some(new battle.Status(4, 4, 2, 1)), 3, [{ name: "dead_sacred_slime", per: 1 }, { name: "potion", per: 0.1 }], { revive: 5 });
+    model.tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0", "", "sacred_slime", true, true, utils.some(new battle.Status(4, 4, 2, 1)), 3, [{ name: "dead_sacred_slime", per: 1 }, { name: "potion", per: 0.1 }, { name: "revival", per: 0.01 }], { revive: 5 });
     // 実際の配置物
     var Entity = (function () {
         function Entity(ux, uy, tile) {
@@ -234,8 +234,23 @@ var model;
         }
         model.action_counters.effi++;
         model.action_counters.heal++;
-        if (model.player.status.hp == 0)
-            main.menu_mode = ["dead"];
+        if (model.player.status.hp == 0) {
+            for (var i = 0; i < items.item_entities.length; i++) {
+                var ent = items.item_entities[i];
+                if ("revive" in ent.more_props) {
+                    model.player.status.max_hp = utils.limit(model.player.status.max_hp, ent.more_props["revive"], model.player.status.max_hp + 1);
+                    model.player.status.hp = ent.more_props["revive"];
+                    for (var j = 0; j < 9; j++) {
+                        var delta_upos = new utils.Pos(j % 3 - 1, Math.floor(j / 3) - 1);
+                        utils.start_anim("twinkle", 2, model.player.upos.add(delta_upos).mul(view.unit_size).sub(view.prefix_pos), new utils.Pos(32, 32), 12);
+                    }
+                    items.item_entities.splice(i, 1);
+                    break;
+                }
+            }
+            if (model.player.status.hp == 0)
+                main.menu_mode = ["dead"];
+        }
         for (var i = 0; i < model.entities.length; i++) {
             if (model.entities[i].status.hp == 0 && model.entities[i].treasures.length == 0) {
                 model.entities.splice(i, 1);

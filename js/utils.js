@@ -59,6 +59,15 @@ var utils;
         return true;
     }
     utils.all = all;
+    function exist(ary, fn) {
+        for (var _i = 0, ary_2 = ary; _i < ary_2.length; _i++) {
+            var v = ary_2[_i];
+            if (fn(v))
+                return true;
+        }
+        return false;
+    }
+    utils.exist = exist;
     /**
      * [min,max)
      */
@@ -223,29 +232,32 @@ var utils;
     }
     utils.shallow_copy = shallow_copy;
     var TmpAnim = (function () {
-        function TmpAnim(name, fps, pos, src_wh) {
+        function TmpAnim(name, fps, pos, src_wh, repeat) {
             this.name = name;
             this.counter = 0;
             this.fps = fps;
             this.pos = pos;
             this.src_wh = src_wh;
+            this.repeat = repeat;
         }
         TmpAnim.prototype.print = function (ctx) {
-            var cnt = Math.floor(this.counter / this.fps);
+            var cnt = Math.floor(this.counter / this.fps) % main.Asset.image_frames[this.name];
             ctx.drawImage(main.Asset.images[this.name], 0, this.src_wh.y * cnt, this.src_wh.x, this.src_wh.y, this.pos.x, this.pos.y, this.src_wh.x, this.src_wh.y);
             this.counter++;
         };
         return TmpAnim;
     }());
     var tmp_anim_tasks = [];
-    function start_anim(name, fps, pos, src_wh) {
-        tmp_anim_tasks.push(new TmpAnim(name, fps, pos, src_wh));
+    function start_anim(name, fps, pos, src_wh, repeat) {
+        if (repeat == undefined)
+            repeat = 1;
+        tmp_anim_tasks.push(new TmpAnim(name, fps, pos, src_wh, repeat));
     }
     utils.start_anim = start_anim;
     function print_anims(ctx) {
         for (var i = 0; i < tmp_anim_tasks.length; i++) {
             tmp_anim_tasks[i].print(ctx);
-            if (tmp_anim_tasks[i].counter / tmp_anim_tasks[i].fps >= main.Asset.image_frames[tmp_anim_tasks[i].name]) {
+            if (tmp_anim_tasks[i].counter / tmp_anim_tasks[i].fps >= main.Asset.image_frames[tmp_anim_tasks[i].name] * tmp_anim_tasks[i].repeat) {
                 tmp_anim_tasks.splice(i, 1);
                 i--;
             }

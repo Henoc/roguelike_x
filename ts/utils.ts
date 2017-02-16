@@ -51,6 +51,13 @@ namespace utils{
     }
     return true
   }
+
+  export function exist<T>(ary:T[], fn: (elem:T) => boolean){
+    for(let v of ary){
+      if(fn(v)) return true
+    }
+    return false
+  }
   
   /**
    * [min,max)
@@ -229,27 +236,30 @@ namespace utils{
     fps:number
     pos:Pos
     src_wh:Pos
-    constructor(name:string, fps:number, pos:Pos,src_wh:Pos){
+    repeat:number
+    constructor(name:string, fps:number, pos:Pos,src_wh:Pos,repeat:number){
       this.name = name
       this.counter = 0
       this.fps = fps
       this.pos = pos
       this.src_wh = src_wh
+      this.repeat = repeat
     }
     print(ctx:CanvasRenderingContext2D){
-      var cnt = Math.floor(this.counter / this.fps)
+      var cnt = Math.floor(this.counter / this.fps) % main.Asset.image_frames[this.name]
       ctx.drawImage(main.Asset.images[this.name],0,this.src_wh.y * cnt,this.src_wh.x,this.src_wh.y,this.pos.x,this.pos.y,this.src_wh.x,this.src_wh.y)
       this.counter++
     }
   }
   var tmp_anim_tasks:TmpAnim[] = []
-  export function start_anim(name:string, fps:number, pos:Pos, src_wh:Pos){
-    tmp_anim_tasks.push(new TmpAnim(name,fps,pos,src_wh))
+  export function start_anim(name:string, fps:number, pos:Pos, src_wh:Pos, repeat?:number){
+    if(repeat == undefined) repeat = 1
+    tmp_anim_tasks.push(new TmpAnim(name,fps,pos,src_wh,repeat))
   }
   export function print_anims(ctx:CanvasRenderingContext2D){
     for(var i = 0; i < tmp_anim_tasks.length; i++){
       tmp_anim_tasks[i].print(ctx)
-      if(tmp_anim_tasks[i].counter / tmp_anim_tasks[i].fps >= main.Asset.image_frames[tmp_anim_tasks[i].name]) {
+      if(tmp_anim_tasks[i].counter / tmp_anim_tasks[i].fps >= main.Asset.image_frames[tmp_anim_tasks[i].name] * tmp_anim_tasks[i].repeat) {
         tmp_anim_tasks.splice(i,1)
         i--
       }

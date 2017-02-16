@@ -45,6 +45,7 @@ var main;
             { type: "image", name: "player_down", src: "assets/player_down.png", frames: 7 },
             { type: "image", name: "level_up", src: "assets/level_up.png", frames: 20 },
             { type: "image", name: "treasure", src: "assets/treasure.png", frames: 1 },
+            { type: "image", name: "twinkle", src: "assets/twinkle.png", frames: 5 },
         ];
         Asset.images = {};
         Asset.image_frames = {};
@@ -92,7 +93,7 @@ var main;
             new items.ItemEntity(items.type.onigiri),
             new items.ItemEntity(items.type.potion),
             new items.ItemEntity(items.type.knife),
-            new items.ItemEntity(items.type.flying_pan),
+            new items.ItemEntity(items.type.revival),
         ];
         Asset.loadAssets(function () {
             requestAnimationFrame(update);

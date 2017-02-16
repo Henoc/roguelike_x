@@ -56,6 +56,7 @@ var battle;
             model.player.level++;
             battle.dist_point++;
             utils.start_anim("level_up", 4 / main.sp60f, model.player.upos.sub(new utils.Pos(1, 2)).mul(view.unit_size).sub(view.prefix_pos), new utils.Pos(96, 96));
+            utils.start_tmp_frame("\u30EC\u30D9\u30EB\u304C\u4E0A\u304C\u3063\u305F");
         }
     }
     battle.add_exp = add_exp;

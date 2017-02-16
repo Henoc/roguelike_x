@@ -228,6 +228,21 @@ namespace utils{
     }
   }
 
+  // export class ScrollableFrame extends Frame {
+  //   inner_canvas : HTMLCanvasElement  // size w * h
+  //   inner_pos : Pos
+  //   inner_wh : Pos
+  //   constructor(x:number,y:number,w:number,h:number,inner_w:number,inner_h:number,margin:number,color:string,life?:number){
+  //     super(x,y,w,h,margin,color,life)
+  //     this.inner_wh = new Pos(inner_w, inner_h)
+  //     this.inner_pos = new Pos(inner_w - w, inner_h - h)
+  //   }
+
+  //   print(ctx:CanvasRenderingContext2D){
+
+  //   }
+  // }
+
   export var frame_tasks :Frame[] = []
   export function print_frame(ctx:CanvasRenderingContext2D){
     for(var i = 0; i < frame_tasks.length; i++){
@@ -237,6 +252,25 @@ namespace utils{
         i--
       }
     }
+  }
+
+  var tmp_frame : Option<Frame> = none<Frame>()
+  export function start_tmp_frame(text:string){
+    if(tmp_frame.exist()) tmp_frame.get().life = 60
+    else{
+      var window_w = view.window_usize.x * view.unit_size.x
+      var window_h = view.window_usize.y * view.unit_size.y
+      var tf = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.3, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)",60)
+      tf.font_size = window_h / 32
+      tmp_frame = some(tf)
+    }
+    tmp_frame.get().insert_text(text)
+  }
+  export function print_tmp_frame(ctx:CanvasRenderingContext2D){
+    tmp_frame.foreach(t => {
+      t.print(ctx)
+      if(t.life != undefined && t.life < 0) tmp_frame = none<Frame>()
+    })
   }
 
   export function shallow_copy(obj:any):any {

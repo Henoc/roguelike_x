@@ -171,6 +171,7 @@ var view;
             dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F");
         }
         utils.print_frame(ctx);
+        utils.print_tmp_frame(ctx);
         // draw temporal animations
         utils.print_anims(ctx);
         // draw temporal damage animations

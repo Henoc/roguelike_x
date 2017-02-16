@@ -197,6 +197,7 @@ namespace view{
     }
     
     utils.print_frame(ctx)
+    utils.print_tmp_frame(ctx)
 
     // draw temporal animations
     utils.print_anims(ctx)

@@ -111,14 +111,9 @@ namespace model{
         }
         // tmp frame
         if(picked_names.length != 0) {
-          var window_w = view.window_usize.x * view.unit_size.x
-          var window_h = view.window_usize.y * view.unit_size.y
-          var tmp_frame = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.2, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)",60)
-          tmp_frame.font_size = window_h / 32
           for(let v of picked_names){
-            tmp_frame.insert_text(v)
+            utils.start_tmp_frame(v + " \u3092\u53D6\u5F97")
           }
-          utils.frame_tasks.push(tmp_frame)
         }
       }
     }
@@ -263,6 +258,7 @@ namespace model{
     action_counters.effi++
     action_counters.heal++
     if(player.status.hp == 0) {
+      utils.start_tmp_frame("\u6B7B\u3093\u3067\u3057\u307E\u3063\u305F")
       // item property: revive
       for(var i = 0; i < items.item_entities.length; i++){
         var ent = items.item_entities[i]
@@ -274,6 +270,7 @@ namespace model{
             utils.start_anim("twinkle",2,player.upos.add(delta_upos).mul(view.unit_size).sub(view.prefix_pos), new utils.Pos(32,32), 12)
           }
           items.item_entities.splice(i,1)
+          utils.start_tmp_frame("\u8607\u751F\u85AC\u3067\u751F\u304D\u8FD4\u3063\u305F")
           break
         }
       }
@@ -289,6 +286,7 @@ namespace model{
       entities = []
       rank++
       init_entities()
+      utils.start_tmp_frame(rank + "\u968E\u306B\u5230\u9054\u3057\u305F")
     }
   }
 

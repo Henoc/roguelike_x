@@ -98,6 +98,7 @@ var main;
             new items.ItemEntity(items.type.potion),
             new items.ItemEntity(items.type.knife),
             new items.ItemEntity(items.type.revival),
+            new items.ItemEntity(items.type.ghost_camouflage),
         ];
         Asset.loadAssets(function () {
             requestAnimationFrame(update);
@@ -183,6 +184,7 @@ var main;
                                     }
                                     items.equips[selected.item.equip_region] = utils.some(selected);
                                     model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum());
+                                    model.player.more_props = items.equips_more_props_sum();
                                     items.item_entities.splice(main.cursor["items"], 1);
                                     main.cursor_max["items"]--;
                                     main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);

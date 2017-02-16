@@ -33,7 +33,16 @@ namespace model{
     }
   }
 
-  // タイルインスタンス
+  /**
+   * エンティティの型
+   * 
+   * more_props:
+   * no_attack 攻撃しない
+   * no_damage 攻撃を受けない
+   * revive(x) HP0になったxターン後に復活
+   * hide 移動の間にキャラが表示されない
+   * camouflage(x) プレイヤー専用．x%敵の視力が下がる．元は半径4マス．
+   */
   export var tiles: { [key: string]: Tile; } = {}
   tiles["floor"] = new Tile("\u5e8a","rgba(20,40,40,1)","floor",false,false,utils.none<battle.Status>(),0,[],{})
   tiles["wall"] = new Tile("\u58c1","rgba(50,30,10,1)","wall",true,false,utils.none<battle.Status>(),0,[],{})
@@ -42,7 +51,7 @@ namespace model{
   tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F","rgba(15,140,15,1)","mame_mouse",true,true,utils.some(new battle.Status(2,2,1,0)),1,[{name:"soramame_head",per:0.2},{name:"mame_mouse_ibukuro",per:0.05}],{})
   tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC","","lang_dog",true,true,utils.some(new battle.Status(3,3,1,0)),2,[{name:"lang_dog_shoes",per:0.2},{name:"lang_dog_paper",per:0.03}],{})
   tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0","","sacred_slime",true,true,utils.some(new battle.Status(4,4,2,1)),3,[{name:"dead_sacred_slime",per:1},{name:"potion",per:0.1},{name:"revival",per:0.01}],{revive:5})
-  tiles["violent_ghost"] = new Tile("\u66B4\u308C\u30B4\u30FC\u30B9\u30C8","","violent_ghost",true,true,utils.some(new battle.Status(4,4,3,0)),4,[],{hide:true})
+  tiles["violent_ghost"] = new Tile("\u66B4\u308C\u30B4\u30FC\u30B9\u30C8","","violent_ghost",true,true,utils.some(new battle.Status(4,4,3,0)),4,[{name:"candle",per:0.2},{name:"ghost_camouflage", per: 0.05}],{hide:true})
 
   // 実際の配置物
   export class Entity{
@@ -315,7 +324,8 @@ namespace model{
         ent.direction = ent.dir_to(player)
         ent.attack()
         if("hide" in ent.more_props) ent.more_props["hide"] = false
-      }else if(ent.near(player,4)){
+        // property: camouflage
+      }else if(ent.near(player,4 * ("camouflage" in player.more_props ? (1 - player.more_props["camouflage"]) : 1))){
         ent.move(dir[ent.dir_to(player)])
       }else{
         ent.move(dir_ary[utils.randInt(4)])
@@ -336,7 +346,7 @@ namespace model{
   export function delete_entities_at(upos:utils.Pos, cond: (entity:Entity) => boolean){
     var ret : Entity[] = []
     for(var i = 0; i< entities.length; i++){
-      if(entities[i].upos.equals(upos) && cond(entities[i])){
+      if(entities[i].tile.name != "player" && entities[i].upos.equals(upos) && cond(entities[i])){
         ret.push(entities[i])
         entities.splice(i,1)
         i--

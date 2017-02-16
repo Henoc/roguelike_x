@@ -27,10 +27,11 @@ var model;
     model.tiles = {};
     model.tiles["floor"] = new Tile("\u5e8a", "rgba(20,40,40,1)", "floor", false, false, utils.none(), 0, [], {});
     model.tiles["wall"] = new Tile("\u58c1", "rgba(50,30,10,1)", "wall", true, false, utils.none(), 0, [], {});
-    model.tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc", "rgba(180,110,180,1)", "player", true, true, utils.some(new battle.Status(10, 10, 1, 0, 20, 10)), 1, [], {});
+    model.tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc", "rgba(180,110,180,1)", "player", true, true, utils.some(new battle.Status(10, 10, 1, 0, 20, 10)), 1, [{ name: "potion", per: 1 }], {});
+    model.tiles["goal"] = new Tile("\u30B4\u30FC\u30EB", "", "goal", false, false, utils.some(new battle.Status(1, 1, 0, 0)), 0, [], { no_attack: true, no_damage: true });
     model.tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F", "rgba(15,140,15,1)", "mame_mouse", true, true, utils.some(new battle.Status(2, 2, 1, 0)), 1, [{ name: "soramame_head", per: 0.2 }, { name: "mame_mouse_ibukuro", per: 0.05 }], {});
     model.tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC", "", "lang_dog", true, true, utils.some(new battle.Status(3, 3, 1, 0)), 2, [{ name: "lang_dog_shoes", per: 0.2 }, { name: "lang_dog_paper", per: 0.03 }], {});
-    model.tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0", "", "sacred_slime", true, true, utils.some(new battle.Status(4, 4, 2, 1)), 3, [{ name: "potion", per: 0.1 }], { revive: 5 });
+    model.tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0", "", "sacred_slime", true, true, utils.some(new battle.Status(4, 4, 2, 1)), 3, [{ name: "dead_sacred_slime", per: 1 }, { name: "potion", per: 0.1 }], { revive: 5 });
     // 実際の配置物
     var Entity = (function () {
         function Entity(ux, uy, tile) {
@@ -57,7 +58,7 @@ var model;
                 ctx.fillStyle = "white";
                 var font_size = view.window_usize.y * view.unit_size.y / 40;
                 ctx.font = "normal " + font_size + "px sans-serif";
-                utils.fillText_n(ctx, this.tile.jp_name + "\n" + this.status.hp + "/" + this.status.max_hp, realPos.x, realPos.y - view.unit_size.y, font_size, font_size);
+                utils.fillText_n(ctx, this.tile.jp_name + ("no_damage" in this.more_props ? "" : "\n" + this.status.hp + "/" + this.status.max_hp), realPos.x, realPos.y - view.unit_size.y, font_size, font_size);
             }
             else {
                 ctx.drawImage(main.Asset.images["treasure"], 0, 0, 32, 32, realPos.x, realPos.y, view.unit_size.x, view.unit_size.y);
@@ -111,7 +112,7 @@ var model;
                 // 誰かいれば当たる
                 for (var _a = 0, _b = get_entities_at(directed); _a < _b.length; _a++) {
                     var entity = _b[_a];
-                    if (entity.status.hp == 0)
+                    if (entity.status.hp == 0 || "no_damage" in entity.more_props)
                         continue;
                     entity.status = this.status.attackTo(entity);
                     if (entity.status.hp == 0)
@@ -157,13 +158,15 @@ var model;
         return Entity;
     }());
     model.Entity = Entity;
-    // 実際の配置物のインスタンス
+    /**
+     * character instances. Entity has Tile instance, a Tile is an abstract character or floor object.
+     */
     model.entities = [];
-    function initEntities() {
-        map.makeMap();
+    function init_entities() {
+        map.make_map();
         // enemy をランダムに数匹配置
-        for (var i = 0; i < 50; i++) {
-            var upos = randomUpos(function (n) { return !model.tiles[map.entity_names[n]].isWall; });
+        for (var i = 0; i < 20; i++) {
+            var upos = random_upos(function (n) { return !model.tiles[map.entity_names[n]].isWall; });
             var ptn = [];
             ptn[0] = "mame_mouse";
             ptn[1] = "lang_dog";
@@ -171,26 +174,21 @@ var model;
             model.entities.push(model.Entity.of(upos, model.tiles[ptn[utils.randInt(3)]]));
         }
         // player を壁でないところにランダム配置
-        var player_upos = randomUpos(function (n) { return !model.tiles[map.entity_names[n]].isWall; });
+        var player_upos = random_upos(function (n) { return !model.tiles[map.entity_names[n]].isWall; });
         model.player = new model.Entity(player_upos.x, player_upos.y, model.tiles["player"]);
         model.entities.push(model.player);
+        // goal
+        var goal_upos = random_upos(function (n) { return !model.tiles[map.entity_names[n]].isWall; });
+        model.goal = new model.Entity(goal_upos.x, goal_upos.y, model.tiles["goal"]);
+        model.entities.push(model.goal);
         // player を中心とする画面にする
         view.prefix_pos = player_upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5, 0.5)).mul(view.unit_size);
-        // items
-        items.item_entities = [
-            new items.ItemEntity(items.type.onigiri),
-            new items.ItemEntity(items.type.onigiri),
-            new items.ItemEntity(items.type.onigiri),
-            new items.ItemEntity(items.type.potion),
-            new items.ItemEntity(items.type.knife),
-            new items.ItemEntity(items.type.flying_pan),
-        ];
     }
-    model.initEntities = initEntities;
+    model.init_entities = init_entities;
     /**
      * cond を満たす filed の upos をとる
      */
-    function randomUpos(cond) {
+    function random_upos(cond) {
         var upos;
         do {
             upos = new utils.Pos(utils.randInt(map.width), utils.randInt(map.height));
@@ -244,12 +242,17 @@ var model;
                 i--;
             }
         }
+        if (model.player.upos.equals(model.goal.upos)) {
+            model.entities = [];
+            model.rank++;
+            init_entities();
+        }
     }
     function monsters_action() {
         // monsters をランダムに移動させる
         for (var _i = 0, entities_1 = model.entities; _i < entities_1.length; _i++) {
             var ent = entities_1[_i];
-            if (ent == model.player)
+            if (ent == model.player || "no_attack" in ent.more_props)
                 continue;
             if (ent.status.hp == 0) {
                 // additional property: revive

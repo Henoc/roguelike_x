@@ -1,6 +1,6 @@
 namespace map{
-  export var width = 60
-  export var height = 60
+  export var width = 30
+  export var height = 30
   export var fields : number[][] = new Array()
   for(var i = 0; i < height; i++){
     fields[i] = new Array()
@@ -48,10 +48,10 @@ namespace map{
   /**
    * ランダムなマップの自動生成
    */
-  export function makeMap(){
+  export function make_map(){
     for(var i = 0; i < height; i+= minimap_usize.y){
       for(var j = 0; j < width; j+= minimap_usize.x){
-        utils.paste(fields, makeMiniMap(), i, j)
+        utils.paste(fields, make_minimap(), i, j)
       }
     }
   }
@@ -59,7 +59,7 @@ namespace map{
   /**
    * このミニマップをつなぎ合わせる
    */
-  function makeMiniMap():number[][]{
+  function make_minimap():number[][]{
       var mini_pattern = [
       [
         "1111001111",

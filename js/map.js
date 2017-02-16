@@ -1,7 +1,7 @@
 var map;
 (function (map) {
-    map.width = 60;
-    map.height = 60;
+    map.width = 30;
+    map.height = 30;
     map.fields = new Array();
     for (var i = 0; i < map.height; i++) {
         map.fields[i] = new Array();
@@ -45,18 +45,18 @@ var map;
     /**
      * ランダムなマップの自動生成
      */
-    function makeMap() {
+    function make_map() {
         for (var i = 0; i < map.height; i += minimap_usize.y) {
             for (var j = 0; j < map.width; j += minimap_usize.x) {
-                utils.paste(map.fields, makeMiniMap(), i, j);
+                utils.paste(map.fields, make_minimap(), i, j);
             }
         }
     }
-    map.makeMap = makeMap;
+    map.make_map = make_map;
     /**
      * このミニマップをつなぎ合わせる
      */
-    function makeMiniMap() {
+    function make_minimap() {
         var mini_pattern = [
             [
                 "1111001111",

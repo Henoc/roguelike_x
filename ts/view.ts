@@ -137,6 +137,7 @@ namespace view{
     if(main.menu_mode[0] == "explore"){
       // hp gage
       top_frame.font_size = window_h / 32
+      top_frame.insert_text(model.rank + "\u968E")
       top_frame.insert_text("level " + model.player.level + "  next " + Math.floor(battle.player_exp) + "/" + battle.max_exp())
       top_frame.insert_text("HP " + model.player.status.hp + "/" + model.player.status.max_hp)
       var max_hp_frame_w = window_w * model.player.status.max_hp / 100

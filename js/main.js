@@ -38,6 +38,7 @@ var main;
             { type: "image", name: "sacred_slime_down", src: "assets/sacred_slime_down.png", frames: 2 },
             { type: "image", name: "floor", src: "assets/floor.png", frames: 1 },
             { type: "image", name: "wall", src: "assets/wall.png", frames: 1 },
+            { type: "image", name: "goal", src: "assets/goal.png", frames: 1 },
             { type: "image", name: "player_left", src: "assets/player_left.png", frames: 7 },
             { type: "image", name: "player_right", src: "assets/player_right.png", frames: 7 },
             { type: "image", name: "player_up", src: "assets/player_up.png", frames: 7 },
@@ -81,8 +82,18 @@ var main;
         Asset.assets.forEach(function (asset) {
             Asset.image_frames[asset.name] = asset.frames;
         });
+        model.rank = 1;
         // エンティティの配置
-        model.initEntities();
+        model.init_entities();
+        // アイテム支給
+        items.item_entities = [
+            new items.ItemEntity(items.type.onigiri),
+            new items.ItemEntity(items.type.onigiri),
+            new items.ItemEntity(items.type.onigiri),
+            new items.ItemEntity(items.type.potion),
+            new items.ItemEntity(items.type.knife),
+            new items.ItemEntity(items.type.flying_pan),
+        ];
         Asset.loadAssets(function () {
             requestAnimationFrame(update);
         });

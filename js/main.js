@@ -40,6 +40,7 @@ var main;
             { type: "image", name: "violent_ghost_right", src: "assets/violent_ghost_right.png", frames: 4 },
             { type: "image", name: "violent_ghost_up", src: "assets/violent_ghost_up.png", frames: 4 },
             { type: "image", name: "violent_ghost_down", src: "assets/violent_ghost_down.png", frames: 4 },
+            { type: "image", name: "treasure_box", src: "assets/treasure_box.png", frames: 1 },
             { type: "image", name: "floor", src: "assets/floor.png", frames: 1 },
             { type: "image", name: "wall", src: "assets/wall.png", frames: 1 },
             { type: "image", name: "goal", src: "assets/goal.png", frames: 1 },
@@ -82,6 +83,8 @@ var main;
         ctx = canvas.getContext('2d');
         canvas.width = view.window_usize.x * view.unit_size.x;
         canvas.height = view.window_usize.y * view.unit_size.y;
+        canvas.addEventListener("touchstart", main.touchstart);
+        canvas.addEventListener("touchmove", main.touchmove);
         ctx.textBaseline = "top";
         // image_frames
         Asset.assets.forEach(function (asset) {
@@ -96,7 +99,7 @@ var main;
             new items.ItemEntity(items.type.onigiri),
             new items.ItemEntity(items.type.onigiri),
             new items.ItemEntity(items.type.potion),
-            new items.ItemEntity(items.type.knife),
+            new items.ItemEntity(items.type.silver_knife),
             new items.ItemEntity(items.type.revival),
             new items.ItemEntity(items.type.ghost_camouflage),
         ];
@@ -155,51 +158,57 @@ var main;
                                 main.menu_mode.push("command");
                                 var mode = main.menu_mode.join(">");
                                 main.cursor[mode] = 0;
-                                main.cursor_max[mode] = items.item_entities[main.cursor["items"]].item.commands.length;
+                                main.cursor_max[mode] = items.item_entities[main.cursor["items"]].get_valid_commands().length;
                             }
                             break;
                         case "items>command":
                             var selected = items.item_entities[main.cursor["items"]];
-                            switch (selected.item.commands[main.cursor["items>command"]]) {
-                                case "use":
-                                    if (selected.item.delta_status.hp > 0)
-                                        utils.start_tmp_num(selected.item.delta_status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos));
-                                    model.player.status = model.player.status.add(selected.item.delta_status);
-                                    items.item_entities.splice(main.cursor["items"], 1);
-                                    main.cursor_max["items"]--;
-                                    main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
-                                    main.menu_mode.pop();
-                                    break;
-                                case "put":
-                                    items.item_entities.splice(main.cursor["items"], 1);
-                                    main.cursor_max["items"]--;
-                                    main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
-                                    main.menu_mode.pop();
-                                    break;
-                                case "equip":
-                                    var old_eq = items.equips[selected.item.equip_region];
-                                    if (old_eq.exist()) {
-                                        items.item_entities.push(old_eq.get());
-                                        main.cursor_max["items"]++;
-                                    }
-                                    items.equips[selected.item.equip_region] = utils.some(selected);
-                                    model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum());
-                                    model.player.more_props = items.equips_more_props_sum();
-                                    items.item_entities.splice(main.cursor["items"], 1);
-                                    main.cursor_max["items"]--;
-                                    main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
-                                    main.menu_mode.pop();
-                                    break;
-                                case "decode":
-                                    battle.add_exp(selected.item.more_props["exp"]);
-                                    items.item_entities.splice(main.cursor["items"], 1);
-                                    main.cursor_max["items"]--;
-                                    main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
-                                    main.menu_mode.pop();
-                                    break;
-                                default:
-                                    throw "default reached";
+                            var selected_command_name = selected.get_valid_commands()[main.cursor["items>command"]];
+                            if (selected_command_name.indexOf("cannot_") == 0) {
                             }
+                            else
+                                switch (selected_command_name) {
+                                    case "use":
+                                        if (selected.item.delta_status.hp > 0)
+                                            utils.start_tmp_num(selected.item.delta_status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos));
+                                        model.player.status = model.player.status.add(selected.item.delta_status);
+                                        items.item_entities.splice(main.cursor["items"], 1);
+                                        main.cursor_max["items"]--;
+                                        main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
+                                        main.menu_mode.pop();
+                                        break;
+                                    case "put":
+                                        items.item_entities.splice(main.cursor["items"], 1);
+                                        main.cursor_max["items"]--;
+                                        main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
+                                        main.menu_mode.pop();
+                                        break;
+                                    case "equip":
+                                        var old_eq = items.equips[selected.item.equip_region];
+                                        if (old_eq.exist()) {
+                                            items.item_entities.push(old_eq.get());
+                                            main.cursor_max["items"]++;
+                                        }
+                                        items.equips[selected.item.equip_region] = utils.some(selected);
+                                        model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum());
+                                        model.player.more_props = items.equips_more_props_sum();
+                                        items.item_entities.splice(main.cursor["items"], 1);
+                                        main.cursor_max["items"]--;
+                                        main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
+                                        main.menu_mode.pop();
+                                        break;
+                                    case "cannot_equip":
+                                        break;
+                                    case "decode":
+                                        battle.add_exp(selected.item.more_props["exp"]);
+                                        items.item_entities.splice(main.cursor["items"], 1);
+                                        main.cursor_max["items"]--;
+                                        main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
+                                        main.menu_mode.pop();
+                                        break;
+                                    default:
+                                        throw "default reached";
+                                }
                             break;
                         default:
                             throw "default reached";
@@ -314,6 +323,20 @@ var main;
         }
     }
     main.keyup = keyup;
+    function touchstart(e) {
+        var rect = canvas.getBoundingClientRect();
+        var x = e.targetTouches[0].clientX - rect.left;
+        var y = e.targetTouches[0].clientY - rect.top;
+        keys.touch_start_pos = utils.some(new utils.Pos(x, y));
+    }
+    main.touchstart = touchstart;
+    function touchmove(e) {
+        var rect = canvas.getBoundingClientRect();
+        var x = e.changedTouches[0].clientX - rect.left;
+        var y = e.changedTouches[0].clientY - rect.top;
+        keys.touch_move_pos = utils.some(new utils.Pos(x, y));
+    }
+    main.touchmove = touchmove;
 })(main || (main = {}));
 window.addEventListener('load', main.init);
 window.addEventListener("keydown", main.keydown);

@@ -55,6 +55,7 @@ namespace main{
       {type: "image", name: "violent_ghost_right", src: "assets/violent_ghost_right.png", frames:4},
       {type: "image", name: "violent_ghost_up", src: "assets/violent_ghost_up.png", frames:4},
       {type: "image", name: "violent_ghost_down", src: "assets/violent_ghost_down.png", frames:4},
+      {type: "image", name: "treasure_box", src: "assets/treasure_box.png", frames:1},
 
       {type: "image", name: "floor", src: "assets/floor.png", frames:1},
       {type: "image", name: "wall", src: "assets/wall.png", frames:1},
@@ -102,6 +103,9 @@ namespace main{
     canvas.width = view.window_usize.x * view.unit_size.x;
     canvas.height = view.window_usize.y * view.unit_size.y;
 
+    canvas.addEventListener("touchstart",main.touchstart)
+    canvas.addEventListener("touchmove",main.touchmove)
+
     ctx.textBaseline = "top"
 
     // image_frames
@@ -120,7 +124,7 @@ namespace main{
       new items.ItemEntity(items.type.onigiri),
       new items.ItemEntity(items.type.onigiri),
       new items.ItemEntity(items.type.potion),
-      new items.ItemEntity(items.type.knife),
+      new items.ItemEntity(items.type.silver_knife),
       new items.ItemEntity(items.type.revival),
       new items.ItemEntity(items.type.ghost_camouflage),
     ]
@@ -180,12 +184,15 @@ namespace main{
             menu_mode.push("command")
             var mode = menu_mode.join(">")
             cursor[mode] = 0
-            cursor_max[mode] = items.item_entities[cursor["items"]].item.commands.length
+            cursor_max[mode] = items.item_entities[cursor["items"]].get_valid_commands().length
           }
           break
           case "items>command":
           var selected = items.item_entities[cursor["items"]]
-          switch(selected.item.commands[cursor["items>command"]]){
+          var selected_command_name = selected.get_valid_commands()[cursor["items>command"]]
+          if(selected_command_name.indexOf("cannot_") == 0) {
+            // nothing to do
+          }else switch(selected_command_name){
             case "use":
             if(selected.item.delta_status.hp > 0) utils.start_tmp_num(selected.item.delta_status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos))
             model.player.status = model.player.status.add(selected.item.delta_status)
@@ -213,6 +220,8 @@ namespace main{
             cursor_max["items"]--
             cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
             menu_mode.pop()
+            break
+            case "cannot_equip":
             break
             case "decode":
             battle.add_exp(selected.item.more_props["exp"])
@@ -328,6 +337,20 @@ namespace main{
       default:
         break;
     }
+  }
+
+  export function touchstart(e:TouchEvent){
+    var rect = canvas.getBoundingClientRect()
+    var x = e.targetTouches[0].clientX - rect.left
+    var y = e.targetTouches[0].clientY - rect.top
+    keys.touch_start_pos = utils.some(new utils.Pos(x,y))
+  }
+
+  export function touchmove(e:TouchEvent){
+    var rect = canvas.getBoundingClientRect()
+    var x = e.changedTouches[0].clientX - rect.left
+    var y = e.changedTouches[0].clientY - rect.top
+    keys.touch_move_pos = utils.some(new utils.Pos(x,y))
   }
 }
 

@@ -168,13 +168,18 @@ namespace view{
 
       top_frame.move_point_y(0.2)
       var message = top_frame.insert_subframe(utils.some(window_w * 0.5),utils.none<number>(),"rgba(0,0,0,0.6)")
-      if(main.cursor_max["items"] != 0) message.insert_text(items.item_entities[main.cursor["items"]].item.text)
+      if(main.cursor_max["items"] != 0) {
+        var item_ent = items.item_entities[main.cursor["items"]]
+        message.insert_text(item_ent.item.text)
+        if("equip_level" in item_ent.more_props) message.insert_text("Level " + item_ent.more_props["equip_level"] + " \u4EE5\u4E0A\u3067\u88C5\u5099\u53EF\u80FD")
+      }
       
       if(main.menu_mode[1] == "command"){
         var command = message.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(100,0,0,0.6)")
-        for(var i = 0; i < items.item_entities[main.cursor["items"]].item.commands.length; i++){
-          var command_name = items.item_entities[main.cursor["items"]].item.commands[i]
-          command.insert_text((main.cursor["items>command"] == i ? ">" : " ") + items.commands[command_name])
+        var item_ent = items.item_entities[main.cursor["items"]]
+        var valid_command_names = item_ent.get_valid_commands()
+        for(var i = 0; i < valid_command_names.length; i++){
+          command.insert_text((main.cursor["items>command"] == i ? ">" : " ") + items.commands_info[valid_command_names[i]].name_jp)
         }
       }
     }else if(main.menu_mode[0] == "dist"){

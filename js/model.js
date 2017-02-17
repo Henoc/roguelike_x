@@ -27,7 +27,7 @@ var model;
      * エンティティの型
      *
      * more_props:
-     * no_attack 攻撃しない
+     * no_attack 攻撃しない，移動しない
      * no_damage 攻撃を受けない
      * revive(x) HP0になったxターン後に復活
      * hide 移動の間にキャラが表示されない
@@ -42,6 +42,7 @@ var model;
     model.tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC", "", "lang_dog", true, true, utils.some(new battle.Status(3, 3, 1, 0)), 2, [{ name: "lang_dog_shoes", per: 0.2 }, { name: "lang_dog_paper", per: 0.03 }], {});
     model.tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0", "", "sacred_slime", true, true, utils.some(new battle.Status(4, 4, 2, 1)), 3, [{ name: "dead_sacred_slime", per: 1 }, { name: "potion", per: 0.1 }, { name: "revival", per: 0.01 }], { revive: 5 });
     model.tiles["violent_ghost"] = new Tile("\u66B4\u308C\u30B4\u30FC\u30B9\u30C8", "", "violent_ghost", true, true, utils.some(new battle.Status(4, 4, 3, 0)), 4, [{ name: "candle", per: 0.2 }, { name: "ghost_camouflage", per: 0.05 }], { hide: true });
+    model.tiles["treasure_box"] = new Tile("\u5B9D\u7BB1", "", "treasure_box", true, false, utils.some(new battle.Status(10, 10, 0, 4)), 4, [{ name: "knife", per: 0.7 }, { name: "copper_armor", per: 0.7 }], { no_attack: true });
     // 実際の配置物
     var Entity = (function () {
         function Entity(ux, uy, tile) {
@@ -99,8 +100,6 @@ var model;
                 var picked_names = [];
                 for (var _i = 0, _a = delete_entities_at(moved, function (ent) { return ent.status.hp == 0; }); _i < _a.length; _i++) {
                     var dead = _a[_i];
-                    if (dead.tile.name == "player")
-                        continue;
                     dead.treasures.forEach(function (t) {
                         items.item_entities.push(new items.ItemEntity(items.type[t]));
                         picked_names.push(items.type[t].name);
@@ -188,7 +187,8 @@ var model;
             ptn[1] = "lang_dog";
             ptn[2] = "sacred_slime";
             ptn[3] = "violent_ghost";
-            model.entities.push(model.Entity.of(upos, model.tiles[ptn[utils.randInt(4)]]));
+            ptn[4] = "treasure_box";
+            model.entities.push(model.Entity.of(upos, model.tiles[ptn[utils.randInt(5)]]));
         }
         // player を壁でないところにランダム配置
         var player_upos = random_upos(function (n) { return !model.tiles[map.entity_names[n]].isWall; });
@@ -358,12 +358,16 @@ var keys;
     keys.z_key = false;
     keys.x_key = false;
     keys.c_key = false;
+    keys.touch_start_pos = utils.none();
+    keys.touch_move_pos = utils.none();
     function keyReset() {
         //dir_key = model.dir.none
         keys.dir_key2 = model.dir.none;
         keys.z_key = false;
         keys.x_key = false;
         keys.c_key = false;
+        keys.touch_start_pos = utils.none();
+        keys.touch_move_pos = utils.none();
     }
     keys.keyReset = keyReset;
 })(keys || (keys = {}));

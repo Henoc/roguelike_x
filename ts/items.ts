@@ -28,7 +28,7 @@ namespace items{
    * revive(x) HP x で蘇生
    * camouflage(x) 装備すると 敵の視力をx%カット の more_props がプレイヤーに着く 
    */
-  export var type = {
+  export let type = {
     onigiri: new Item("\u304A\u306B\u304E\u308A",["use","put"],battle.Status.of_food(5),"none",
     `\u98DF\u3079\u308B\u3068\u6700\u5927HP\u304C5\u4E0A\u6607\u3059\u308B`),
     potion: new Item("\u30DD\u30FC\u30B7\u30E7\u30F3",["use","put"],battle.Status.of_drink(10),"none",
@@ -69,7 +69,7 @@ namespace items{
    * cond: condition of validating the command  
    * no_hide: show the command even if cond fails. Then cannot_command appears
    */
-  export var commands_info: { [key: string]: {name_jp:string, cond?:(ient:ItemEntity)=>boolean, no_hide?:boolean }} = {}
+  export let commands_info: { [key: string]: {name_jp:string, cond?:(ient:ItemEntity)=>boolean, no_hide?:boolean }} = {}
   commands_info["use"] = {name_jp:"\u4F7F\u3046"}
   commands_info["put"] = {name_jp:"\u6368\u3066\u308B"}
   commands_info["equip"] = {name_jp:"\u88C5\u5099", cond:(ient:ItemEntity) => {
@@ -86,7 +86,7 @@ namespace items{
       this.more_props = utils.shallow_copy(item.more_props)
     }
     get_valid_commands():string[]{
-      var ret:string[] = []
+      let ret:string[] = []
       this.item.commands.forEach(command_name => {
         if(commands_info[command_name].cond == undefined || commands_info[command_name].cond(this)) ret.push(command_name)
         else if("no_hide" in commands_info[command_name]) ret.push("cannot_" + command_name)
@@ -95,15 +95,15 @@ namespace items{
     }
   }
 
-  export var item_entities : ItemEntity[] = []
-  export var equips: { [key: string]: utils.Option<ItemEntity>; } = {}
+  export let item_entities : ItemEntity[] = []
+  export let equips: { [key: string]: utils.Option<ItemEntity>; } = {}
   equips["head"] = utils.none<ItemEntity>()
   equips["body"] = utils.none<ItemEntity>()
   equips["hand"] = utils.none<ItemEntity>()
   equips["foot"] = utils.none<ItemEntity>()
 
   export function equips_status_sum(){
-    var ret = new battle.Status(0,0,0,0)
+    let ret = new battle.Status(0,0,0,0)
     for(let region of ["head","body","hand","foot"]){
       if(equips[region].exist()){
         ret = ret.add(equips[region].get().item.delta_status)
@@ -113,10 +113,10 @@ namespace items{
   }
 
   export function equips_more_props_sum(){
-    var ret = {}
+    let ret = {}
     for(let region of ["head","body","hand","foot"]){
       if(equips[region].exist()){
-        var more_props = equips[region].get().more_props
+        let more_props = equips[region].get().more_props
         for(let prop_name in more_props){
           if(prop_name in ret) ret[prop_name] += more_props[prop_name]
           else ret[prop_name] = more_props[prop_name]
@@ -130,7 +130,7 @@ namespace items{
    * equips sum replacing one equipment
    */
   export function equips_status_sum_replace(item_entity:ItemEntity){
-    var ret = new battle.Status(0,0,0,0)
+    let ret = new battle.Status(0,0,0,0)
     for(let region of ["head","body","hand","foot"]){
       if(item_entity.item.equip_region == region){
         ret = ret.add(item_entity.item.delta_status)

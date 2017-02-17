@@ -1,35 +1,35 @@
 namespace main{
 
-  var canvas: HTMLCanvasElement;
-  var ctx: CanvasRenderingContext2D;
+  let canvas: HTMLCanvasElement;
+  let ctx: CanvasRenderingContext2D;
   /**
    * expore, items
    */
-  export var menu_mode = ["explore"]
+  export let menu_mode = ["explore"]
 
   /**
    * cursur[menu_mode.join(">")] にカーソルの位置が入る
    */
-  export var cursor = {}
+  export let cursor = {}
   /**
    * max
    */
-  export var cursor_max = {}
+  export let cursor_max = {}
 
   /**
    * for status distribution
    */
-  export var point_distributed: {
+  export let point_distributed: {
     atk:number, def:number, rest:number
   }
-  var point_dist_rate = {
+  let point_dist_rate = {
     atk:1,def:1,effi:2
   }
 
   /**
    * second per 60 frames
    */
-  export var sp60f = 1
+  export let sp60f = 1
 
   export namespace Asset{
     interface Ast{
@@ -38,7 +38,7 @@ namespace main{
       src:string;
       frames:number
     }
-    export var assets : Ast[] = [
+    export let assets : Ast[] = [
       {type: "image", name: "mame_mouse_left", src: "assets/mame_mouse_left.png", frames:4},
       {type: "image", name: "mame_mouse_right", src: "assets/mame_mouse_right.png", frames:4},
       {type: "image", name: "mame_mouse_up", src: "assets/mame_mouse_up.png", frames:4},
@@ -68,11 +68,11 @@ namespace main{
       {type: "image", name: "treasure", src: "assets/treasure.png", frames:1},
       {type: "image", name: "twinkle", src: "assets/twinkle.png", frames:5},
     ];
-    export var images = {}
-    export var image_frames = {}
-    export var loadAssets = (onComplete:() => void) => {
-      var total = assets.length;
-      var loadCount = 0;
+    export let images = {}
+    export let image_frames = {}
+    export let loadAssets = (onComplete:() => void) => {
+      let total = assets.length;
+      let loadCount = 0;
 
       function onLoad(){
         loadCount++
@@ -90,7 +90,7 @@ namespace main{
       })
     }
     function loadImage(asset : Ast, onLoad:() => void) {
-        var image = new Image();
+        let image = new Image();
         image.onload = onLoad;
         image.src = asset.src;
         images[asset.name] = image
@@ -135,7 +135,7 @@ namespace main{
 
   }
 
-  var lastTimestamp = null
+  let lastTimestamp = null
 
   function update(timestamp : number){
     requestAnimationFrame(update)
@@ -150,7 +150,7 @@ namespace main{
       break
       case "explore":
       if(!view.action_lock){
-        var moved = keys.dir_key.add(model.player.upos)
+        let moved = keys.dir_key.add(model.player.upos)
         if(
           !keys.dir_key.equals(model.dir.none) &&
           /* 壁判定は move() と重複するが仕方なし */
@@ -182,14 +182,14 @@ namespace main{
           case "items":
           if(main.cursor_max["items"] != 0){
             menu_mode.push("command")
-            var mode = menu_mode.join(">")
+            let mode = menu_mode.join(">")
             cursor[mode] = 0
             cursor_max[mode] = items.item_entities[cursor["items"]].get_valid_commands().length
           }
           break
           case "items>command":
-          var selected = items.item_entities[cursor["items"]]
-          var selected_command_name = selected.get_valid_commands()[cursor["items>command"]]
+          let selected = items.item_entities[cursor["items"]]
+          let selected_command_name = selected.get_valid_commands()[cursor["items>command"]]
           if(selected_command_name.indexOf("cannot_") == 0) {
             // nothing to do
           }else switch(selected_command_name){
@@ -212,7 +212,7 @@ namespace main{
             menu_mode.pop()
             break
             case "equip":
-            var old_eq : utils.Option<items.ItemEntity> = items.equips[selected.item.equip_region]
+            let old_eq : utils.Option<items.ItemEntity> = items.equips[selected.item.equip_region]
             if(old_eq.exist()){
               items.item_entities.push(old_eq.get())
               cursor_max["items"]++
@@ -242,16 +242,16 @@ namespace main{
           throw "default reached"
         }
       }else if(keys.dir_key2.equals(model.dir.down)){
-        var mode = menu_mode.join(">")
+        let mode = menu_mode.join(">")
         cursor[mode] = utils.limit(cursor[mode] + 1, 0, cursor_max[mode])
       }else if(keys.dir_key2.equals(model.dir.up)){
-        var mode = menu_mode.join(">")
+        let mode = menu_mode.join(">")
         cursor[mode] = utils.limit(cursor[mode] - 1, 0, cursor_max[mode])
       }
       break
       case "dist":
-      var mode = menu_mode.join(">")
-      var dist_props = ["atk","def"]
+      let mode = menu_mode.join(">")
+      let dist_props = ["atk","def"]
       if(keys.x_key || keys.c_key){
         menu_mode.pop()
         if(menu_mode.length == 0) menu_mode = ["explore"]
@@ -284,14 +284,14 @@ namespace main{
     render()
   }
 
-  var render_cnt = 0
+  let render_cnt = 0
   function render(){
     view.print(ctx,render_cnt)
     render_cnt++
   }
 
   export function keydown(e:KeyboardEvent){
-    var keyCode = e.keyCode
+    let keyCode = e.keyCode
     switch (keyCode) {
       case 37:
         keys.dir_key = model.dir.left
@@ -323,7 +323,7 @@ namespace main{
   }
 
   export function keyup(e:KeyboardEvent){
-    var keyCode = e.keyCode
+    let keyCode = e.keyCode
     switch (keyCode) {
       case 37:
         if(keys.dir_key.equals(model.dir.left)) keys.dir_key = model.dir.none
@@ -343,16 +343,16 @@ namespace main{
   }
 
   export function touchstart(e:TouchEvent){
-    var rect = canvas.getBoundingClientRect()
-    var x = e.targetTouches[0].clientX - rect.left
-    var y = e.targetTouches[0].clientY - rect.top
+    let rect = canvas.getBoundingClientRect()
+    let x = e.targetTouches[0].clientX - rect.left
+    let y = e.targetTouches[0].clientY - rect.top
     keys.touch_start_pos = utils.some(new utils.Pos(x,y))
   }
 
   export function touchmove(e:TouchEvent){
-    var rect = canvas.getBoundingClientRect()
-    var x = e.changedTouches[0].clientX - rect.left
-    var y = e.changedTouches[0].clientY - rect.top
+    let rect = canvas.getBoundingClientRect()
+    let x = e.changedTouches[0].clientX - rect.left
+    let y = e.changedTouches[0].clientY - rect.top
     keys.touch_move_pos = utils.some(new utils.Pos(x,y))
   }
 }

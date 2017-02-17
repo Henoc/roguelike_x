@@ -156,26 +156,26 @@ var main;
                         case "items":
                             if (main.cursor_max["items"] != 0) {
                                 main.menu_mode.push("command");
-                                var mode = main.menu_mode.join(">");
-                                main.cursor[mode] = 0;
-                                main.cursor_max[mode] = items.item_entities[main.cursor["items"]].get_valid_commands().length;
+                                var mode_1 = main.menu_mode.join(">");
+                                main.cursor[mode_1] = 0;
+                                main.cursor_max[mode_1] = items.item_entities[main.cursor["items"]].get_valid_commands().length;
                             }
                             break;
                         case "items>command":
-                            var selected = items.item_entities[main.cursor["items"]];
-                            var selected_command_name = selected.get_valid_commands()[main.cursor["items>command"]];
+                            var selected_1 = items.item_entities[main.cursor["items"]];
+                            var selected_command_name = selected_1.get_valid_commands()[main.cursor["items>command"]];
                             if (selected_command_name.indexOf("cannot_") == 0) {
                             }
                             else
                                 switch (selected_command_name) {
                                     case "use":
-                                        if (selected.item.delta_status.hp > 0)
-                                            utils.start_tmp_num(selected.item.delta_status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos));
-                                        model.player.status = model.player.status.add(selected.item.delta_status);
+                                        if (selected_1.item.delta_status.hp > 0)
+                                            utils.start_tmp_num(selected_1.item.delta_status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos));
+                                        model.player.status = model.player.status.add(selected_1.item.delta_status);
                                         var more_prop_names = ["effi", "heal"];
                                         more_prop_names.forEach(function (name) {
-                                            if (name in selected.more_props)
-                                                model.player.more_props[name] += selected.more_props[name];
+                                            if (name in selected_1.more_props)
+                                                model.player.more_props[name] += selected_1.more_props[name];
                                         });
                                         items.item_entities.splice(main.cursor["items"], 1);
                                         main.cursor_max["items"]--;
@@ -189,12 +189,12 @@ var main;
                                         main.menu_mode.pop();
                                         break;
                                     case "equip":
-                                        var old_eq = items.equips[selected.item.equip_region];
+                                        var old_eq = items.equips[selected_1.item.equip_region];
                                         if (old_eq.exist()) {
                                             items.item_entities.push(old_eq.get());
                                             main.cursor_max["items"]++;
                                         }
-                                        items.equips[selected.item.equip_region] = utils.some(selected);
+                                        items.equips[selected_1.item.equip_region] = utils.some(selected_1);
                                         model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum());
                                         model.player.more_props = items.equips_more_props_sum();
                                         items.item_entities.splice(main.cursor["items"], 1);
@@ -205,7 +205,7 @@ var main;
                                     case "cannot_equip":
                                         break;
                                     case "decode":
-                                        battle.add_exp(selected.item.more_props["exp"]);
+                                        battle.add_exp(selected_1.item.more_props["exp"]);
                                         items.item_entities.splice(main.cursor["items"], 1);
                                         main.cursor_max["items"]--;
                                         main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
@@ -220,12 +220,12 @@ var main;
                     }
                 }
                 else if (keys.dir_key2.equals(model.dir.down)) {
-                    var mode = main.menu_mode.join(">");
-                    main.cursor[mode] = utils.limit(main.cursor[mode] + 1, 0, main.cursor_max[mode]);
+                    var mode_2 = main.menu_mode.join(">");
+                    main.cursor[mode_2] = utils.limit(main.cursor[mode_2] + 1, 0, main.cursor_max[mode_2]);
                 }
                 else if (keys.dir_key2.equals(model.dir.up)) {
-                    var mode = main.menu_mode.join(">");
-                    main.cursor[mode] = utils.limit(main.cursor[mode] - 1, 0, main.cursor_max[mode]);
+                    var mode_3 = main.menu_mode.join(">");
+                    main.cursor[mode_3] = utils.limit(main.cursor[mode_3] - 1, 0, main.cursor_max[mode_3]);
                 }
                 break;
             case "dist":

@@ -97,18 +97,18 @@ var model;
                 this.anim_tasks.push(new view.MoveAnim(this.upos));
                 this.upos = moved;
                 // 落ちているものを拾う
-                var picked_names = [];
+                var picked_names_1 = [];
                 for (var _i = 0, _a = delete_entities_at(moved, function (ent) { return ent.status.hp == 0; }); _i < _a.length; _i++) {
                     var dead = _a[_i];
                     dead.treasures.forEach(function (t) {
                         items.item_entities.push(new items.ItemEntity(items.type[t]));
-                        picked_names.push(items.type[t].name);
+                        picked_names_1.push(items.type[t].name);
                     });
                 }
                 // tmp frame
-                if (picked_names.length != 0) {
-                    for (var _b = 0, picked_names_1 = picked_names; _b < picked_names_1.length; _b++) {
-                        var v = picked_names_1[_b];
+                if (picked_names_1.length != 0) {
+                    for (var _b = 0, picked_names_2 = picked_names_1; _b < picked_names_2.length; _b++) {
+                        var v = picked_names_2[_b];
                         utils.start_tmp_frame(v + " \u3092\u53D6\u5F97");
                     }
                 }

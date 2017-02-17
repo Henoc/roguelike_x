@@ -25,9 +25,9 @@ namespace model{
     print(ctx:CanvasRenderingContext2D, realPos: utils.Pos, direction:"left"|"right"|"up"|"down"|"none", cnt:number){
       ctx.fillStyle = this.color
 
-      var dired_image_name = this.name
+      let dired_image_name = this.name
       if(direction != "none") dired_image_name += "_" + direction
-      var frms = main.Asset.image_frames[dired_image_name]
+      let frms = main.Asset.image_frames[dired_image_name]
       ctx.drawImage(main.Asset.images[dired_image_name],
         0,(Math.floor(cnt/utils.limit(Math.floor(utils.limit(64/frms/main.sp60f,1,64)),1,64))%frms) * view.unit_size.y,32,32,realPos.x,realPos.y,view.unit_size.x,view.unit_size.y,)
     }
@@ -43,7 +43,7 @@ namespace model{
    * hide 移動の間にキャラが表示されない
    * camouflage(x) プレイヤー専用．x%敵の視力が下がる．元は半径4マス．
    */
-  export var tiles: { [key: string]: Tile; } = {}
+  export let tiles: { [key: string]: Tile; } = {}
   tiles["floor"] = new Tile("\u5e8a","rgba(20,40,40,1)","floor",false,false,utils.none<battle.Status>(),0,[],{})
   tiles["wall"] = new Tile("\u58c1","rgba(50,30,10,1)","wall",true,false,utils.none<battle.Status>(),0,[],{})
   tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","player",true,true,utils.some(new battle.Status(10,10,1,0)),1,[{name:"potion",per:1}],{effi:20, heal:13})
@@ -87,7 +87,7 @@ namespace model{
       }else if(this.status.hp != 0){
         this.tile.print(ctx,realPos,this.direction,cnt)
         ctx.fillStyle ="white" 
-        var font_size = view.window_usize.y * view.unit_size.y / 40
+        let font_size = view.window_usize.y * view.unit_size.y / 40
         ctx.font = "normal " + font_size + "px sans-serif"
         utils.fillText_n(ctx,this.tile.jp_name + ( "no_damage" in this.more_props ? "" : "\n" + this.status.hp + "/" + this.status.max_hp), realPos.x, realPos.y - view.unit_size.y, font_size ,font_size)
       }else{
@@ -105,7 +105,7 @@ namespace model{
       if(udelta.x == 0 && udelta.y < 0) this.direction = "up"
       if(udelta.x == 0 && udelta.y > 0) this.direction = "down"
 
-      var moved = this.upos.add(udelta)
+      let moved = this.upos.add(udelta)
       if(
         map.inner(moved) &&
         utils.all(get_entities_at(moved),e => !e.tile.isWall || e.status.hp == 0) &&
@@ -114,7 +114,7 @@ namespace model{
         this.anim_tasks.push(new view.MoveAnim(this.upos))
         this.upos = moved
         // 落ちているものを拾う
-        var picked_names:string[] = []
+        let picked_names:string[] = []
         for(let dead of delete_entities_at(moved, ent => ent.status.hp == 0)){
           dead.treasures.forEach(t => {
             items.item_entities.push(new items.ItemEntity(items.type[t]))
@@ -133,7 +133,7 @@ namespace model{
     attack(){
       // 壁を壊す | 攻撃する
       for(let v of dir_ary){
-        var directed = this.upos.add(v)
+        let directed = this.upos.add(v)
         if(!map.inner(directed)) continue
         if(map.field_at_tile(directed).isWall){
           map.field_set_by_name(directed,"floor")
@@ -153,7 +153,7 @@ namespace model{
      */
     reach(that:Entity){
       for(let v of dir_ary){
-        var directed = this.upos.add(v)
+        let directed = this.upos.add(v)
         if(that.upos.equals(directed)) return true
       }
       return false
@@ -179,20 +179,20 @@ namespace model{
   /**
    * character instances. Entity has Tile instance, a Tile is an abstract character or floor object.
    */
-  export var entities : Array<Entity> = []
+  export let entities : Array<Entity> = []
 
-  export var player : Entity
-  export var goal : Entity
+  export let player : Entity
+  export let goal : Entity
 
-  export var rank : number
+  export let rank : number
 
   export function init_entities(){
     map.make_map()
 
     // enemy をランダムに数匹配置
-    for(var i = 0; i < 20; i++){
-      var upos = random_upos(n => !tiles[map.entity_names[n]].isWall)
-      var ptn:string[] = []
+    for(let i = 0; i < 20; i++){
+      let upos = random_upos(n => !tiles[map.entity_names[n]].isWall)
+      let ptn:string[] = []
       ptn[0] = "mame_mouse"
       ptn[1] = "lang_dog"
       ptn[2] = "sacred_slime"
@@ -204,12 +204,12 @@ namespace model{
     }
 
     // player を壁でないところにランダム配置
-    var player_upos = random_upos(n => !tiles[map.entity_names[n]].isWall)
+    let player_upos = random_upos(n => !tiles[map.entity_names[n]].isWall)
     player = new model.Entity(player_upos.x,player_upos.y,model.tiles["player"])
     entities.push(player)
 
     // goal
-    var goal_upos = random_upos(n => !tiles[map.entity_names[n]].isWall)
+    let goal_upos = random_upos(n => !tiles[map.entity_names[n]].isWall)
     goal = new model.Entity(goal_upos.x, goal_upos.y, model.tiles["goal"])
     entities.push(goal)
 
@@ -221,7 +221,7 @@ namespace model{
    * cond を満たす filed の upos をとる
    */
   function random_upos(cond : (n:number) => boolean){
-    var upos:utils.Pos
+    let upos:utils.Pos
     do{
       upos = new utils.Pos(
         utils.randInt(map.width),
@@ -230,7 +230,7 @@ namespace model{
     return upos
   }
 
-  export var dir = {
+  export let dir = {
     down : new utils.Pos(0,1),
     up : new utils.Pos(0,-1),
     left : new utils.Pos(-1,0),
@@ -238,7 +238,7 @@ namespace model{
     none : new utils.Pos(0,0)
   }
 
-  export var dir_ary = [dir.down,dir.up,dir.left,dir.right]
+  export let dir_ary = [dir.down,dir.up,dir.left,dir.right]
 
   export function move(){
     monsters_action()
@@ -252,7 +252,7 @@ namespace model{
     on_each_actions()
   }
 
-  export var action_counters = {
+  export let action_counters = {
     effi:0,
     heal:0
   }
@@ -276,13 +276,13 @@ namespace model{
     if(player.status.hp == 0) {
       utils.start_tmp_frame("\u6B7B\u3093\u3067\u3057\u307E\u3063\u305F")
       // item property: revive
-      for(var i = 0; i < items.item_entities.length; i++){
-        var ent = items.item_entities[i]
+      for(let i = 0; i < items.item_entities.length; i++){
+        let ent = items.item_entities[i]
         if("revive" in ent.more_props){
           player.status.max_hp = utils.limit(player.status.max_hp, ent.more_props["revive"], player.status.max_hp + 1)
           player.status.hp = ent.more_props["revive"]
-          for(var j = 0; j < 9; j++){
-            var delta_upos = new utils.Pos(j%3-1,Math.floor(j/3)-1)
+          for(let j = 0; j < 9; j++){
+            let delta_upos = new utils.Pos(j%3-1,Math.floor(j/3)-1)
             utils.start_anim("twinkle",2,player.upos.add(delta_upos).mul(view.unit_size).sub(view.prefix_pos), new utils.Pos(32,32), 12)
           }
           items.item_entities.splice(i,1)
@@ -292,7 +292,7 @@ namespace model{
       }
       if(player.status.hp == 0) main.menu_mode = ["dead"]
     }
-    for(var i = 0; i < entities.length; i++){
+    for(let i = 0; i < entities.length; i++){
       if(entities[i].status.hp == 0 && entities[i].treasures.length == 0){
         entities.splice(i,1)
         i--
@@ -340,7 +340,7 @@ namespace model{
   }
 
   export function get_entities_at(upos:utils.Pos){
-    var ret : Entity[] = []
+    let ret : Entity[] = []
     for(let v of entities){
       if(v.upos.equals(upos)){
         ret.push(v)
@@ -350,8 +350,8 @@ namespace model{
   }
 
   export function delete_entities_at(upos:utils.Pos, cond: (entity:Entity) => boolean){
-    var ret : Entity[] = []
-    for(var i = 0; i< entities.length; i++){
+    let ret : Entity[] = []
+    for(let i = 0; i< entities.length; i++){
       if(entities[i].tile.name != "player" && entities[i].upos.equals(upos) && cond(entities[i])){
         ret.push(entities[i])
         entities.splice(i,1)
@@ -369,16 +369,16 @@ namespace keys{
   /**
    * continuouse key press looking by keydown & keyup
    */
-  export var dir_key = model.dir.none
+  export let dir_key = model.dir.none
   /**
    * original keydown
    */
-  export var dir_key2 = model.dir.none
-  export var z_key = false
-  export var x_key = false
-  export var c_key = false
-  export var touch_start_pos: utils.Option<utils.Pos> = utils.none<utils.Pos>()
-  export var touch_move_pos: utils.Option<utils.Pos> = utils.none<utils.Pos>()
+  export let dir_key2 = model.dir.none
+  export let z_key = false
+  export let x_key = false
+  export let c_key = false
+  export let touch_start_pos: utils.Option<utils.Pos> = utils.none<utils.Pos>()
+  export let touch_move_pos: utils.Option<utils.Pos> = utils.none<utils.Pos>()
   export function keyReset(){
     //dir_key = model.dir.none
     dir_key2 = model.dir.none

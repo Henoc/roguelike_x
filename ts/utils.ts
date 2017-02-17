@@ -4,8 +4,8 @@ namespace utils{
    * @param board 破壊的変更を受ける
    */
   export function paste(board:number[][], paper:number[][], pre_y:number,pre_x:number){
-    for(var i = pre_y; i < pre_y + paper.length; i++){
-      for(var j = pre_x; j < pre_x + paper[i - pre_y].length; j++){
+    for(let i = pre_y; i < pre_y + paper.length; i++){
+      for(let j = pre_x; j < pre_x + paper[i - pre_y].length; j++){
         board[i][j] = paper[i - pre_y][j - pre_x]
       }
     }
@@ -121,8 +121,8 @@ namespace utils{
   }
 
   export function fillText_n(ctx:CanvasRenderingContext2D, text:string, x:number, y:number, font_size:number, newline_size:number){
-    var strs = text.split("\n")
-    for(var i = 0; i < strs.length; i++){
+    let strs = text.split("\n")
+    for(let i = 0; i < strs.length; i++){
       ctx.fillText(strs[i],x,y + newline_size * i)
     }
   }
@@ -158,16 +158,16 @@ namespace utils{
         font_size:this.font_size,
         color:this.text_color
       })
-      var last = this.start_points[this.start_points.length - 1]
+      let last = this.start_points[this.start_points.length - 1]
       this.start_points.push(last.add(new Pos(0,this.font_size * 1.2)))
     }
     insert_subframe(width:Option<number>,height:Option<number>,color:string,margin?:number){
       if(margin == undefined) margin = this.margin
-      var last = this.start_points[this.start_points.length - 1]
-      var width2 = width.get_or_else(this.pos.x + this.wh.x - last.x - this.margin)
-      var height2 = height.get_or_else(this.pos.y + this.wh.y - last.y - this.margin)
+      let last = this.start_points[this.start_points.length - 1]
+      let width2 = width.get_or_else(this.pos.x + this.wh.x - last.x - this.margin)
+      let height2 = height.get_or_else(this.pos.y + this.wh.y - last.y - this.margin)
       // inherits parent frame properties
-      var inner = new Frame(last.x,last.y,width2,height2,margin,color)
+      let inner = new Frame(last.x,last.y,width2,height2,margin,color)
       inner.font_size = this.font_size
       inner.text_color = this.text_color
 
@@ -185,14 +185,14 @@ namespace utils{
      * @param per percentage of moving
      */
     move_point_x(per:number){
-      var inner_width = this.wh.x - 2 * this.margin
-      var last = this.start_points.length - 1
+      let inner_width = this.wh.x - 2 * this.margin
+      let last = this.start_points.length - 1
       this.start_points[last] = this.start_points[last].add(new Pos(inner_width * per,0))
     }
 
     move_point_y(per:number){
-      var inner_height = this.wh.y - 2 * this.margin
-      var last = this.start_points.length - 1
+      let inner_height = this.wh.y - 2 * this.margin
+      let last = this.start_points.length - 1
       this.start_points[last] = this.start_points[last].add(new Pos(0,inner_height * per))
     }
 
@@ -205,9 +205,9 @@ namespace utils{
     print(ctx:CanvasRenderingContext2D){
       ctx.fillStyle = this.color
       ctx.fillRect(this.pos.x,this.pos.y,this.wh.x,this.wh.y)
-      for(var i = 0; i < this.contents.length; i++){
-        var pos = this.start_points[i]
-        var content = this.contents[i]
+      for(let i = 0; i < this.contents.length; i++){
+        let pos = this.start_points[i]
+        let content = this.contents[i]
         switch(content["type"]){
           case "text":
           ctx.font = "normal " + content["font_size"] + "px sans-serif"
@@ -215,7 +215,7 @@ namespace utils{
           ctx.fillText(content["text"],pos.x,pos.y)
           break
           case "frame":
-          var sub_frame = (<Frame>content["frame"])
+          let sub_frame = (<Frame>content["frame"])
           if(sub_frame.life == undefined || sub_frame.life >=0 ) sub_frame.print(ctx)
           break
           default:
@@ -243,9 +243,9 @@ namespace utils{
   //   }
   // }
 
-  export var frame_tasks :Frame[] = []
+  export let frame_tasks :Frame[] = []
   export function print_frame(ctx:CanvasRenderingContext2D){
-    for(var i = 0; i < frame_tasks.length; i++){
+    for(let i = 0; i < frame_tasks.length; i++){
       frame_tasks[i].print(ctx)
       if(frame_tasks[i].life != undefined && frame_tasks[i].life < 0) {
         frame_tasks.splice(i,1)
@@ -254,13 +254,13 @@ namespace utils{
     }
   }
 
-  var tmp_frame : Option<Frame> = none<Frame>()
+  let tmp_frame : Option<Frame> = none<Frame>()
   export function start_tmp_frame(text:string){
     if(tmp_frame.exist()) tmp_frame.get().life = 80
     else{
-      var window_w = view.window_usize.x * view.unit_size.x
-      var window_h = view.window_usize.y * view.unit_size.y
-      var tf = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.3, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)",80)
+      let window_w = view.window_usize.x * view.unit_size.x
+      let window_h = view.window_usize.y * view.unit_size.y
+      let tf = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.3, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)",80)
       tf.font_size = window_h / 32
       tmp_frame = some(tf)
     }
@@ -277,8 +277,8 @@ namespace utils{
   }
 
   export function shallow_copy(obj:any):any {
-    var clone = {}
-    for(var str in obj){
+    let clone = {}
+    for(let str in obj){
       clone[str] = obj[str]
     }
     return clone
@@ -300,18 +300,18 @@ namespace utils{
       this.repeat = repeat
     }
     print(ctx:CanvasRenderingContext2D){
-      var cnt = Math.floor(this.counter / this.fps) % main.Asset.image_frames[this.name]
+      let cnt = Math.floor(this.counter / this.fps) % main.Asset.image_frames[this.name]
       ctx.drawImage(main.Asset.images[this.name],0,this.src_wh.y * cnt,this.src_wh.x,this.src_wh.y,this.pos.x,this.pos.y,this.src_wh.x,this.src_wh.y)
       this.counter++
     }
   }
-  var tmp_anim_tasks:TmpAnim[] = []
+  let tmp_anim_tasks:TmpAnim[] = []
   export function start_anim(name:string, fps:number, pos:Pos, src_wh:Pos, repeat?:number){
     if(repeat == undefined) repeat = 1
     tmp_anim_tasks.push(new TmpAnim(name,fps,pos,src_wh,repeat))
   }
   export function print_anims(ctx:CanvasRenderingContext2D){
-    for(var i = 0; i < tmp_anim_tasks.length; i++){
+    for(let i = 0; i < tmp_anim_tasks.length; i++){
       tmp_anim_tasks[i].print(ctx)
       if(tmp_anim_tasks[i].counter / tmp_anim_tasks[i].fps >= main.Asset.image_frames[tmp_anim_tasks[i].name] * tmp_anim_tasks[i].repeat) {
         tmp_anim_tasks.splice(i,1)
@@ -320,7 +320,7 @@ namespace utils{
     }
   }
 
-  var tmp_num_tasks:{number:number,color:string,pos:Pos,counter:number}[] = []
+  let tmp_num_tasks:{number:number,color:string,pos:Pos,counter:number}[] = []
   /**
    * damage expression
    */
@@ -331,20 +331,20 @@ namespace utils{
     function print_number(k:string, pos:Pos, cnt:number):Pos{
       if(cnt >= 0){
         cnt = limit(cnt, 0, 10 / main.sp60f)
-        var delta = view.window_usize.y * view.unit_size.y / 240
+        let delta = view.window_usize.y * view.unit_size.y / 240
         ctx.fillText(k, pos.x, pos.y - (10 / main.sp60f - cnt) * delta)
       }
-      var w = ctx.measureText(k).width
+      let w = ctx.measureText(k).width
       return pos.add(new Pos(w,0))
     }
 
-    for(var i = 0; i < tmp_num_tasks.length; i++){
-      var tmp_num_task = tmp_num_tasks[i]
+    for(let i = 0; i < tmp_num_tasks.length; i++){
+      let tmp_num_task = tmp_num_tasks[i]
       ctx.font = "normal " + (view.window_usize.y * view.unit_size.y / 40) + "px sans-serif"
       ctx.fillStyle = tmp_num_task.color
-      var num_text = tmp_num_task.number + ""
-      var pos = tmp_num_task.pos
-      for(var j = 0; j < num_text.length; j++){
+      let num_text = tmp_num_task.number + ""
+      let pos = tmp_num_task.pos
+      for(let j = 0; j < num_text.length; j++){
         pos = print_number(num_text[j],pos,80 / main.sp60f - tmp_num_task.counter - j * 10 / main.sp60f)
       }
       tmp_num_task.counter--

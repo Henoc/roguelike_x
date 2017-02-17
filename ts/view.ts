@@ -1,8 +1,8 @@
 namespace view{
 
-  export var window_usize = new utils.Pos(640 / 32, 480 / 32)
-  export var unit_size = new utils.Pos(32,32)
-  export var prefix_pos = new utils.Pos(0,0)
+  export let window_usize = new utils.Pos(640 / 32, 480 / 32)
+  export let unit_size = new utils.Pos(32,32)
+  export let prefix_pos = new utils.Pos(0,0)
 
   export function progress_rate(){
     return 0.2 * main.sp60f
@@ -12,7 +12,7 @@ namespace view{
    * animation 中なので key 入力をブロック
    * print() 内で更新する
    */
-  export var action_lock = false
+  export let action_lock = false
 
   export interface Anim{
     /**
@@ -54,7 +54,7 @@ namespace view{
       return false
     }
     get_upos(current_upos:utils.Pos){
-      var theta = Math.PI * 2 * this.progress
+      let theta = Math.PI * 2 * this.progress
       return current_upos.add(new utils.Pos(Math.cos(theta),Math.sin(theta)).mul_bloadcast(0.4))
     }
   }
@@ -71,15 +71,15 @@ namespace view{
     window_usize.y * unit_size.y)
 
     // player を中心とする画面にする
-    var tmp = model.player.upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5,0.5)).mul(view.unit_size)
+    let tmp = model.player.upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5,0.5)).mul(view.unit_size)
     prefix_pos = tmp.sub(prefix_pos).map(d => utils.limit(d,-unit_size.x * progress_rate(), unit_size.x * progress_rate())).add(prefix_pos)
 
     // draw a map
-    for(var i = 0; i < map.height; i++){
-      for(var j = 0; j < map.width; j++){
-        var upos = new utils.Pos(j,i)
-        var realPos = upos.mul(unit_size).sub(prefix_pos)
-        var field_tile = map.field_at_tile(upos)
+    for(let i = 0; i < map.height; i++){
+      for(let j = 0; j < map.width; j++){
+        let upos = new utils.Pos(j,i)
+        let realPos = upos.mul(unit_size).sub(prefix_pos)
+        let field_tile = map.field_at_tile(upos)
         field_tile.print(ctx,realPos,"none",cnt)
       }
     }
@@ -89,11 +89,11 @@ namespace view{
     // エンティティを描画
     for (let entity of model.entities) {
       // アニメーションがあれば
-      var entity_upos = entity.upos
+      let entity_upos = entity.upos
       if(entity.anim_tasks.length != 0){
         action_lock = true
 
-        var firstAnim = entity.anim_tasks[0]
+        let firstAnim = entity.anim_tasks[0]
         // アニメーション更新
         if(firstAnim.advance()){
           entity.anim_tasks.shift()
@@ -101,14 +101,14 @@ namespace view{
         entity_upos = firstAnim.get_upos(entity.upos)
       }
 
-      var realEntityPos = entity_upos.mul(unit_size).sub(prefix_pos)
+      let realEntityPos = entity_upos.mul(unit_size).sub(prefix_pos)
       entity.print(ctx,realEntityPos,cnt)
     }
 
 
-    var window_w = window_usize.x * unit_size.x
-    var window_h = window_usize.y * unit_size.y
-    var top_frame = new utils.Frame(0,0,window_w,window_h,window_h * 0.03,"rgba(0,0,0,0)",1)
+    let window_w = window_usize.x * unit_size.x
+    let window_h = window_usize.y * unit_size.y
+    let top_frame = new utils.Frame(0,0,window_w,window_h,window_h * 0.03,"rgba(0,0,0,0)",1)
     utils.frame_tasks.push(top_frame)
 
     if(main.menu_mode[0] == "explore"){
@@ -117,35 +117,35 @@ namespace view{
       top_frame.insert_text(model.rank + "\u968E")
       top_frame.insert_text("level " + model.player.level + "  next " + Math.floor(battle.player_exp) + "/" + battle.max_exp())
       top_frame.insert_text("HP " + model.player.status.hp + "/" + model.player.status.max_hp)
-      var max_hp_frame_w = window_w * model.player.status.max_hp / 100
-      var max_hp_frame = top_frame.insert_subframe(utils.some(max_hp_frame_w),utils.some(window_h * 0.03), "rgba(0,0,0,1)", window_h * 0.002)
+      let max_hp_frame_w = window_w * model.player.status.max_hp / 100
+      let max_hp_frame = top_frame.insert_subframe(utils.some(max_hp_frame_w),utils.some(window_h * 0.03), "rgba(0,0,0,1)", window_h * 0.002)
       max_hp_frame.insert_subframe(utils.some((max_hp_frame_w - max_hp_frame.margin * 2) * model.player.status.hp / model.player.status.max_hp),utils.none<number>(), "rgba(0,200,50,1)")
     }
     // menu mode = items
     else if(main.menu_mode[0] == "items"){
       top_frame.move_point_x(0.6)
-      var item_top = top_frame.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(0,0,0,0.6)")
+      let item_top = top_frame.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(0,0,0,0.6)")
       
       item_top.font_size = window_h / 32
       item_top.insert_text("\u30A2\u30A4\u30C6\u30E0")
-      for(var i = 0; i < items.item_entities.length; i++){
-        var itemEntity = items.item_entities[i]
+      for(let i = 0; i < items.item_entities.length; i++){
+        let itemEntity = items.item_entities[i]
         item_top.insert_text((main.cursor["items"] == i ? ">" : " ") + itemEntity.item.name)
       }
 
       top_frame.reset_point()
-      var status_frame = top_frame.insert_subframe(utils.some(window_w * 0.3),utils.some(window_h * 0.5),"rgba(0,0,0,0.6)")
+      let status_frame = top_frame.insert_subframe(utils.some(window_w * 0.3),utils.some(window_h * 0.5),"rgba(0,0,0,0.6)")
       status_frame.insert_text("\u30B9\u30C6\u30FC\u30BF\u30B9")
       
       // 装備品と食べ物でステータス変動の計算が異なる（装備品は付け替えることがある）
-      var modified_status = new battle.Status(0,0,0,0)
-      var delta_status = new battle.Status(0,0,0,0)
+      let modified_status = new battle.Status(0,0,0,0)
+      let delta_status = new battle.Status(0,0,0,0)
       if(main.cursor_max["items"] != 0){
         if(items.item_entities[main.cursor["items"]].item.equip_region == "none"){
           delta_status = items.item_entities[main.cursor["items"]].item.delta_status
           modified_status = model.player.status.add(delta_status)
         }else{
-          var item_entity = items.item_entities[main.cursor["items"]]
+          let item_entity = items.item_entities[main.cursor["items"]]
           delta_status = item_entity.item.delta_status
           modified_status = model.player.tile.status.get().add(items.equips_status_sum_replace(item_entity))
         }
@@ -165,25 +165,25 @@ namespace view{
       status_frame.insert_text("\u8DB3 " + items.equips["foot"].map(e => e.item.name).get_or_else(""))
 
       top_frame.move_point_y(0.2)
-      var message = top_frame.insert_subframe(utils.some(window_w * 0.5),utils.none<number>(),"rgba(0,0,0,0.6)")
+      let message = top_frame.insert_subframe(utils.some(window_w * 0.5),utils.none<number>(),"rgba(0,0,0,0.6)")
       if(main.cursor_max["items"] != 0) {
-        var item_ent = items.item_entities[main.cursor["items"]]
+        let item_ent = items.item_entities[main.cursor["items"]]
         message.insert_text(item_ent.item.text)
         if("equip_level" in item_ent.more_props) message.insert_text("Level " + item_ent.more_props["equip_level"] + " \u4EE5\u4E0A\u3067\u88C5\u5099\u53EF\u80FD")
       }
       
       if(main.menu_mode[1] == "command"){
-        var command = message.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(100,0,0,0.6)")
-        var item_ent = items.item_entities[main.cursor["items"]]
-        var valid_command_names = item_ent.get_valid_commands()
-        for(var i = 0; i < valid_command_names.length; i++){
+        let command = message.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(100,0,0,0.6)")
+        let item_ent = items.item_entities[main.cursor["items"]]
+        let valid_command_names = item_ent.get_valid_commands()
+        for(let i = 0; i < valid_command_names.length; i++){
           command.insert_text((main.cursor["items>command"] == i ? ">" : " ") + items.commands_info[valid_command_names[i]].name_jp)
         }
       }
     }else if(main.menu_mode[0] == "dist"){
       top_frame.move_point_x(0.2)
       top_frame.move_point_y(0.2)
-      var dist_frame = top_frame.insert_subframe(utils.some((window_w - top_frame.margin * 2) * 0.6), utils.some((window_h - top_frame.margin * 2) * 0.6), "rgba(0,0,0,0.6)", window_h * 0.05)
+      let dist_frame = top_frame.insert_subframe(utils.some((window_w - top_frame.margin * 2) * 0.6), utils.some((window_h - top_frame.margin * 2) * 0.6), "rgba(0,0,0,0.6)", window_h * 0.05)
       dist_frame.font_size = window_h / 32
       dist_frame.insert_text("\u30B9\u30C6\u30FC\u30BF\u30B9\u632F\u308A\u5206\u3051")
       dist_frame.insert_text("")
@@ -193,7 +193,7 @@ namespace view{
       dist_frame.insert_text("")
       dist_frame.insert_text("\u2190\u2192\u30AD\u30FC\u3067\u632F\u308A\u5206\u3051 Z\u30AD\u30FC\u3067\u6C7A\u5B9A")
     }else if(main.menu_mode[0] == "dead"){
-      var dead_frame = top_frame.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(0,0,0,0.6)")
+      let dead_frame = top_frame.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(0,0,0,0.6)")
       dead_frame.font_size = window_h / 32
       dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F")
     }

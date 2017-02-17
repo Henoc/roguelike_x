@@ -1,10 +1,10 @@
 namespace map{
-  export var width = 30
-  export var height = 30
-  export var fields : number[][] = new Array()
-  for(var i = 0; i < height; i++){
+  export let width = 30
+  export let height = 30
+  export let fields : number[][] = new Array()
+  for(let i = 0; i < height; i++){
     fields[i] = new Array()
-    for(var j = 0; j < width; j++){
+    for(let j = 0; j < width; j++){
       fields[i][j] = 0
     }
   }
@@ -33,24 +33,24 @@ namespace map{
   /**
    * fields 上の番号 -> 名前
    */
-  export var entity_names = [
+  export let entity_names = [
     "floor",
     "wall"
   ]
 
-  export var entity_number : { [key: string]: number; } = {
+  export let entity_number : { [key: string]: number; } = {
     floor:0,
     wall:1
   }
 
-  var minimap_usize = new utils.Pos(10,10)
+  let minimap_usize = new utils.Pos(10,10)
 
   /**
    * ランダムなマップの自動生成
    */
   export function make_map(){
-    for(var i = 0; i < height; i+= minimap_usize.y){
-      for(var j = 0; j < width; j+= minimap_usize.x){
+    for(let i = 0; i < height; i+= minimap_usize.y){
+      for(let j = 0; j < width; j+= minimap_usize.x){
         utils.paste(fields, make_minimap(), i, j)
       }
     }
@@ -60,7 +60,7 @@ namespace map{
    * このミニマップをつなぎ合わせる
    */
   function make_minimap():number[][]{
-      var mini_pattern = [
+      let mini_pattern = [
       [
         "1111001111",
         "1111001111",
@@ -99,7 +99,7 @@ namespace map{
       ]]
 
       function patternTo2darray(pattern: string[]){
-        var ary : number[][] = new Array()
+        let ary : number[][] = new Array()
         for(let str of pattern){
           ary.push(strToArray(str))
         }
@@ -107,8 +107,8 @@ namespace map{
       }
 
       function strToArray(str : string){
-        var ary : number[] = new Array()
-        for(var i = 0; i < str.length; i++){
+        let ary : number[] = new Array()
+        for(let i = 0; i < str.length; i++){
           ary.push(Number(str.charAt(i)))
         }
         return ary

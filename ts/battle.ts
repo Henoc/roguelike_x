@@ -34,7 +34,7 @@ namespace battle{
     }
 
     copy(){
-      var copied = new Status(this.max_hp,this.hp,this.atk,this.def)
+      let copied = new Status(this.max_hp,this.hp,this.atk,this.def)
       return copied
     }
 
@@ -47,9 +47,9 @@ namespace battle{
      * 必ず1は毎回減る
      */
     attackTo(that:model.Entity){
-      var that_status = that.status
-      var that_status2 = that_status.copy()
-      var damage = this.atk - that_status.def <= 0 ? 1 : this.atk - that_status.def
+      let that_status = that.status
+      let that_status2 = that_status.copy()
+      let damage = this.atk - that_status.def <= 0 ? 1 : this.atk - that_status.def
       // damage expression
       utils.start_tmp_num(damage, "red", that.upos.mul(view.unit_size).sub(view.prefix_pos) )
       that_status2.hp = that_status2.hp - damage <= 0 ? 0 : that_status2.hp - damage
@@ -57,8 +57,8 @@ namespace battle{
     }
   }
 
-  export var player_exp = 0
-  export var dist_point = 0
+  export let player_exp = 0
+  export let dist_point = 0
   export function add_exp(exp:number){
     player_exp += exp
     while(player_exp >= max_exp()){

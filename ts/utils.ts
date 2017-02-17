@@ -66,6 +66,17 @@ namespace utils{
     return n < min ? min : (n >= max ? max - 1 : n)
   }
 
+  /**
+   * [min,max]
+   */
+  export function included_limit(n:number, min:number, max: number){
+    return n < min ? min : (n > max ? max : n)
+  }
+
+  export function lower_bound(n:number, min:number){
+    return n < min ? min : n
+  }
+
   export abstract class Option<T>{
     abstract get():T;
     abstract foreach(fn:(e:T) => void):void
@@ -261,7 +272,7 @@ namespace utils{
       let window_w = view.window_usize.x * view.unit_size.x
       let window_h = view.window_usize.y * view.unit_size.y
       let tf = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.3, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)",80)
-      tf.font_size = window_h / 32
+      tf.font_size = window_h / 40
       tmp_frame = some(tf)
     }
     tmp_frame.get().insert_text(text)
@@ -320,11 +331,11 @@ namespace utils{
     }
   }
 
-  let tmp_num_tasks:{number:number,color:string,pos:Pos,counter:number}[] = []
+  let tmp_num_tasks:{number:number|"miss",color:string,pos:Pos,counter:number}[] = []
   /**
    * damage expression
    */
-  export function start_tmp_num(n:number,color:string,pos:Pos){
+  export function start_tmp_num(n:number|"miss",color:string,pos:Pos){
     tmp_num_tasks.push({number:n, color:color, pos:pos, counter:80 / main.sp60f})
   }
   export function print_tmp_num(ctx:CanvasRenderingContext2D){

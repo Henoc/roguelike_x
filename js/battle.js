@@ -1,45 +1,54 @@
 var battle;
 (function (battle) {
     var Status = (function () {
-        function Status(max_hp, hp, atk, def) {
+        function Status(max_hp, hp, atk, def, dex, eva) {
             this.max_hp = max_hp;
             this.hp = hp;
             this.atk = atk;
             this.def = def;
+            this.dex = dex;
+            this.eva = eva;
         }
         Status.zero = function () {
-            return new Status(0, 0, 0, 0);
+            return new Status(0, 0, 0, 0, 0, 0);
         };
         Status.of_food = function (max_hp) {
-            return new Status(max_hp, 0, 0, 0);
+            return new Status(max_hp, 0, 0, 0, 0, 0);
         };
         Status.of_drink = function (hp) {
-            return new Status(0, hp, 0, 0);
+            return new Status(0, hp, 0, 0, 0, 0);
         };
         Status.of_knife = function (atk) {
-            return new Status(0, 0, atk, 0);
+            return new Status(0, 0, atk, 0, 0, 0);
         };
         Status.of_guard = function (def) {
-            return new Status(0, 0, 0, def);
+            return new Status(0, 0, 0, def, 0, 0);
         };
         Status.prototype.copy = function () {
-            var copied = new Status(this.max_hp, this.hp, this.atk, this.def);
+            var copied = new Status(this.max_hp, this.hp, this.atk, this.def, this.dex, this.eva);
             return copied;
         };
         Status.prototype.add = function (that) {
-            return new Status(this.max_hp + that.max_hp, utils.limit(this.hp + that.hp, 0, this.max_hp + that.max_hp + 1), this.atk + that.atk, this.def + that.def);
+            return new Status(this.max_hp + that.max_hp, utils.limit(this.hp + that.hp, 0, this.max_hp + that.max_hp + 1), this.atk + that.atk, this.def + that.def, this.dex + that.dex, this.eva + that.eva);
         };
         /**
-         * return new attacked status of that
-         * 必ず1は毎回減る
+         * that の被弾後ステータスを返す
+         * * 最小1ダメージ
+         * * 最大回避95%
          */
         Status.prototype.attackTo = function (that) {
             var that_status = that.status;
             var that_status2 = that_status.copy();
-            var damage = this.atk - that_status.def <= 0 ? 1 : this.atk - that_status.def;
+            var hit_rate = (20 - utils.included_limit(that.status.eva - this.dex, 0, 19)) / 20;
+            var damage = Math.random() < hit_rate ?
+                (this.atk - that_status.def <= 0 ?
+                    1
+                    : this.atk - that_status.def)
+                : "miss";
             // damage expression
             utils.start_tmp_num(damage, "red", that.upos.mul(view.unit_size).sub(view.prefix_pos));
-            that_status2.hp = that_status2.hp - damage <= 0 ? 0 : that_status2.hp - damage;
+            if (damage != "miss")
+                that_status2.hp = that_status2.hp - damage <= 0 ? 0 : that_status2.hp - damage;
             return that_status2;
         };
         return Status;

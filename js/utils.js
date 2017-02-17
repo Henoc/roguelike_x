@@ -75,6 +75,17 @@ var utils;
         return n < min ? min : (n >= max ? max - 1 : n);
     }
     utils.limit = limit;
+    /**
+     * [min,max]
+     */
+    function included_limit(n, min, max) {
+        return n < min ? min : (n > max ? max : n);
+    }
+    utils.included_limit = included_limit;
+    function lower_bound(n, min) {
+        return n < min ? min : n;
+    }
+    utils.lower_bound = lower_bound;
     var Option = (function () {
         function Option() {
         }
@@ -260,7 +271,7 @@ var utils;
             var window_w = view.window_usize.x * view.unit_size.x;
             var window_h = view.window_usize.y * view.unit_size.y;
             var tf = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.3, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)", 80);
-            tf.font_size = window_h / 32;
+            tf.font_size = window_h / 40;
             tmp_frame = some(tf);
         }
         tmp_frame.get().insert_text(text);

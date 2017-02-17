@@ -20,11 +20,9 @@ namespace main{
    * for status distribution
    */
   export let point_distributed: {
-    atk:number, def:number, rest:number
+    atk:number, def:number, dex:number, eva:number, rest:number
   }
-  let point_dist_rate = {
-    atk:1,def:1,effi:2
-  }
+  let point_dist_rate = {atk:1,def:1,dex:1,eva:1}
 
   /**
    * second per 60 frames
@@ -168,8 +166,8 @@ namespace main{
         }else if(keys.c_key){
           menu_mode = ["dist"]
           cursor["dist"] = 0
-          cursor_max["dist"] = 2
-          point_distributed = {atk:0,def:0,rest:battle.dist_point}
+          cursor_max["dist"] = 4
+          point_distributed = {atk:0,def:0,dex:0,eva:0,rest:battle.dist_point}
         }
       }
       break
@@ -219,7 +217,7 @@ namespace main{
             }
             items.equips[selected.item.equip_region] = utils.some(selected)
             model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum())
-            model.player.more_props = items.equips_more_props_sum()
+            model.player.more_props = items.equips_more_props_sum(model.player.more_props)
             items.item_entities.splice(cursor["items"],1)
             cursor_max["items"]--
             cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
@@ -258,7 +256,7 @@ namespace main{
       }else if(keys.z_key){
         model.player.status.atk += point_distributed.atk
         model.player.status.def += point_distributed.def
-        point_distributed = {atk:0,def:0,rest:point_distributed.rest}
+        point_distributed = {atk:0,def:0,dex:0,eva:0,rest:point_distributed.rest}
         battle.dist_point = point_distributed.rest
       }else if(keys.dir_key2.equals(model.dir.down)){
         cursor[mode] = utils.limit(cursor[mode] + 1, 0, cursor_max[mode])

@@ -14,9 +14,7 @@ var main;
      * max
      */
     main.cursor_max = {};
-    var point_dist_rate = {
-        atk: 1, def: 1, effi: 2
-    };
+    var point_dist_rate = { atk: 1, def: 1, dex: 1, eva: 1 };
     /**
      * second per 60 frames
      */
@@ -140,8 +138,8 @@ var main;
                     else if (keys.c_key) {
                         main.menu_mode = ["dist"];
                         main.cursor["dist"] = 0;
-                        main.cursor_max["dist"] = 2;
-                        main.point_distributed = { atk: 0, def: 0, rest: battle.dist_point };
+                        main.cursor_max["dist"] = 4;
+                        main.point_distributed = { atk: 0, def: 0, dex: 0, eva: 0, rest: battle.dist_point };
                     }
                 }
                 break;
@@ -196,7 +194,7 @@ var main;
                                         }
                                         items.equips[selected_1.item.equip_region] = utils.some(selected_1);
                                         model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum());
-                                        model.player.more_props = items.equips_more_props_sum();
+                                        model.player.more_props = items.equips_more_props_sum(model.player.more_props);
                                         items.item_entities.splice(main.cursor["items"], 1);
                                         main.cursor_max["items"]--;
                                         main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
@@ -239,7 +237,7 @@ var main;
                 else if (keys.z_key) {
                     model.player.status.atk += main.point_distributed.atk;
                     model.player.status.def += main.point_distributed.def;
-                    main.point_distributed = { atk: 0, def: 0, rest: main.point_distributed.rest };
+                    main.point_distributed = { atk: 0, def: 0, dex: 0, eva: 0, rest: main.point_distributed.rest };
                     battle.dist_point = main.point_distributed.rest;
                 }
                 else if (keys.dir_key2.equals(model.dir.down)) {

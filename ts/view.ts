@@ -138,8 +138,8 @@ namespace view{
       status_frame.insert_text("\u30B9\u30C6\u30FC\u30BF\u30B9")
       
       // 装備品と食べ物でステータス変動の計算が異なる（装備品は付け替えることがある）
-      let modified_status = new battle.Status(0,0,0,0)
-      let delta_status = new battle.Status(0,0,0,0)
+      let modified_status = battle.Status.zero()
+      let delta_status = battle.Status.zero()
       if(main.cursor_max["items"] != 0){
         if(items.item_entities[main.cursor["items"]].item.equip_region == "none"){
           delta_status = items.item_entities[main.cursor["items"]].item.delta_status
@@ -157,6 +157,8 @@ namespace view{
         + (delta_status.atk != 0 ? " \u2192 " + modified_status.atk : ""))
       status_frame.insert_text("\u9632\u5FA1 " + model.player.status.def
         + (delta_status.def != 0 ? " \u2192 " + modified_status.def : ""))
+      status_frame.insert_text("\u547D\u4E2D " + model.player.status.dex + (delta_status.dex != 0 ? " \u2192 " + modified_status.dex : ""))
+      status_frame.insert_text("\u56DE\u907F " + model.player.status.eva + (delta_status.eva != 0 ? " \u2192 " + modified_status.eva : ""))
       status_frame.insert_text("")
       status_frame.insert_text("\u88C5\u5099")
       status_frame.insert_text("\u982D " + items.equips["head"].map(e => e.item.name).get_or_else(""))
@@ -170,6 +172,9 @@ namespace view{
         let item_ent = items.item_entities[main.cursor["items"]]
         message.insert_text(item_ent.item.text)
         if("equip_level" in item_ent.more_props) message.insert_text("Level " + item_ent.more_props["equip_level"] + " \u4EE5\u4E0A\u3067\u88C5\u5099\u53EF\u80FD")
+        if("effi" in item_ent.more_props) message.insert_text("\u71C3\u8CBB +" + item_ent.more_props["effi"])
+        if("heal" in item_ent.more_props) message.insert_text("\u81EA\u7136\u6CBB\u7652\u529B +" + item_ent.more_props["heal"])
+        if("camouflage" in item_ent.more_props) message.insert_text("\u8996\u8A8D\u6027 -" + (item_ent.more_props["camouflage"] * 100) + "%")
       }
       
       if(main.menu_mode[1] == "command"){
@@ -188,8 +193,11 @@ namespace view{
       dist_frame.insert_text("\u30B9\u30C6\u30FC\u30BF\u30B9\u632F\u308A\u5206\u3051")
       dist_frame.insert_text("")
       dist_frame.insert_text("\u632F\u308A\u5206\u3051\u53EF\u80FD\u30DD\u30A4\u30F3\u30C8 " + main.point_distributed.rest)
-      dist_frame.insert_text((main.cursor["dist"] == 0 ? ">" : " ") + "\u653B\u6483 " + model.player.status.atk + " + " + main.point_distributed.atk)
-      dist_frame.insert_text((main.cursor["dist"] == 1 ? ">" : " ") + "\u9632\u5FA1 " + model.player.status.def + " + " + main.point_distributed.def)
+      let status_names = ["atk","def","dex","eva"]
+      let status_names_jp = ["\u653B\u6483","\u9632\u5FA1","\u547D\u4E2D","\u56DE\u907F"]
+      for(let i = 0; i < status_names.length; i++){
+        dist_frame.insert_text((main.cursor["dist"] == i ? ">" : " ") + status_names_jp[i] + " " + model.player.status[status_names[i]] + " + " + main.point_distributed[status_names[i]])
+      }
       dist_frame.insert_text("")
       dist_frame.insert_text("\u2190\u2192\u30AD\u30FC\u3067\u632F\u308A\u5206\u3051 Z\u30AD\u30FC\u3067\u6C7A\u5B9A")
     }else if(main.menu_mode[0] == "dead"){

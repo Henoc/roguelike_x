@@ -20,7 +20,7 @@ namespace main{
    * for status distribution
    */
   export var point_distributed: {
-    atk:number, def:number, effi:number, rest:number
+    atk:number, def:number, rest:number
   }
   var point_dist_rate = {
     atk:1,def:1,effi:2
@@ -168,8 +168,8 @@ namespace main{
         }else if(keys.c_key){
           menu_mode = ["dist"]
           cursor["dist"] = 0
-          cursor_max["dist"] = 3
-          point_distributed = {atk:0,def:0,effi:0,rest:battle.dist_point}
+          cursor_max["dist"] = 2
+          point_distributed = {atk:0,def:0,rest:battle.dist_point}
         }
       }
       break
@@ -196,6 +196,10 @@ namespace main{
             case "use":
             if(selected.item.delta_status.hp > 0) utils.start_tmp_num(selected.item.delta_status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos))
             model.player.status = model.player.status.add(selected.item.delta_status)
+            let more_prop_names = ["effi","heal"]
+            more_prop_names.forEach(name => {
+              if(name in selected.more_props) model.player.more_props[name] += selected.more_props[name]
+            })
             items.item_entities.splice(cursor["items"],1)
             cursor_max["items"]--
             cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
@@ -247,15 +251,14 @@ namespace main{
       break
       case "dist":
       var mode = menu_mode.join(">")
-      var dist_props = ["atk","def","effi"]
+      var dist_props = ["atk","def"]
       if(keys.x_key || keys.c_key){
         menu_mode.pop()
         if(menu_mode.length == 0) menu_mode = ["explore"]
       }else if(keys.z_key){
         model.player.status.atk += point_distributed.atk
         model.player.status.def += point_distributed.def
-        model.player.status.effi += point_distributed.effi
-        point_distributed = {atk:0,def:0,effi:0,rest:point_distributed.rest}
+        point_distributed = {atk:0,def:0,rest:point_distributed.rest}
         battle.dist_point = point_distributed.rest
       }else if(keys.dir_key2.equals(model.dir.down)){
         cursor[mode] = utils.limit(cursor[mode] + 1, 0, cursor_max[mode])

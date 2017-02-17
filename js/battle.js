@@ -1,13 +1,11 @@
 var battle;
 (function (battle) {
     var Status = (function () {
-        function Status(max_hp, hp, atk, def, effi, heal) {
+        function Status(max_hp, hp, atk, def) {
             this.max_hp = max_hp;
             this.hp = hp;
             this.atk = atk;
             this.def = def;
-            this.effi = effi == undefined ? 0 : effi;
-            this.heal = heal == undefined ? 0 : heal;
         }
         Status.zero = function () {
             return new Status(0, 0, 0, 0);
@@ -25,11 +23,11 @@ var battle;
             return new Status(0, 0, 0, def);
         };
         Status.prototype.copy = function () {
-            var copied = new Status(this.max_hp, this.hp, this.atk, this.def, this.effi, this.heal);
+            var copied = new Status(this.max_hp, this.hp, this.atk, this.def);
             return copied;
         };
         Status.prototype.add = function (that) {
-            return new Status(this.max_hp + that.max_hp, utils.limit(this.hp + that.hp, 0, this.max_hp + that.max_hp + 1), this.atk + that.atk, this.def + that.def, this.effi + that.effi, this.heal + that.heal);
+            return new Status(this.max_hp + that.max_hp, utils.limit(this.hp + that.hp, 0, this.max_hp + that.max_hp + 1), this.atk + that.atk, this.def + that.def);
         };
         /**
          * return new attacked status of that

@@ -140,8 +140,8 @@ var main;
                     else if (keys.c_key) {
                         main.menu_mode = ["dist"];
                         main.cursor["dist"] = 0;
-                        main.cursor_max["dist"] = 3;
-                        main.point_distributed = { atk: 0, def: 0, effi: 0, rest: battle.dist_point };
+                        main.cursor_max["dist"] = 2;
+                        main.point_distributed = { atk: 0, def: 0, rest: battle.dist_point };
                     }
                 }
                 break;
@@ -172,6 +172,11 @@ var main;
                                         if (selected.item.delta_status.hp > 0)
                                             utils.start_tmp_num(selected.item.delta_status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos));
                                         model.player.status = model.player.status.add(selected.item.delta_status);
+                                        var more_prop_names = ["effi", "heal"];
+                                        more_prop_names.forEach(function (name) {
+                                            if (name in selected.more_props)
+                                                model.player.more_props[name] += selected.more_props[name];
+                                        });
                                         items.item_entities.splice(main.cursor["items"], 1);
                                         main.cursor_max["items"]--;
                                         main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
@@ -225,7 +230,7 @@ var main;
                 break;
             case "dist":
                 var mode = main.menu_mode.join(">");
-                var dist_props = ["atk", "def", "effi"];
+                var dist_props = ["atk", "def"];
                 if (keys.x_key || keys.c_key) {
                     main.menu_mode.pop();
                     if (main.menu_mode.length == 0)
@@ -234,8 +239,7 @@ var main;
                 else if (keys.z_key) {
                     model.player.status.atk += main.point_distributed.atk;
                     model.player.status.def += main.point_distributed.def;
-                    model.player.status.effi += main.point_distributed.effi;
-                    main.point_distributed = { atk: 0, def: 0, effi: 0, rest: main.point_distributed.rest };
+                    main.point_distributed = { atk: 0, def: 0, rest: main.point_distributed.rest };
                     battle.dist_point = main.point_distributed.rest;
                 }
                 else if (keys.dir_key2.equals(model.dir.down)) {

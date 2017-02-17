@@ -131,8 +131,6 @@ var view;
                 + (delta_status.atk != 0 ? " \u2192 " + modified_status.atk : ""));
             status_frame.insert_text("\u9632\u5FA1 " + model.player.status.def
                 + (delta_status.def != 0 ? " \u2192 " + modified_status.def : ""));
-            status_frame.insert_text("\u71C3\u8CBB " + model.player.status.effi
-                + (delta_status.effi != 0 ? " \u2192 " + modified_status.effi : ""));
             status_frame.insert_text("");
             status_frame.insert_text("\u88C5\u5099");
             status_frame.insert_text("\u982D " + items.equips["head"].map(function (e) { return e.item.name; }).get_or_else(""));
@@ -166,7 +164,6 @@ var view;
             dist_frame.insert_text("\u632F\u308A\u5206\u3051\u53EF\u80FD\u30DD\u30A4\u30F3\u30C8 " + main.point_distributed.rest);
             dist_frame.insert_text((main.cursor["dist"] == 0 ? ">" : " ") + "\u653B\u6483 " + model.player.status.atk + " + " + main.point_distributed.atk);
             dist_frame.insert_text((main.cursor["dist"] == 1 ? ">" : " ") + "\u9632\u5FA1 " + model.player.status.def + " + " + main.point_distributed.def);
-            dist_frame.insert_text((main.cursor["dist"] == 2 ? ">" : " ") + "\u71C3\u8CBB " + model.player.status.effi + " + " + main.point_distributed.effi);
             dist_frame.insert_text("");
             dist_frame.insert_text("\u2190\u2192\u30AD\u30FC\u3067\u632F\u308A\u5206\u3051 Z\u30AD\u30FC\u3067\u6C7A\u5B9A");
         }

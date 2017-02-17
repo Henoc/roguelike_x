@@ -46,13 +46,13 @@ namespace model{
   export var tiles: { [key: string]: Tile; } = {}
   tiles["floor"] = new Tile("\u5e8a","rgba(20,40,40,1)","floor",false,false,utils.none<battle.Status>(),0,[],{})
   tiles["wall"] = new Tile("\u58c1","rgba(50,30,10,1)","wall",true,false,utils.none<battle.Status>(),0,[],{})
-  tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","player",true,true,utils.some(new battle.Status(10,10,1,0,20,10)),1,[{name:"potion",per:1}],{})
+  tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","player",true,true,utils.some(new battle.Status(10,10,1,0)),1,[{name:"potion",per:1}],{effi:20, heal:13})
   tiles["goal"] = new Tile("\u30B4\u30FC\u30EB","","goal",false,false,utils.some(new battle.Status(1,1,0,0)),0,[],{no_attack:true,no_damage:true})
   tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F","rgba(15,140,15,1)","mame_mouse",true,true,utils.some(new battle.Status(2,2,1,0)),1,[{name:"soramame_head",per:0.2},{name:"mame_mouse_ibukuro",per:0.05}],{})
   tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC","","lang_dog",true,true,utils.some(new battle.Status(3,3,1,0)),2,[{name:"lang_dog_shoes",per:0.2},{name:"lang_dog_paper",per:0.03}],{})
   tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0","","sacred_slime",true,true,utils.some(new battle.Status(4,4,2,1)),3,[{name:"dead_sacred_slime",per:1},{name:"potion",per:0.1},{name:"revival",per:0.01}],{revive:5})
   tiles["violent_ghost"] = new Tile("\u66B4\u308C\u30B4\u30FC\u30B9\u30C8","","violent_ghost",true,true,utils.some(new battle.Status(4,4,3,0)),4,[{name:"candle",per:0.2},{name:"ghost_camouflage", per: 0.05}],{hide:true})
-  tiles["treasure_box"] = new Tile("\u5B9D\u7BB1","","treasure_box",true,false,utils.some(new battle.Status(10,10,0,4)),4,[{name:"knife",per:0.7}, {name:"copper_armor", per:0.7}],{no_attack:true})
+  tiles["treasure_box"] = new Tile("\u5B9D\u7BB1","","treasure_box",true,false,utils.some(new battle.Status(10,10,0,4)),4,[{name:"knife",per:0.7}, {name:"copper_armor", per:0.7}, {name:"silver_knife",per:0.3}, {name:"iron_armor",per:0.3}, {name:"gold_knife",per:0.1}, {name:"gold_armor", per:0.1}],{no_attack:true})
 
   // 実際の配置物
   export class Entity{
@@ -260,14 +260,16 @@ namespace model{
    * hungry
    */
   function on_each_actions(){
-    if(action_counters.effi >= player.status.effi) {
+    if(action_counters.effi >= player.more_props["effi"]) {
       player.status.max_hp = utils.limit(player.status.max_hp - 1,0,player.status.max_hp)
       player.status.hp = utils.limit(player.status.hp, 0, player.status.max_hp + 1)
       action_counters.effi = 0
+      utils.start_tmp_frame("\u304A\u8179\u304C\u7A7A\u3044\u305F(\u6700\u5927HP-1)")
     }
-    if(action_counters.heal >= player.status.heal) {
+    if(action_counters.heal >= player.more_props["heal"]) {
       player.status.hp = utils.limit(player.status.hp + 1, 0, player.status.max_hp + 1)
       action_counters.heal = 0
+      utils.start_tmp_frame("\u5C11\u3057\u75B2\u308C\u304C\u53D6\u308C\u305F(HP+1)")
     }
     action_counters.effi++
     action_counters.heal++
@@ -315,16 +317,19 @@ namespace model{
           if(ent.more_props["revive"] == 0) {
             ent.status = ent.tile.status.get()
             ent.more_props = utils.shallow_copy(ent.tile.more_props)
+            utils.start_tmp_frame(ent.tile.jp_name + "\u304C\u8607\u751F\u3057\u305F!")
           }
         }
         continue
       }
       // property: hide
-      if("hide" in ent.more_props) ent.more_props["hide"] = true
       if(ent.reach(player)){
         ent.direction = ent.dir_to(player)
         ent.attack()
-        if("hide" in ent.more_props) ent.more_props["hide"] = false
+        if("hide" in ent.more_props && ent.more_props["hide"]) {
+          ent.more_props["hide"] = false
+          utils.start_tmp_frame(ent.tile.jp_name + "\u304C\u59FF\u3092\u8868\u3057\u305F!")
+        }
         // property: camouflage
       }else if(ent.near(player,4 * ("camouflage" in player.more_props ? (1 - player.more_props["camouflage"]) : 1))){
         ent.move(dir[ent.dir_to(player)])

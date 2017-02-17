@@ -255,11 +255,11 @@ var utils;
     var tmp_frame = none();
     function start_tmp_frame(text) {
         if (tmp_frame.exist())
-            tmp_frame.get().life = 60;
+            tmp_frame.get().life = 80;
         else {
             var window_w = view.window_usize.x * view.unit_size.x;
             var window_h = view.window_usize.y * view.unit_size.y;
-            var tf = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.3, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)", 60);
+            var tf = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.3, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)", 80);
             tf.font_size = window_h / 32;
             tmp_frame = some(tf);
         }
@@ -274,6 +274,10 @@ var utils;
         });
     }
     utils.print_tmp_frame = print_tmp_frame;
+    function delete_tmp_frame() {
+        tmp_frame = none();
+    }
+    utils.delete_tmp_frame = delete_tmp_frame;
     function shallow_copy(obj) {
         var clone = {};
         for (var str in obj) {

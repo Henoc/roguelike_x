@@ -97,9 +97,11 @@ var main;
             new items.ItemEntity(items.type.onigiri),
             new items.ItemEntity(items.type.onigiri),
             new items.ItemEntity(items.type.potion),
-            new items.ItemEntity(items.type.silver_knife),
+            new items.ItemEntity(items.type.knife),
             new items.ItemEntity(items.type.revival),
-            new items.ItemEntity(items.type.ghost_camouflage),
+            new items.ItemEntity(items.type.sharpener),
+            new items.ItemEntity(items.type.sharpener),
+            new items.ItemEntity(items.type.sharpener),
         ];
         Asset.loadAssets(function () {
             requestAnimationFrame(update);
@@ -167,9 +169,9 @@ var main;
                             else
                                 switch (selected_command_name) {
                                     case "use":
-                                        if (selected_1.item.delta_status.hp > 0)
-                                            utils.start_tmp_num(selected_1.item.delta_status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos));
-                                        model.player.status = model.player.status.add(selected_1.item.delta_status);
+                                        if (selected_1.status.hp > 0)
+                                            utils.start_tmp_num(selected_1.status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos));
+                                        model.player.status = model.player.status.add(selected_1.status);
                                         var more_prop_names = ["effi", "heal"];
                                         more_prop_names.forEach(function (name) {
                                             if (name in selected_1.more_props)
@@ -200,7 +202,23 @@ var main;
                                         main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
                                         main.menu_mode.pop();
                                         break;
-                                    case "cannot_equip":
+                                    case "sharpen":
+                                        var _a = selected_1.more_props["sharpen"], success_rate = _a[0], delta_atk = _a[1];
+                                        if (Math.random() < success_rate) {
+                                            items.equips["hand"].get().status.atk += delta_atk;
+                                            utils.start_tmp_frame(selected_1.item.name + "\u3067\u6B66\u5668\u306E\u5F37\u5316... \u6210\u529F! \u6B66\u5668\u653B\u6483\u529B +" + delta_atk);
+                                        }
+                                        else {
+                                            items.equips["hand"].get().status.atk = utils.lower_bound(items.equips["hand"].get().status.atk - delta_atk, 0);
+                                            utils.start_tmp_frame(selected_1.item.name + "\u3067\u6B66\u5668\u306E\u5F37\u5316... \u5931\u6557! \u6B66\u5668\u653B\u6483\u529B -" + delta_atk);
+                                        }
+                                        // 武器のステータスを変えたので装備計算を再度実行
+                                        model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum());
+                                        model.player.more_props = items.equips_more_props_sum(model.player.more_props);
+                                        items.item_entities.splice(main.cursor["items"], 1);
+                                        main.cursor_max["items"]--;
+                                        main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
+                                        main.menu_mode.pop();
                                         break;
                                     case "decode":
                                         battle.add_exp(selected_1.item.more_props["exp"]);

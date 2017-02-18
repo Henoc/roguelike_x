@@ -142,11 +142,11 @@ namespace view{
       let delta_status = battle.Status.zero()
       if(main.cursor_max["items"] != 0){
         if(items.item_entities[main.cursor["items"]].item.equip_region == "none"){
-          delta_status = items.item_entities[main.cursor["items"]].item.delta_status
+          delta_status = items.item_entities[main.cursor["items"]].status
           modified_status = model.player.status.add(delta_status)
         }else{
           let item_entity = items.item_entities[main.cursor["items"]]
-          delta_status = item_entity.item.delta_status
+          delta_status = item_entity.status
           modified_status = model.player.tile.status.get().add(items.equips_status_sum_replace(item_entity))
         }
       }
@@ -172,6 +172,7 @@ namespace view{
         let item_ent = items.item_entities[main.cursor["items"]]
         message.insert_text(item_ent.item.text)
         if("equip_level" in item_ent.more_props) message.insert_text("Level " + item_ent.more_props["equip_level"] + " \u4EE5\u4E0A\u3067\u88C5\u5099\u53EF\u80FD")
+        if("sharpen" in item_ent.more_props) message.insert_text("\u6210\u529F\u7387 " + item_ent.more_props["sharpen"][0] + " \u6B66\u5668\u306E\u653B\u6483 \u00B1" + item_ent.more_props["sharpen"][1])
         if("effi" in item_ent.more_props) message.insert_text("\u71C3\u8CBB +" + item_ent.more_props["effi"])
         if("heal" in item_ent.more_props) message.insert_text("\u81EA\u7136\u6CBB\u7652\u529B +" + item_ent.more_props["heal"])
         if("camouflage" in item_ent.more_props) message.insert_text("\u8996\u8A8D\u6027 -" + (item_ent.more_props["camouflage"] * 100) + "%")

@@ -14,7 +14,7 @@ namespace view{
    */
   export let action_lock = false
 
-  export interface Anim{
+  export interface EntityAnim{
     /**
      * animation の1進捗
      * @returns animation is ended
@@ -23,7 +23,7 @@ namespace view{
     get_upos(current_upos:utils.Pos):utils.Pos
   }
 
-  export class MoveAnim implements Anim{
+  export class MoveAnim implements EntityAnim{
     pre_upos:utils.Pos
     progress:number
     constructor(pre_upos:utils.Pos){
@@ -43,7 +43,7 @@ namespace view{
     }
   }
 
-  export class AttackAnim implements Anim{
+  export class AttackAnim implements EntityAnim{
     progress:number = 0
     advance(){
       this.progress += progress_rate()
@@ -126,9 +126,14 @@ namespace view{
       top_frame.move_point_x(0.6)
       let item_top = top_frame.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(0,0,0,0.6)")
       
+      let page_size = 20
+      let page_no = Math.floor(main.cursor["items"] / page_size)
+      let page_max = Math.floor((main.cursor_max["items"] - 1) / page_size)
+      
       item_top.font_size = window_h / 32
-      item_top.insert_text("\u30A2\u30A4\u30C6\u30E0")
-      for(let i = 0; i < items.item_entities.length; i++){
+      item_top.insert_text("\u30A2\u30A4\u30C6\u30E0 (\u30DA\u30FC\u30B8 " + (page_no + 1) + "/" + (page_max + 1) + ")")
+      item_top.insert_text("")
+      for(let i = page_no * page_size; i < Math.min((page_no + 1) * page_size, items.item_entities.length); i++){
         let itemEntity = items.item_entities[i]
         item_top.insert_text((main.cursor["items"] == i ? ">" : " ") + itemEntity.item.name)
       }

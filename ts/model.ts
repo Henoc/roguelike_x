@@ -62,7 +62,7 @@ namespace model{
     tile:Tile
     status:battle.Status
     level:number
-    anim_tasks:view.Anim[]
+    anim_tasks:view.EntityAnim[]
     direction:"left"|"right"|"up"|"down"|"none"
     more_props:any
     treasures:string[]
@@ -116,18 +116,25 @@ namespace model{
         this.anim_tasks.push(new view.MoveAnim(this.upos))
         this.upos = moved
         // 落ちているものを拾う
-        let picked_names:string[] = []
-        for(let dead of delete_entities_at(moved, ent => ent.status.hp == 0)){
-          dead.treasures.forEach(t => {
-            items.item_entities.push(new items.ItemEntity(items.type[t]))
-            picked_names.push(items.type[t].name)
-          })
-        }
-        // tmp frame
-        if(picked_names.length != 0) {
-          for(let v of picked_names){
-            utils.start_tmp_frame(v + " \u3092\u53D6\u5F97")
+        if(this.tile.name == "player"){
+          let picked_names:string[] = []
+          let picked_max = items.item_entities_max - items.item_entities.length
+          let max_flag = false
+          for(let dead of delete_entities_at(moved, ent => ent.status.hp == 0)){
+            dead.treasures.forEach(t => {
+              if(picked_names.length < picked_max){
+                items.item_entities.push(new items.ItemEntity(items.type[t]))
+                picked_names.push(items.type[t].name)
+              }else max_flag = true
+            })
           }
+          // tmp frame
+          if(picked_names.length != 0) {
+            for(let v of picked_names){
+              utils.start_tmp_frame(v + " \u3092\u53D6\u5F97")
+            }
+          }
+          if(max_flag) utils.start_tmp_frame("\u30A2\u30A4\u30C6\u30E0\u304C\u4E00\u676F\u3067\u3059!")
         }
       }
     }

@@ -243,6 +243,14 @@ var main;
                     var mode_3 = main.menu_mode.join(">");
                     main.cursor[mode_3] = utils.limit(main.cursor[mode_3] - 1, 0, main.cursor_max[mode_3]);
                 }
+                else if (keys.dir_key2.equals(model.dir.left)) {
+                    var mode_4 = main.menu_mode.join(">");
+                    main.cursor[mode_4] = utils.limit(main.cursor[mode_4] - 20, 0, main.cursor_max[mode_4]);
+                }
+                else if (keys.dir_key2.equals(model.dir.right)) {
+                    var mode_5 = main.menu_mode.join(">");
+                    main.cursor[mode_5] = utils.limit(main.cursor[mode_5] + 20, 0, main.cursor_max[mode_5]);
+                }
                 break;
             case "dist":
                 var mode = main.menu_mode.join(">");

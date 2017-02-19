@@ -107,6 +107,7 @@ namespace items{
   }
 
   export let item_entities : ItemEntity[] = []
+  export let item_entities_max = 20
   export let equips: { [key: string]: utils.Option<ItemEntity>; } = {}
   equips["head"] = utils.none<ItemEntity>()
   equips["body"] = utils.none<ItemEntity>()

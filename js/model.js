@@ -99,20 +99,30 @@ var model;
                 this.anim_tasks.push(new view.MoveAnim(this.upos));
                 this.upos = moved;
                 // 落ちているものを拾う
-                var picked_names_1 = [];
-                for (var _i = 0, _a = delete_entities_at(moved, function (ent) { return ent.status.hp == 0; }); _i < _a.length; _i++) {
-                    var dead = _a[_i];
-                    dead.treasures.forEach(function (t) {
-                        items.item_entities.push(new items.ItemEntity(items.type[t]));
-                        picked_names_1.push(items.type[t].name);
-                    });
-                }
-                // tmp frame
-                if (picked_names_1.length != 0) {
-                    for (var _b = 0, picked_names_2 = picked_names_1; _b < picked_names_2.length; _b++) {
-                        var v = picked_names_2[_b];
-                        utils.start_tmp_frame(v + " \u3092\u53D6\u5F97");
+                if (this.tile.name == "player") {
+                    var picked_names_1 = [];
+                    var picked_max_1 = items.item_entities_max - items.item_entities.length;
+                    var max_flag_1 = false;
+                    for (var _i = 0, _a = delete_entities_at(moved, function (ent) { return ent.status.hp == 0; }); _i < _a.length; _i++) {
+                        var dead = _a[_i];
+                        dead.treasures.forEach(function (t) {
+                            if (picked_names_1.length < picked_max_1) {
+                                items.item_entities.push(new items.ItemEntity(items.type[t]));
+                                picked_names_1.push(items.type[t].name);
+                            }
+                            else
+                                max_flag_1 = true;
+                        });
                     }
+                    // tmp frame
+                    if (picked_names_1.length != 0) {
+                        for (var _b = 0, picked_names_2 = picked_names_1; _b < picked_names_2.length; _b++) {
+                            var v = picked_names_2[_b];
+                            utils.start_tmp_frame(v + " \u3092\u53D6\u5F97");
+                        }
+                    }
+                    if (max_flag_1)
+                        utils.start_tmp_frame("\u30A2\u30A4\u30C6\u30E0\u304C\u4E00\u676F\u3067\u3059!");
                 }
             }
         };
@@ -194,7 +204,11 @@ var model;
         }
         // player を壁でないところにランダム配置
         var player_upos = random_upos(function (n) { return !model.tiles[map.entity_names[n]].isWall; });
-        model.player = model.player == undefined ? new model.Entity(player_upos.x, player_upos.y, model.tiles["player"]) : model.player;
+        if (model.player == undefined)
+            model.player = new model.Entity(player_upos.x, player_upos.y, model.tiles["player"]);
+        else {
+            model.player.upos = player_upos;
+        }
         model.entities.push(model.player);
         // goal
         var goal_upos = random_upos(function (n) { return !model.tiles[map.entity_names[n]].isWall; });

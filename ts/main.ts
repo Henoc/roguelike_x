@@ -262,6 +262,12 @@ namespace main{
       }else if(keys.dir_key2.equals(model.dir.up)){
         let mode = menu_mode.join(">")
         cursor[mode] = utils.limit(cursor[mode] - 1, 0, cursor_max[mode])
+      }else if(keys.dir_key2.equals(model.dir.left)){
+        let mode = menu_mode.join(">")
+        cursor[mode] = utils.limit(cursor[mode] - 20, 0, cursor_max[mode])
+      }else if(keys.dir_key2.equals(model.dir.right)){
+        let mode = menu_mode.join(">")
+        cursor[mode] = utils.limit(cursor[mode] + 20, 0, cursor_max[mode])
       }
       break
       case "dist":

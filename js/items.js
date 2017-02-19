@@ -93,6 +93,7 @@ var items;
     }());
     items.ItemEntity = ItemEntity;
     items.item_entities = [];
+    items.item_entities_max = 20;
     items.equips = {};
     items.equips["head"] = utils.none();
     items.equips["body"] = utils.none();

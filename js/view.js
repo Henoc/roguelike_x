@@ -102,9 +102,13 @@ var view;
         else if (main.menu_mode[0] == "items") {
             top_frame.move_point_x(0.6);
             var item_top = top_frame.insert_subframe(utils.none(), utils.none(), "rgba(0,0,0,0.6)");
+            var page_size = 20;
+            var page_no = Math.floor(main.cursor["items"] / page_size);
+            var page_max = Math.floor((main.cursor_max["items"] - 1) / page_size);
             item_top.font_size = window_h / 32;
-            item_top.insert_text("\u30A2\u30A4\u30C6\u30E0");
-            for (var i = 0; i < items.item_entities.length; i++) {
+            item_top.insert_text("\u30A2\u30A4\u30C6\u30E0 (\u30DA\u30FC\u30B8 " + (page_no + 1) + "/" + (page_max + 1) + ")");
+            item_top.insert_text("");
+            for (var i = page_no * page_size; i < Math.min((page_no + 1) * page_size, items.item_entities.length); i++) {
                 var itemEntity = items.item_entities[i];
                 item_top.insert_text((main.cursor["items"] == i ? ">" : " ") + itemEntity.item.name);
             }

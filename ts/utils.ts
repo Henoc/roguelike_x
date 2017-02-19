@@ -269,7 +269,7 @@ namespace utils{
   export function start_tmp_frame(text:string){
     if(tmp_frame.exist()) tmp_frame.get().life = 80
     else{
-      let tf = new utils.Frame(view.window_w * 0.6, view.window_h * 0.4, view.window_w * 0.3, view.window_h * 0.2, view.window_h * 0.03, "rgba(0,0,0,0.6)",80)
+      let tf = new utils.Frame(view.window_w * 0.75, view.window_h * 0.4, view.window_w * 0.25, view.window_h * 0.2, view.window_h * 0.03, "rgba(0,0,0,0.6)",80)
       tf.font_size = view.window_h / 40
       tmp_frame = some(tf)
     }
@@ -372,8 +372,8 @@ namespace utils{
     canvas.height = view.window_h
     let ctx = canvas.getContext("2d")
     let image_data = ctx.createImageData(view.window_w, view.window_h)
-    let px = view.window_w / 2
-    let py = view.window_h / 2
+    let px = view.window_w / 2 + view.move_center.x
+    let py = view.window_h / 2 + view.move_center.y
     for(let y = 0; y < view.window_h; y++){
       for(let x = 0; x < view.window_w; x++){
         let i = (y * view.window_w + x) * 4

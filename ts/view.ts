@@ -5,6 +5,7 @@ namespace view{
   export let prefix_pos = new utils.Pos(0,0)
   export const window_w = window_usize.x * unit_size.x
   export const window_h = window_usize.y * unit_size.y
+  export const move_center = new utils.Pos(-80,0)
 
   export function progress_rate(){
     return 0.2 * main.sp60f
@@ -66,11 +67,11 @@ namespace view{
     ctx.clearRect(0,0,window_w,window_h)
 
     // 画面外は黒
-    ctx.fillStyle = "black"
+    ctx.fillStyle = "rgba(30,30,30,1)"
     ctx.fillRect(0,0,window_w,window_h)
 
     // player を中心とする画面にする
-    let tmp = model.player.upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5,0.5)).mul(view.unit_size)
+    let tmp = model.player.upos.sub(window_usize.div_bloadcast(2)).add(new utils.Pos(0.5,0.5)).mul(view.unit_size).sub(move_center)
     prefix_pos = tmp.sub(prefix_pos).map(d => utils.limit(d,-unit_size.x * progress_rate(), unit_size.x * progress_rate())).add(prefix_pos)
 
     // draw a map

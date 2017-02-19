@@ -5,6 +5,7 @@ var view;
     view.prefix_pos = new utils.Pos(0, 0);
     view.window_w = view.window_usize.x * view.unit_size.x;
     view.window_h = view.window_usize.y * view.unit_size.y;
+    view.move_center = new utils.Pos(-80, 0);
     function progress_rate() {
         return 0.2 * main.sp60f;
     }
@@ -55,10 +56,10 @@ var view;
     function print(ctx, cnt) {
         ctx.clearRect(0, 0, view.window_w, view.window_h);
         // 画面外は黒
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "rgba(30,30,30,1)";
         ctx.fillRect(0, 0, view.window_w, view.window_h);
         // player を中心とする画面にする
-        var tmp = model.player.upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5, 0.5)).mul(view.unit_size);
+        var tmp = model.player.upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5, 0.5)).mul(view.unit_size).sub(view.move_center);
         view.prefix_pos = tmp.sub(view.prefix_pos).map(function (d) { return utils.limit(d, -view.unit_size.x * progress_rate(), view.unit_size.x * progress_rate()); }).add(view.prefix_pos);
         // draw a map
         for (var i = 0; i < map.height; i++) {
@@ -189,6 +190,7 @@ var view;
             dead_frame.font_size = view.window_h / 32;
             dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F");
         }
+        // 視野
         ctx.drawImage(utils.reversal_circle(view.window_h / 2 * 0.75), 0, 0);
         utils.print_frame(ctx);
         utils.print_tmp_frame(ctx);

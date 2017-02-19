@@ -268,7 +268,7 @@ var utils;
         if (tmp_frame.exist())
             tmp_frame.get().life = 80;
         else {
-            var tf = new utils.Frame(view.window_w * 0.6, view.window_h * 0.4, view.window_w * 0.3, view.window_h * 0.2, view.window_h * 0.03, "rgba(0,0,0,0.6)", 80);
+            var tf = new utils.Frame(view.window_w * 0.75, view.window_h * 0.4, view.window_w * 0.25, view.window_h * 0.2, view.window_h * 0.03, "rgba(0,0,0,0.6)", 80);
             tf.font_size = view.window_h / 40;
             tmp_frame = some(tf);
         }
@@ -372,8 +372,8 @@ var utils;
         canvas.height = view.window_h;
         var ctx = canvas.getContext("2d");
         var image_data = ctx.createImageData(view.window_w, view.window_h);
-        var px = view.window_w / 2;
-        var py = view.window_h / 2;
+        var px = view.window_w / 2 + view.move_center.x;
+        var py = view.window_h / 2 + view.move_center.y;
         for (var y = 0; y < view.window_h; y++) {
             for (var x = 0; x < view.window_w; x++) {
                 var i = (y * view.window_w + x) * 4;

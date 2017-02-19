@@ -7,7 +7,7 @@ var view;
     view.window_h = view.window_usize.y * view.unit_size.y;
     view.move_center = new utils.Pos(-80, 0);
     function progress_rate() {
-        return 0.2 * main.sp60f;
+        return 0.1 * main.sp60f;
     }
     view.progress_rate = progress_rate;
     /**
@@ -60,7 +60,7 @@ var view;
         ctx.fillRect(0, 0, view.window_w, view.window_h);
         // player を中心とする画面にする
         var tmp = model.player.upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5, 0.5)).mul(view.unit_size).sub(view.move_center);
-        view.prefix_pos = tmp.sub(view.prefix_pos).map(function (d) { return utils.limit(d, -view.unit_size.x * progress_rate(), view.unit_size.x * progress_rate()); }).add(view.prefix_pos);
+        view.prefix_pos = tmp.sub(view.prefix_pos).map(function (d) { return utils.included_limit(d, -view.unit_size.x * progress_rate(), view.unit_size.x * progress_rate()); }).add(view.prefix_pos);
         // draw a map
         for (var i = 0; i < map.height; i++) {
             for (var j = 0; j < map.width; j++) {

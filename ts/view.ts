@@ -8,7 +8,7 @@ namespace view{
   export const move_center = new utils.Pos(-80,0)
 
   export function progress_rate(){
-    return 0.2 * main.sp60f
+    return 0.1 * main.sp60f
   }
 
   /**
@@ -72,7 +72,7 @@ namespace view{
 
     // player を中心とする画面にする
     let tmp = model.player.upos.sub(window_usize.div_bloadcast(2)).add(new utils.Pos(0.5,0.5)).mul(view.unit_size).sub(move_center)
-    prefix_pos = tmp.sub(prefix_pos).map(d => utils.limit(d,-unit_size.x * progress_rate(), unit_size.x * progress_rate())).add(prefix_pos)
+    prefix_pos = tmp.sub(prefix_pos).map(d => utils.included_limit(d,-unit_size.x * progress_rate(), unit_size.x * progress_rate())).add(prefix_pos)
 
     // draw a map
     for(let i = 0; i < map.height; i++){

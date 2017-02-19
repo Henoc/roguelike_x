@@ -374,13 +374,15 @@ var utils;
         var image_data = ctx.createImageData(view.window_w, view.window_h);
         var px = view.window_w / 2 + view.move_center.x;
         var py = view.window_h / 2 + view.move_center.y;
+        var eps = r * 0.05;
         for (var y = 0; y < view.window_h; y++) {
             for (var x = 0; x < view.window_w; x++) {
                 var i = (y * view.window_w + x) * 4;
-                if (Math.pow(px - x, 2) + Math.pow(py - y, 2) < r * r) {
+                var d = Math.sqrt(Math.pow(px - x, 2) + Math.pow(py - y, 2));
+                if (d < r) {
                 }
                 else {
-                    image_data.data[i + 3] = 255;
+                    image_data.data[i + 3] = d < r + eps ? 255 * (d - r) / eps : 255;
                 }
             }
         }

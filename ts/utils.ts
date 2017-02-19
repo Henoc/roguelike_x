@@ -374,13 +374,15 @@ namespace utils{
     let image_data = ctx.createImageData(view.window_w, view.window_h)
     let px = view.window_w / 2 + view.move_center.x
     let py = view.window_h / 2 + view.move_center.y
+    let eps = r * 0.05
     for(let y = 0; y < view.window_h; y++){
       for(let x = 0; x < view.window_w; x++){
         let i = (y * view.window_w + x) * 4
-        if(Math.pow(px - x,2) + Math.pow(py - y,2) < r * r){
+        let d = Math.sqrt( Math.pow(px - x,2) + Math.pow(py - y,2) )
+        if(d < r){
           // nothing to do
         }else{
-          image_data.data[i+3] = 255
+          image_data.data[i+3] = d < r + eps ? 255 * (d - r) / eps : 255
         }
       }
     }

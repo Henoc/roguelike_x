@@ -268,10 +268,8 @@ var utils;
         if (tmp_frame.exist())
             tmp_frame.get().life = 80;
         else {
-            var window_w = view.window_usize.x * view.unit_size.x;
-            var window_h = view.window_usize.y * view.unit_size.y;
-            var tf = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.3, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)", 80);
-            tf.font_size = window_h / 40;
+            var tf = new utils.Frame(view.window_w * 0.6, view.window_h * 0.4, view.window_w * 0.3, view.window_h * 0.2, view.window_h * 0.03, "rgba(0,0,0,0.6)", 80);
+            tf.font_size = view.window_h / 40;
             tmp_frame = some(tf);
         }
         tmp_frame.get().insert_text(text);
@@ -342,7 +340,7 @@ var utils;
         function print_number(k, pos, cnt) {
             if (cnt >= 0) {
                 cnt = limit(cnt, 0, 10 / main.sp60f);
-                var delta = view.window_usize.y * view.unit_size.y / 240;
+                var delta = view.window_h / 240;
                 ctx.fillText(k, pos.x, pos.y - (10 / main.sp60f - cnt) * delta);
             }
             var w = ctx.measureText(k).width;
@@ -350,7 +348,7 @@ var utils;
         }
         for (var i = 0; i < tmp_num_tasks.length; i++) {
             var tmp_num_task = tmp_num_tasks[i];
-            ctx.font = "normal " + (view.window_usize.y * view.unit_size.y / 40) + "px sans-serif";
+            ctx.font = "normal " + (view.window_h / 40) + "px sans-serif";
             ctx.fillStyle = tmp_num_task.color;
             var num_text = tmp_num_task.number + "";
             var pos = tmp_num_task.pos;
@@ -365,4 +363,31 @@ var utils;
         }
     }
     utils.print_tmp_num = print_tmp_num;
+    var reversal_circle_memo = {};
+    function reversal_circle(r) {
+        if (r in reversal_circle_memo)
+            return reversal_circle_memo[r];
+        var canvas = document.createElement("canvas");
+        canvas.width = view.window_w;
+        canvas.height = view.window_h;
+        var ctx = canvas.getContext("2d");
+        var image_data = ctx.createImageData(view.window_w, view.window_h);
+        var px = view.window_w / 2;
+        var py = view.window_h / 2;
+        for (var y = 0; y < view.window_h; y++) {
+            for (var x = 0; x < view.window_w; x++) {
+                var i = (y * view.window_w + x) * 4;
+                if (Math.pow(px - x, 2) + Math.pow(py - y, 2) < r * r) {
+                }
+                else {
+                    image_data.data[i + 3] = 255;
+                }
+            }
+        }
+        ctx.putImageData(image_data, 0, 0);
+        reversal_circle_memo = {}; // 以前のものを破棄
+        reversal_circle_memo[r] = canvas;
+        return canvas;
+    }
+    utils.reversal_circle = reversal_circle;
 })(utils || (utils = {}));

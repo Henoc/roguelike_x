@@ -100,10 +100,10 @@ namespace main{
   }
 
   export function init() {
-    canvas = <HTMLCanvasElement> document.getElementById('maincanvas');
+    canvas = <HTMLCanvasElement> document.getElementById('canvas1');
     ctx = canvas.getContext('2d');
-    canvas.width = view.window_usize.x * view.unit_size.x;
-    canvas.height = view.window_usize.y * view.unit_size.y;
+    canvas.width = view.window_w;
+    canvas.height = view.window_h;
 
     canvas.addEventListener("touchstart",main.touchstart)
     canvas.addEventListener("touchmove",main.touchmove)
@@ -222,7 +222,10 @@ namespace main{
               cursor_max["items"]++
             }
             items.equips[selected.item.equip_region] = utils.some(selected)
-            model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum())
+            let equipped_status =  model.tiles["player"].status.get().add(items.equips_status_sum())
+            equipped_status.max_hp = model.player.status.max_hp
+            equipped_status.hp = model.player.status.hp
+            model.player.status = equipped_status
             model.player.more_props = items.equips_more_props_sum(model.player.more_props)
             items.item_entities.splice(cursor["items"],1)
             cursor_max["items"]--

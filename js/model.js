@@ -43,7 +43,7 @@ var model;
     model.tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0", "", "sacred_slime", true, true, utils.some(new battle.Status(4, 4, 2, 1, 0, 0)), 3, [{ name: "dead_sacred_slime", per: 1 }, { name: "potion", per: 0.1 }, { name: "revival", per: 0.01 }], { revive: 5 });
     model.tiles["violent_ghost"] = new Tile("\u66B4\u308C\u30B4\u30FC\u30B9\u30C8", "", "violent_ghost", true, true, utils.some(new battle.Status(4, 4, 3, 0, 0, 2)), 4, [{ name: "candle", per: 0.2 }, { name: "ghost_camouflage", per: 0.05 }], { hide: true });
     model.tiles["treasure_box"] = new Tile("\u5B9D\u7BB1", "", "treasure_box", true, false, utils.some(new battle.Status(10, 10, 0, 4, 0, 0)), 4, [
-        { name: "knife", per: 0.7 }, { name: "copper_armor", per: 0.7 }, { name: "silver_knife", per: 0.3 }, { name: "iron_armor", per: 0.3 }, { name: "gold_knife", per: 0.1 }, { name: "gold_armor", per: 0.1 }, { name: "sharpener", per: 0.2 }, { name: "magic_sharpener", per: 0.1 }, { name: "fairy_sharpener", per: 0.05 }, { name: "dragon_sharpener", per: 0.025 }
+        { name: "knife", per: 0.3 }, { name: "copper_armor", per: 0.3 }, { name: "silver_knife", per: 0.1 }, { name: "iron_armor", per: 0.1 }, { name: "gold_knife", per: 0.05 }, { name: "gold_armor", per: 0.05 }, { name: "sharpener", per: 0.2 }, { name: "magic_sharpener", per: 0.1 }, { name: "fairy_sharpener", per: 0.05 }, { name: "dragon_sharpener", per: 0.025 }
     ], { no_attack: true });
     model.tiles["shadow_bird"] = new Tile("\u602A\u9CE5\u306E\u5F71", "", "shadow_bird", true, true, utils.some(new battle.Status(4, 4, 2, 0, 0, 8)), 5, [], {});
     // 実際の配置物
@@ -72,7 +72,7 @@ var model;
             else if (this.status.hp != 0) {
                 this.tile.print(ctx, realPos, this.direction, cnt);
                 ctx.fillStyle = "white";
-                var font_size = view.window_usize.y * view.unit_size.y / 40;
+                var font_size = view.window_h / 40;
                 ctx.font = "normal " + font_size + "px sans-serif";
                 utils.fillText_n(ctx, this.tile.jp_name + ("no_damage" in this.more_props ? "" : "\n" + this.status.hp + "/" + this.status.max_hp), realPos.x, realPos.y - view.unit_size.y, font_size, font_size);
             }

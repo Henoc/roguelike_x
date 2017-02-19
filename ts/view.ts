@@ -1,8 +1,10 @@
 namespace view{
 
-  export let window_usize = new utils.Pos(640 / 32, 480 / 32)
-  export let unit_size = new utils.Pos(32,32)
+  export const window_usize = new utils.Pos(640 / 32, 480 / 32)
+  export const unit_size = new utils.Pos(32,32)
   export let prefix_pos = new utils.Pos(0,0)
+  export const window_w = window_usize.x * unit_size.x
+  export const window_h = window_usize.y * unit_size.y
 
   export function progress_rate(){
     return 0.2 * main.sp60f
@@ -60,15 +62,12 @@ namespace view{
   }
 
   export function print(ctx : CanvasRenderingContext2D, cnt:number){
-    ctx.clearRect(0,0,
-    window_usize.x * unit_size.x,
-    window_usize.y * unit_size.y)
+
+    ctx.clearRect(0,0,window_w,window_h)
 
     // 画面外は黒
     ctx.fillStyle = "black"
-    ctx.fillRect(0,0,
-    window_usize.x * unit_size.x,
-    window_usize.y * unit_size.y)
+    ctx.fillRect(0,0,window_w,window_h)
 
     // player を中心とする画面にする
     let tmp = model.player.upos.sub(view.window_usize.div_bloadcast(2)).add(new utils.Pos(0.5,0.5)).mul(view.unit_size)
@@ -105,9 +104,6 @@ namespace view{
       entity.print(ctx,realEntityPos,cnt)
     }
 
-
-    let window_w = window_usize.x * unit_size.x
-    let window_h = window_usize.y * unit_size.y
     let top_frame = new utils.Frame(0,0,window_w,window_h,window_h * 0.03,"rgba(0,0,0,0)",1)
     utils.frame_tasks.push(top_frame)
 
@@ -211,6 +207,9 @@ namespace view{
       dead_frame.font_size = window_h / 32
       dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F")
     }
+
+    // 視野
+    ctx.drawImage(utils.reversal_circle(window_h / 2 * 0.75),0,0)
     
     utils.print_frame(ctx)
     utils.print_tmp_frame(ctx)

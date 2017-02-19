@@ -269,10 +269,8 @@ namespace utils{
   export function start_tmp_frame(text:string){
     if(tmp_frame.exist()) tmp_frame.get().life = 80
     else{
-      let window_w = view.window_usize.x * view.unit_size.x
-      let window_h = view.window_usize.y * view.unit_size.y
-      let tf = new utils.Frame(window_w * 0.6, window_h * 0.4, window_w * 0.3, window_h * 0.2, window_h * 0.03, "rgba(0,0,0,0.6)",80)
-      tf.font_size = window_h / 40
+      let tf = new utils.Frame(view.window_w * 0.6, view.window_h * 0.4, view.window_w * 0.3, view.window_h * 0.2, view.window_h * 0.03, "rgba(0,0,0,0.6)",80)
+      tf.font_size = view.window_h / 40
       tmp_frame = some(tf)
     }
     tmp_frame.get().insert_text(text)
@@ -342,7 +340,7 @@ namespace utils{
     function print_number(k:string, pos:Pos, cnt:number):Pos{
       if(cnt >= 0){
         cnt = limit(cnt, 0, 10 / main.sp60f)
-        let delta = view.window_usize.y * view.unit_size.y / 240
+        let delta = view.window_h / 240
         ctx.fillText(k, pos.x, pos.y - (10 / main.sp60f - cnt) * delta)
       }
       let w = ctx.measureText(k).width
@@ -351,7 +349,7 @@ namespace utils{
 
     for(let i = 0; i < tmp_num_tasks.length; i++){
       let tmp_num_task = tmp_num_tasks[i]
-      ctx.font = "normal " + (view.window_usize.y * view.unit_size.y / 40) + "px sans-serif"
+      ctx.font = "normal " + (view.window_h / 40) + "px sans-serif"
       ctx.fillStyle = tmp_num_task.color
       let num_text = tmp_num_task.number + ""
       let pos = tmp_num_task.pos
@@ -364,5 +362,31 @@ namespace utils{
         i--
       }
     }
+  }
+
+  let reversal_circle_memo: { [key: number]: HTMLCanvasElement; }  = {}
+  export function reversal_circle(r:number):HTMLCanvasElement {
+    if(r in reversal_circle_memo) return reversal_circle_memo[r]
+    let canvas = document.createElement("canvas")
+    canvas.width = view.window_w
+    canvas.height = view.window_h
+    let ctx = canvas.getContext("2d")
+    let image_data = ctx.createImageData(view.window_w, view.window_h)
+    let px = view.window_w / 2
+    let py = view.window_h / 2
+    for(let y = 0; y < view.window_h; y++){
+      for(let x = 0; x < view.window_w; x++){
+        let i = (y * view.window_w + x) * 4
+        if(Math.pow(px - x,2) + Math.pow(py - y,2) < r * r){
+          // nothing to do
+        }else{
+          image_data.data[i+3] = 255
+        }
+      }
+    }
+    ctx.putImageData(image_data,0,0)
+    reversal_circle_memo = {} // 以前のものを破棄
+    reversal_circle_memo[r] = canvas
+    return canvas
   }
 }

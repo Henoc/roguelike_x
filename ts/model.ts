@@ -51,10 +51,11 @@ namespace model{
   tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F","rgba(15,140,15,1)","mame_mouse",true,true,utils.some(new battle.Status(2,2,1,0,0,0)),1,[{name:"soramame_head",per:0.2},{name:"mame_mouse_ibukuro",per:0.05}],{})
   tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC","","lang_dog",true,true,utils.some(new battle.Status(3,3,1,0,0,0)),2,[{name:"lang_dog_shoes",per:0.2},{name:"lang_dog_paper",per:0.03}],{})
   tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0","","sacred_slime",true,true,utils.some(new battle.Status(4,4,2,1,0,0)),3,[{name:"dead_sacred_slime",per:1},{name:"potion",per:0.1},{name:"revival",per:0.01}],{revive:5})
-  tiles["violent_ghost"] = new Tile("\u66B4\u308C\u30B4\u30FC\u30B9\u30C8","","violent_ghost",true,true,utils.some(new battle.Status(4,4,3,0,0,0)),4,[{name:"candle",per:0.2},{name:"ghost_camouflage", per: 0.05}],{hide:true})
+  tiles["violent_ghost"] = new Tile("\u66B4\u308C\u30B4\u30FC\u30B9\u30C8","","violent_ghost",true,true,utils.some(new battle.Status(4,4,3,0,0,2)),4,[{name:"candle",per:0.2},{name:"ghost_camouflage", per: 0.05}],{hide:true})
   tiles["treasure_box"] = new Tile("\u5B9D\u7BB1","","treasure_box",true,false,utils.some(new battle.Status(10,10,0,4,0,0)),4,[
     {name:"knife",per:0.7}, {name:"copper_armor", per:0.7}, {name:"silver_knife",per:0.3}, {name:"iron_armor",per:0.3}, {name:"gold_knife",per:0.1}, {name:"gold_armor", per:0.1}, {name:"sharpener", per:0.2},{name:"magic_sharpener", per:0.1},{name:"fairy_sharpener", per:0.05},{name:"dragon_sharpener", per:0.025}
     ],{no_attack:true})
+  tiles["shadow_bird"] = new Tile("\u602A\u9CE5\u306E\u5F71","","shadow_bird",true,true,utils.some(new battle.Status(4,4,2,0,0,8)),5,[],{})
 
   // 実際の配置物
   export class Entity{
@@ -195,20 +196,22 @@ namespace model{
 
   export let rank : number
 
+  let rank_enemy_map: { [key: number]: string[]; } = {}
+  rank_enemy_map[0] = ["mame_mouse",   "lang_dog"]
+  rank_enemy_map[1] = ["mame_mouse",   "lang_dog",    "sacred_slime"]
+  rank_enemy_map[2] = ["mame_mouse",   "lang_dog",    "sacred_slime", "treasure_box"]
+  rank_enemy_map[3] = ["violent_ghost","lang_dog",    "sacred_slime", "treasure_box"]
+  rank_enemy_map[4] = ["violent_ghost","shadow_bird", "sacred_slime", "treasure_box"]
+
   export function init_entities(){
     map.make_map()
 
     // enemy をランダムに数匹配置
-    for(let i = 0; i < 20; i++){
+    for(let i = 0; i < 10; i++){
       let upos = random_upos(n => !tiles[map.entity_names[n]].isWall)
-      let ptn:string[] = []
-      ptn[0] = "mame_mouse"
-      ptn[1] = "lang_dog"
-      ptn[2] = "sacred_slime"
-      ptn[3] = "violent_ghost"
-      ptn[4] = "treasure_box"
+      let ptn:string[] = rank_enemy_map[rank - 1]
       entities.push(
-        model.Entity.of(upos,model.tiles[ptn[utils.randInt(5)]])
+        model.Entity.of(upos,model.tiles[ptn[utils.randInt(ptn.length)]])
       )
     }
 

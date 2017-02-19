@@ -54,6 +54,10 @@ namespace main{
       {type: "image", name: "violent_ghost_up", src: "assets/violent_ghost_up.png", frames:4},
       {type: "image", name: "violent_ghost_down", src: "assets/violent_ghost_down.png", frames:4},
       {type: "image", name: "treasure_box", src: "assets/treasure_box.png", frames:1},
+      {type: "image", name: "shadow_bird_left", src: "assets/shadow_bird_left.png", frames:6},
+      {type: "image", name: "shadow_bird_right", src: "assets/shadow_bird_right.png", frames:6},
+      {type: "image", name: "shadow_bird_up", src: "assets/shadow_bird_up.png", frames:4},
+      {type: "image", name: "shadow_bird_down", src: "assets/shadow_bird_down.png", frames:4},
 
       {type: "image", name: "floor", src: "assets/floor.png", frames:1},
       {type: "image", name: "wall", src: "assets/wall.png", frames:1},

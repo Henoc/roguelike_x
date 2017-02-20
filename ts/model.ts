@@ -132,10 +132,10 @@ namespace model{
           // tmp frame
           if(picked_names.length != 0) {
             for(let v of picked_names){
-              utils.start_tmp_frame(v + " \u3092\u53D6\u5F97")
+              utils.log.push(v + " \u3092\u53D6\u5F97")
             }
           }
-          if(max_flag) utils.start_tmp_frame("\u30A2\u30A4\u30C6\u30E0\u304C\u4E00\u676F\u3067\u3059!")
+          if(max_flag) utils.log.push("\u30A2\u30A4\u30C6\u30E0\u304C\u4E00\u676F\u3067\u3059!")
         }
       }
     }
@@ -279,17 +279,17 @@ namespace model{
       player.status.max_hp = utils.limit(player.status.max_hp - 1,0,player.status.max_hp)
       player.status.hp = utils.limit(player.status.hp, 0, player.status.max_hp + 1)
       action_counters.effi = 0
-      utils.start_tmp_frame("\u304A\u8179\u304C\u7A7A\u3044\u305F(\u6700\u5927HP-1)")
+      utils.log.push("\u304A\u8179\u304C\u7A7A\u3044\u305F(\u6700\u5927HP-1)")
     }
     if(action_counters.heal >= player.more_props["heal"]) {
       player.status.hp = utils.limit(player.status.hp + 1, 0, player.status.max_hp + 1)
       action_counters.heal = 0
-      utils.start_tmp_frame("\u5C11\u3057\u75B2\u308C\u304C\u53D6\u308C\u305F(HP+1)")
+      utils.log.push("\u5C11\u3057\u75B2\u308C\u304C\u53D6\u308C\u305F(HP+1)")
     }
     action_counters.effi++
     action_counters.heal++
     if(player.status.hp == 0) {
-      utils.start_tmp_frame("\u6B7B\u3093\u3067\u3057\u307E\u3063\u305F")
+      utils.log.push("\u6B7B\u3093\u3067\u3057\u307E\u3063\u305F")
       // item property: revive
       for(let i = 0; i < items.item_entities.length; i++){
         let ent = items.item_entities[i]
@@ -301,7 +301,7 @@ namespace model{
             utils.start_anim("twinkle",2,player.upos.add(delta_upos).mul(view.unit_size).sub(view.prefix_pos), new utils.Pos(32,32), 12)
           }
           items.item_entities.splice(i,1)
-          utils.start_tmp_frame("\u8607\u751F\u85AC\u3067\u751F\u304D\u8FD4\u3063\u305F")
+          utils.log.push("\u8607\u751F\u85AC\u3067\u751F\u304D\u8FD4\u3063\u305F")
           break
         }
       }
@@ -317,7 +317,7 @@ namespace model{
       entities = []
       rank++
       init_entities()
-      utils.start_tmp_frame(rank + "\u968E\u306B\u5230\u9054\u3057\u305F")
+      utils.log.push(rank + "\u968E\u306B\u5230\u9054\u3057\u305F")
     }
   }
 
@@ -332,7 +332,7 @@ namespace model{
           if(ent.more_props["revive"] == 0) {
             ent.status = ent.tile.status.get()
             ent.more_props = utils.shallow_copy(ent.tile.more_props)
-            utils.start_tmp_frame(ent.tile.jp_name + "\u304C\u8607\u751F\u3057\u305F!")
+            utils.log.push(ent.tile.jp_name + "\u304C\u8607\u751F\u3057\u305F!")
           }
         }
         continue
@@ -343,7 +343,7 @@ namespace model{
         ent.attack()
         if("hide" in ent.more_props && ent.more_props["hide"]) {
           ent.more_props["hide"] = false
-          utils.start_tmp_frame(ent.tile.jp_name + "\u304C\u59FF\u3092\u8868\u3057\u305F!")
+          utils.log.push(ent.tile.jp_name + "\u304C\u59FF\u3092\u8868\u3057\u305F!")
         }
         // property: camouflage
       }else if(ent.near(player,4 * ("camouflage" in player.more_props ? (1 - player.more_props["camouflage"]) : 1))){

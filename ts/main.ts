@@ -247,10 +247,10 @@ namespace main{
             let [success_rate, delta_atk] = selected.more_props["sharpen"]
             if(Math.random() < success_rate) {
               items.equips["hand"].get().status.atk += delta_atk
-              utils.start_tmp_frame(selected.item.name + "\u3067\u6B66\u5668\u306E\u5F37\u5316... \u6210\u529F! \u6B66\u5668\u653B\u6483\u529B +" + delta_atk)
+              utils.log.push(selected.item.name + "\u3067\u6B66\u5668\u306E\u5F37\u5316... \u6210\u529F! \u6B66\u5668\u653B\u6483\u529B +" + delta_atk)
             }else{
               items.equips["hand"].get().status.atk = utils.lower_bound(items.equips["hand"].get().status.atk - delta_atk, 0)
-              utils.start_tmp_frame(selected.item.name + "\u3067\u6B66\u5668\u306E\u5F37\u5316... \u5931\u6557! \u6B66\u5668\u653B\u6483\u529B -" + delta_atk)
+              utils.log.push(selected.item.name + "\u3067\u6B66\u5668\u306E\u5F37\u5316... \u5931\u6557! \u6B66\u5668\u653B\u6483\u529B -" + delta_atk)
             }
             // 武器のステータスを変えたので装備計算を再度実行
             model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum())

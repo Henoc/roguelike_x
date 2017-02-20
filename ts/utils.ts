@@ -265,24 +265,36 @@ namespace utils{
     }
   }
 
-  let tmp_frame : Option<Frame> = none<Frame>()
-  export function start_tmp_frame(text:string){
-    if(tmp_frame.exist()) tmp_frame.get().life = 80
-    else{
-      let tf = new utils.Frame(view.window_w * 0.75, view.window_h * 0.4, view.window_w * 0.25, view.window_h * 0.2, view.window_h * 0.03, "rgba(0,0,0,0)",80)
-      tf.font_size = view.window_h / 40
-      tmp_frame = some(tf)
+  // let tmp_frame : Option<Frame> = none<Frame>()
+  // export function start_tmp_frame(text:string){
+  //   if(tmp_frame.exist()) tmp_frame.get().life = 80
+  //   else{
+  //     let tf = new utils.Frame(view.window_w * 0.75, view.window_h * 0.4, view.window_w * 0.25, view.window_h * 0.2, view.window_h * 0.03, "rgba(0,0,0,0)",80)
+  //     tf.font_size = view.window_h / 40
+  //     tmp_frame = some(tf)
+  //   }
+  //   tmp_frame.get().insert_text(text)
+  // }
+  // export function print_tmp_frame(ctx:CanvasRenderingContext2D){
+  //   tmp_frame.foreach(t => {
+  //     t.print(ctx)
+  //     if(t.life != undefined && t.life < 0) tmp_frame = none<Frame>()
+  //   })
+  // }
+  // export function delete_tmp_frame(){
+  //   tmp_frame = none<Frame>()
+  // }
+
+  export let log : string[] = []
+  export function print_log(ctx:CanvasRenderingContext2D){
+    if(log.length >= 20) log.splice(0,log.length - 20 + 1)
+    ctx.font = "normal " + (view.window_h / 40) + "px sans-serif"
+    ctx.fillStyle = "white"
+    for(let i = log.length - 1; i >= 0; i--){
+      let y = view.window_h * 0.6 - (log.length - 1 - i) * view.window_h / 40 * 1.2
+      ctx.fillText(log[i], view.window_w * 0.75, y)
+      ctx.fillStyle = "gray"
     }
-    tmp_frame.get().insert_text(text)
-  }
-  export function print_tmp_frame(ctx:CanvasRenderingContext2D){
-    tmp_frame.foreach(t => {
-      t.print(ctx)
-      if(t.life != undefined && t.life < 0) tmp_frame = none<Frame>()
-    })
-  }
-  export function delete_tmp_frame(){
-    tmp_frame = none<Frame>()
   }
 
   export function shallow_copy(obj:any):any {

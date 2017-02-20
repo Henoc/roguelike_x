@@ -191,7 +191,7 @@ namespace view{
       }
       
       if(main.menu_mode[1] == "command"){
-        let command = message.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(100,0,0,0.6)")
+        let command = message.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(100,0,0,1)")
         let item_ent = items.item_entities[main.cursor["items"]]
         let valid_command_names = item_ent.get_valid_commands()
         for(let i = 0; i < valid_command_names.length; i++){
@@ -214,7 +214,7 @@ namespace view{
       dist_frame.insert_text("")
       dist_frame.insert_text("\u2190\u2192\u30AD\u30FC\u3067\u632F\u308A\u5206\u3051 Z\u30AD\u30FC\u3067\u6C7A\u5B9A")
     }else if(main.menu_mode[0] == "dead"){
-      let dead_frame = top_frame.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(30,30,30,1)")
+      let dead_frame = top_frame.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(30,30,30,0)")
       dead_frame.font_size = window_h / 32
       dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F")
     }
@@ -222,8 +222,9 @@ namespace view{
     // 視野
     ctx.drawImage(utils.reversal_circle(visual_field_size()),0,0)
     
+    utils.print_log(ctx)
     utils.print_frame(ctx)
-    utils.print_tmp_frame(ctx)
+    //utils.print_tmp_frame(ctx)
 
     // draw temporal animations
     utils.print_anims(ctx)

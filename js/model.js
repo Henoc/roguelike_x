@@ -119,11 +119,11 @@ var model;
                     if (picked_names_1.length != 0) {
                         for (var _b = 0, picked_names_2 = picked_names_1; _b < picked_names_2.length; _b++) {
                             var v = picked_names_2[_b];
-                            utils.start_tmp_frame(v + " \u3092\u53D6\u5F97");
+                            utils.log.push(v + " \u3092\u53D6\u5F97");
                         }
                     }
                     if (max_flag_1)
-                        utils.start_tmp_frame("\u30A2\u30A4\u30C6\u30E0\u304C\u4E00\u676F\u3067\u3059!");
+                        utils.log.push("\u30A2\u30A4\u30C6\u30E0\u304C\u4E00\u676F\u3067\u3059!");
                 }
             }
         };
@@ -262,17 +262,17 @@ var model;
             model.player.status.max_hp = utils.limit(model.player.status.max_hp - 1, 0, model.player.status.max_hp);
             model.player.status.hp = utils.limit(model.player.status.hp, 0, model.player.status.max_hp + 1);
             model.action_counters.effi = 0;
-            utils.start_tmp_frame("\u304A\u8179\u304C\u7A7A\u3044\u305F(\u6700\u5927HP-1)");
+            utils.log.push("\u304A\u8179\u304C\u7A7A\u3044\u305F(\u6700\u5927HP-1)");
         }
         if (model.action_counters.heal >= model.player.more_props["heal"]) {
             model.player.status.hp = utils.limit(model.player.status.hp + 1, 0, model.player.status.max_hp + 1);
             model.action_counters.heal = 0;
-            utils.start_tmp_frame("\u5C11\u3057\u75B2\u308C\u304C\u53D6\u308C\u305F(HP+1)");
+            utils.log.push("\u5C11\u3057\u75B2\u308C\u304C\u53D6\u308C\u305F(HP+1)");
         }
         model.action_counters.effi++;
         model.action_counters.heal++;
         if (model.player.status.hp == 0) {
-            utils.start_tmp_frame("\u6B7B\u3093\u3067\u3057\u307E\u3063\u305F");
+            utils.log.push("\u6B7B\u3093\u3067\u3057\u307E\u3063\u305F");
             // item property: revive
             for (var i = 0; i < items.item_entities.length; i++) {
                 var ent = items.item_entities[i];
@@ -284,7 +284,7 @@ var model;
                         utils.start_anim("twinkle", 2, model.player.upos.add(delta_upos).mul(view.unit_size).sub(view.prefix_pos), new utils.Pos(32, 32), 12);
                     }
                     items.item_entities.splice(i, 1);
-                    utils.start_tmp_frame("\u8607\u751F\u85AC\u3067\u751F\u304D\u8FD4\u3063\u305F");
+                    utils.log.push("\u8607\u751F\u85AC\u3067\u751F\u304D\u8FD4\u3063\u305F");
                     break;
                 }
             }
@@ -301,7 +301,7 @@ var model;
             model.entities = [];
             model.rank++;
             init_entities();
-            utils.start_tmp_frame(model.rank + "\u968E\u306B\u5230\u9054\u3057\u305F");
+            utils.log.push(model.rank + "\u968E\u306B\u5230\u9054\u3057\u305F");
         }
     }
     function monsters_action() {
@@ -317,7 +317,7 @@ var model;
                     if (ent.more_props["revive"] == 0) {
                         ent.status = ent.tile.status.get();
                         ent.more_props = utils.shallow_copy(ent.tile.more_props);
-                        utils.start_tmp_frame(ent.tile.jp_name + "\u304C\u8607\u751F\u3057\u305F!");
+                        utils.log.push(ent.tile.jp_name + "\u304C\u8607\u751F\u3057\u305F!");
                     }
                 }
                 continue;
@@ -328,7 +328,7 @@ var model;
                 ent.attack();
                 if ("hide" in ent.more_props && ent.more_props["hide"]) {
                     ent.more_props["hide"] = false;
-                    utils.start_tmp_frame(ent.tile.jp_name + "\u304C\u59FF\u3092\u8868\u3057\u305F!");
+                    utils.log.push(ent.tile.jp_name + "\u304C\u59FF\u3092\u8868\u3057\u305F!");
                 }
             }
             else if (ent.near(model.player, 4 * ("camouflage" in model.player.more_props ? (1 - model.player.more_props["camouflage"]) : 1))) {

@@ -172,7 +172,7 @@ var view;
                     message.insert_text("\u8996\u8A8D\u6027 -" + (item_ent.more_props["camouflage"] * 100) + "%");
             }
             if (main.menu_mode[1] == "command") {
-                var command = message.insert_subframe(utils.none(), utils.none(), "rgba(100,0,0,0.6)");
+                var command = message.insert_subframe(utils.none(), utils.none(), "rgba(100,0,0,1)");
                 var item_ent = items.item_entities[main.cursor["items"]];
                 var valid_command_names = item_ent.get_valid_commands();
                 for (var i = 0; i < valid_command_names.length; i++) {
@@ -197,14 +197,15 @@ var view;
             dist_frame.insert_text("\u2190\u2192\u30AD\u30FC\u3067\u632F\u308A\u5206\u3051 Z\u30AD\u30FC\u3067\u6C7A\u5B9A");
         }
         else if (main.menu_mode[0] == "dead") {
-            var dead_frame = top_frame.insert_subframe(utils.none(), utils.none(), "rgba(30,30,30,1)");
+            var dead_frame = top_frame.insert_subframe(utils.none(), utils.none(), "rgba(30,30,30,0)");
             dead_frame.font_size = view.window_h / 32;
             dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F");
         }
         // 視野
         ctx.drawImage(utils.reversal_circle(visual_field_size()), 0, 0);
+        utils.print_log(ctx);
         utils.print_frame(ctx);
-        utils.print_tmp_frame(ctx);
+        //utils.print_tmp_frame(ctx)
         // draw temporal animations
         utils.print_anims(ctx);
         // draw temporal damage animations

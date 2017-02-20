@@ -186,6 +186,7 @@ namespace view{
         if("sharpen" in item_ent.more_props) message.insert_text("\u6210\u529F\u7387 " + item_ent.more_props["sharpen"][0] + " \u6B66\u5668\u306E\u653B\u6483 \u00B1" + item_ent.more_props["sharpen"][1])
         if("effi" in item_ent.more_props) message.insert_text("\u71C3\u8CBB +" + item_ent.more_props["effi"])
         if("heal" in item_ent.more_props) message.insert_text("\u81EA\u7136\u6CBB\u7652\u529B +" + item_ent.more_props["heal"])
+        if("view" in item_ent.more_props) message.insert_text("\u6240\u6301\u6642 \u8996\u91CE +" + (item_ent.more_props["view"] * 100) + "%")
         if("camouflage" in item_ent.more_props) message.insert_text("\u8996\u8A8D\u6027 -" + (item_ent.more_props["camouflage"] * 100) + "%")
       }
       

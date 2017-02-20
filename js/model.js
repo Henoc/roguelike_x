@@ -151,11 +151,10 @@ var model;
                                 if (ent.tile.name != "player")
                                     ent.status = ent.status.add(buff_1);
                             });
-                            var buff_text = "", status_jp = { max_hp: "\u6700\u5927HP", hp: "HP", atk: "\u653B\u6483", def: "\u9632\u5FA1", dex: "\u547D\u4E2D", eva: "\u56DE\u907F" };
-                            for (var _i = 0, _a = ["max_hp", "hp", "atk", "def", "dex", "eva"]; _i < _a.length; _i++) {
-                                var name_1 = _a[_i];
+                            var buff_text = "";
+                            for (var name_1 in battle.status_jp_names) {
                                 if (buff_1[name_1] != 0)
-                                    buff_text += status_jp[name_1] + " +" + buff_1[name_1] + " ";
+                                    buff_text += battle.status_jp_names[name_1] + " +" + buff_1[name_1] + " ";
                             }
                             utils.log.push(entity.tile.jp_name + "\u306F\u907A\u8A00\u3092\u6B8B\u3057\u305F", "\u30E2\u30F3\u30B9\u30BF\u30FC\u5168\u3066\u306B " + buff_text);
                         }

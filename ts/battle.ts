@@ -68,6 +68,8 @@ namespace battle{
     }
   }
 
+  export let status_jp_names = {max_hp:"\u6700\u5927HP",hp:"HP",atk:"\u653B\u6483",def:"\u9632\u5FA1",dex:"\u547D\u4E2D",eva:"\u56DE\u907F"}
+
   export let player_exp = 0
   export let dist_point = 0
   export function add_exp(exp:number){

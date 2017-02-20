@@ -164,12 +164,12 @@ namespace view{
 
       status_frame.insert_text("HP " + model.player.status.hp + "/" + model.player.status.max_hp 
         + (delta_status.hp != 0 || delta_status.max_hp != 0 ? " \u2192 " + modified_status.hp + "/" + modified_status.max_hp : "") )
-      status_frame.insert_text("\u653B\u6483 " + model.player.status.atk
+      status_frame.insert_text(battle.status_jp_names.atk + " " + model.player.status.atk
         + (delta_status.atk != 0 ? " \u2192 " + modified_status.atk : ""))
-      status_frame.insert_text("\u9632\u5FA1 " + model.player.status.def
+      status_frame.insert_text(battle.status_jp_names.def + " " + model.player.status.def
         + (delta_status.def != 0 ? " \u2192 " + modified_status.def : ""))
-      status_frame.insert_text("\u547D\u4E2D " + model.player.status.dex + (delta_status.dex != 0 ? " \u2192 " + modified_status.dex : ""))
-      status_frame.insert_text("\u56DE\u907F " + model.player.status.eva + (delta_status.eva != 0 ? " \u2192 " + modified_status.eva : ""))
+      status_frame.insert_text(battle.status_jp_names.dex + " " + model.player.status.dex + (delta_status.dex != 0 ? " \u2192 " + modified_status.dex : ""))
+      status_frame.insert_text(battle.status_jp_names.eva + " " + model.player.status.eva + (delta_status.eva != 0 ? " \u2192 " + modified_status.eva : ""))
       status_frame.insert_text("")
       status_frame.insert_text("\u88C5\u5099")
       status_frame.insert_text("\u982D " + items.equips["head"].map(e => e.item.name).get_or_else(""))

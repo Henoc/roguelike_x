@@ -63,7 +63,7 @@ namespace items{
 
     //flying_pan: new Item("\u30D5\u30E9\u30A4\u30D1\u30F3", ["equip","put"], battle.Status.of_knife(1),"hand",`\u53E4\u4EE3\u306E\u920D\u5668\u3060\u304C\u8ABF\u7406\u306B\u3082\u4F7F\u7528\u3067\u304D\u308B`),
     //dead_mame_mouse: new Item("\u8C46\u306D\u305A\u307F\u306E\u8089",["use","put"],battle.Status.of_food(1),"none",`\u8C46\u306E\u5473\u304C\u3059\u308B`),
-    soramame_head: new Item("\u305D\u3089\u8C46\u306E\u5E3D\u5B50",["equip","put"],new battle.Status(2,0,0,0,2,0),"head",`\u305D\u3089\u8C46\u306E\u5F62\u3092\u3057\u305F\u98DF\u3079\u3089\u308C\u308B\u5E3D\u5B50`),
+    soramame_head: new Item("\u305D\u3089\u8C46\u306E\u5E3D\u5B50",["equip","put"],new battle.Status(0,0,0,0,2,0),"head",`\u305D\u3089\u8C46\u306E\u5F62\u3092\u3057\u305F\u5E3D\u5B50\u3002\u5E38\u306B\u8C46\u306E\u5302\u3044\u304C\u3059\u308B`),
     mame_mouse_ibukuro: new Item("\u8C46\u306D\u305A\u307F\u306E\u80C3\u888B",["use","put"],new battle.Status(0,0,0,0,0,0),"none",`\u98DF\u3079\u308B\u3068\u6D88\u5316\u3092\u7269\u7406\u7684\u306B\u52A9\u3051\u3066\u304F\u308C\u308B\u3068\u3044\u3046`,{effi:1}),
     //dead_lang_dog: new Item("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC\u306E\u8089",["use","put"],battle.Status.of_food(1),"none",`\u72AC\u3068\u4EBA\u3068\u306E\u30AD\u30E1\u30E9\u3060\u3068\u3044\u3046\u8AAC\u304C\u3042\u308B`),
     lang_dog_shoes: new Item("\u72AC\u306E\u9774",["equip","put"],new battle.Status(0,0,0,0,0,2),"foot",`\u77E5\u6027\u3092\u611F\u3058\u3055\u305B\u308B\u5E03\u88FD\u306E\u9774`,{effi:2}),

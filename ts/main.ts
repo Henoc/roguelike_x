@@ -2,6 +2,10 @@ namespace main{
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
+
+  let buffer_canvas: HTMLCanvasElement;
+  let buffer_ctx: CanvasRenderingContext2D;
+
   /**
    * expore, items
    */
@@ -109,6 +113,13 @@ namespace main{
     canvas.addEventListener("touchmove",main.touchmove)
 
     ctx.textBaseline = "top"
+
+    // buffer_canvas
+    buffer_canvas = document.createElement("canvas")
+    buffer_canvas.width = view.window_w
+    buffer_canvas.height = view.window_h
+    buffer_ctx = buffer_canvas.getContext("2d")
+    buffer_ctx.textBaseline = "top"
 
     // image_frames
     Asset.assets.forEach(asset => {
@@ -314,7 +325,9 @@ namespace main{
 
   let render_cnt = 0
   function render(){
-    view.print(ctx,render_cnt)
+    view.print(buffer_ctx,render_cnt)
+    let imageData = buffer_ctx.getImageData(0,0,view.window_w,view.window_h)
+    ctx.putImageData(imageData,0,0)
     render_cnt++
   }
 

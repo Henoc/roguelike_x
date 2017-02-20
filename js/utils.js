@@ -268,7 +268,7 @@ var utils;
         if (tmp_frame.exist())
             tmp_frame.get().life = 80;
         else {
-            var tf = new utils.Frame(view.window_w * 0.75, view.window_h * 0.4, view.window_w * 0.25, view.window_h * 0.2, view.window_h * 0.03, "rgba(0,0,0,0.6)", 80);
+            var tf = new utils.Frame(view.window_w * 0.75, view.window_h * 0.4, view.window_w * 0.25, view.window_h * 0.2, view.window_h * 0.03, "rgba(0,0,0,0)", 80);
             tf.font_size = view.window_h / 40;
             tmp_frame = some(tf);
         }

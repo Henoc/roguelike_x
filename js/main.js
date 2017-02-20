@@ -2,6 +2,8 @@ var main;
 (function (main) {
     var canvas;
     var ctx;
+    var buffer_canvas;
+    var buffer_ctx;
     /**
      * expore, items
      */
@@ -88,6 +90,12 @@ var main;
         canvas.addEventListener("touchstart", main.touchstart);
         canvas.addEventListener("touchmove", main.touchmove);
         ctx.textBaseline = "top";
+        // buffer_canvas
+        buffer_canvas = document.createElement("canvas");
+        buffer_canvas.width = view.window_w;
+        buffer_canvas.height = view.window_h;
+        buffer_ctx = buffer_canvas.getContext("2d");
+        buffer_ctx.textBaseline = "top";
         // image_frames
         Asset.assets.forEach(function (asset) {
             Asset.image_frames[asset.name] = asset.frames;
@@ -300,7 +308,9 @@ var main;
     }
     var render_cnt = 0;
     function render() {
-        view.print(ctx, render_cnt);
+        view.print(buffer_ctx, render_cnt);
+        var imageData = buffer_ctx.getImageData(0, 0, view.window_w, view.window_h);
+        ctx.putImageData(imageData, 0, 0);
         render_cnt++;
     }
     function keydown(e) {

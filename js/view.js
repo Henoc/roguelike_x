@@ -54,7 +54,7 @@ var view;
     }());
     view.AttackAnim = AttackAnim;
     function print(ctx, cnt) {
-        ctx.clearRect(0, 0, view.window_w, view.window_h);
+        //ctx.clearRect(0,0,window_w,window_h)
         // 画面外は黒
         ctx.fillStyle = "rgba(30,30,30,1)";
         ctx.fillRect(0, 0, view.window_w, view.window_h);
@@ -102,7 +102,7 @@ var view;
         }
         else if (main.menu_mode[0] == "items") {
             top_frame.move_point_x(0.6);
-            var item_top = top_frame.insert_subframe(utils.none(), utils.none(), "rgba(0,0,0,0.6)");
+            var item_top = top_frame.insert_subframe(utils.none(), utils.none(), "rgba(30,30,30,1)");
             var page_size = 20;
             var page_no = Math.floor(main.cursor["items"] / page_size);
             var page_max = Math.floor((main.cursor_max["items"] - 1) / page_size);
@@ -114,7 +114,7 @@ var view;
                 item_top.insert_text((main.cursor["items"] == i ? ">" : " ") + itemEntity.item.name);
             }
             top_frame.reset_point();
-            var status_frame = top_frame.insert_subframe(utils.some(view.window_w * 0.3), utils.some(view.window_h * 0.5), "rgba(0,0,0,0.6)");
+            var status_frame = top_frame.insert_subframe(utils.some(view.window_w * 0.3), utils.some(view.window_h * 0.5), "rgba(30,30,30,1)");
             status_frame.insert_text("\u30B9\u30C6\u30FC\u30BF\u30B9");
             // 装備品と食べ物でステータス変動の計算が異なる（装備品は付け替えることがある）
             var modified_status = battle.Status.zero();
@@ -145,7 +145,7 @@ var view;
             status_frame.insert_text("\u624B " + items.equips["hand"].map(function (e) { return e.item.name; }).get_or_else(""));
             status_frame.insert_text("\u8DB3 " + items.equips["foot"].map(function (e) { return e.item.name; }).get_or_else(""));
             top_frame.move_point_y(0.2);
-            var message = top_frame.insert_subframe(utils.some(view.window_w * 0.5), utils.none(), "rgba(0,0,0,0.6)");
+            var message = top_frame.insert_subframe(utils.some(view.window_w * 0.5), utils.none(), "rgba(30,30,30,1)");
             if (main.cursor_max["items"] != 0) {
                 var item_ent = items.item_entities[main.cursor["items"]];
                 message.insert_text(item_ent.item.text);
@@ -172,7 +172,7 @@ var view;
         else if (main.menu_mode[0] == "dist") {
             top_frame.move_point_x(0.2);
             top_frame.move_point_y(0.2);
-            var dist_frame = top_frame.insert_subframe(utils.some((view.window_w - top_frame.margin * 2) * 0.6), utils.some((view.window_h - top_frame.margin * 2) * 0.6), "rgba(0,0,0,0.6)", view.window_h * 0.05);
+            var dist_frame = top_frame.insert_subframe(utils.some((view.window_w - top_frame.margin * 2) * 0.6), utils.some((view.window_h - top_frame.margin * 2) * 0.6), "rgba(30,30,30,1)", view.window_h * 0.05);
             dist_frame.font_size = view.window_h / 32;
             dist_frame.insert_text("\u30B9\u30C6\u30FC\u30BF\u30B9\u632F\u308A\u5206\u3051");
             dist_frame.insert_text("");
@@ -186,7 +186,7 @@ var view;
             dist_frame.insert_text("\u2190\u2192\u30AD\u30FC\u3067\u632F\u308A\u5206\u3051 Z\u30AD\u30FC\u3067\u6C7A\u5B9A");
         }
         else if (main.menu_mode[0] == "dead") {
-            var dead_frame = top_frame.insert_subframe(utils.none(), utils.none(), "rgba(0,0,0,0.6)");
+            var dead_frame = top_frame.insert_subframe(utils.none(), utils.none(), "rgba(30,30,30,1)");
             dead_frame.font_size = view.window_h / 32;
             dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F");
         }

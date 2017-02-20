@@ -55,7 +55,7 @@ namespace model{
   tiles["treasure_box"] = new Tile("\u5B9D\u7BB1","","treasure_box",true,false,utils.some(new battle.Status(10,10,0,4,0,0)),4,[
     {name:"knife",per:0.3}, {name:"copper_armor", per:0.3}, {name:"silver_knife",per:0.1}, {name:"iron_armor",per:0.1}, {name:"gold_knife",per:0.05}, {name:"gold_armor", per:0.05}, {name:"sharpener", per:0.2},{name:"magic_sharpener", per:0.1},{name:"fairy_sharpener", per:0.05},{name:"dragon_sharpener", per:0.025}
     ],{no_attack:true})
-  tiles["shadow_bird"] = new Tile("\u602A\u9CE5\u306E\u5F71","","shadow_bird",true,true,utils.some(new battle.Status(4,4,2,0,0,8)),5,[],{})
+  tiles["shadow_bird"] = new Tile("\u602A\u9CE5\u306E\u5F71","","shadow_bird",true,true,utils.some(new battle.Status(4,4,2,0,0,8)),5,[],{buff_floor:new battle.Status(0,0,0,0,0,1)})
 
   // 実際の配置物
   export class Entity{
@@ -152,7 +152,23 @@ namespace model{
         for(let entity of get_entities_at(directed)){
           if(entity.status.hp == 0 || "no_damage" in entity.more_props) continue
           entity.status = this.status.attackTo(entity)
-          if(entity.status.hp == 0) battle.add_exp(Math.floor(1 * Math.pow(1.2,entity.level)))
+
+          // 倒した
+          if(entity.status.hp == 0 && entity.tile.name != "player") {
+            battle.add_exp(Math.floor(1 * Math.pow(1.2,entity.level)))
+            // property: buff_floor
+            if("buff_floor" in entity.more_props){
+              let buff = <battle.Status>entity.more_props["buff_floor"]
+              entities.forEach(ent => {
+                if(ent.tile.name != "player") ent.status = ent.status.add(buff)
+              })
+              let buff_text = "", status_jp = {max_hp:"\u6700\u5927HP",hp:"HP",atk:"\u653B\u6483",def:"\u9632\u5FA1",dex:"\u547D\u4E2D",eva:"\u56DE\u907F"}
+              for(let name of ["max_hp","hp","atk","def","dex","eva"]){
+                if(buff[name] != 0) buff_text += status_jp[name] + " +" + buff[name] + " "
+              }
+              utils.log.push(entity.tile.jp_name + "\u306F\u907A\u8A00\u3092\u6B8B\u3057\u305F", "\u30E2\u30F3\u30B9\u30BF\u30FC\u5168\u3066\u306B " + buff_text)
+            }
+          }
         }
       }
       this.anim_tasks.push(new view.AttackAnim())

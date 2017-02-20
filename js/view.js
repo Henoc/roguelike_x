@@ -106,7 +106,7 @@ var view;
             top_frame.insert_text("level " + model.player.level + "  next " + Math.floor(battle.player_exp) + "/" + battle.max_exp());
             top_frame.insert_text("HP " + model.player.status.hp + "/" + model.player.status.max_hp);
             var max_hp_frame_w = view.window_w * model.player.status.max_hp / 100;
-            var max_hp_frame = top_frame.insert_subframe(utils.some(max_hp_frame_w), utils.some(view.window_h * 0.03), "rgba(0,0,0,1)", view.window_h * 0.002);
+            var max_hp_frame = top_frame.insert_subframe(utils.some(max_hp_frame_w), utils.some(view.window_h * 0.03), "rgba(0,50,20,1)", view.window_h * 0.002);
             max_hp_frame.insert_subframe(utils.some((max_hp_frame_w - max_hp_frame.margin * 2) * model.player.status.hp / model.player.status.max_hp), utils.none(), "rgba(0,200,50,1)");
         }
         else if (main.menu_mode[0] == "items") {

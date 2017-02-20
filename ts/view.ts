@@ -124,7 +124,7 @@ namespace view{
       top_frame.insert_text("level " + model.player.level + "  next " + Math.floor(battle.player_exp) + "/" + battle.max_exp())
       top_frame.insert_text("HP " + model.player.status.hp + "/" + model.player.status.max_hp)
       let max_hp_frame_w = window_w * model.player.status.max_hp / 100
-      let max_hp_frame = top_frame.insert_subframe(utils.some(max_hp_frame_w),utils.some(window_h * 0.03), "rgba(0,0,0,1)", window_h * 0.002)
+      let max_hp_frame = top_frame.insert_subframe(utils.some(max_hp_frame_w),utils.some(window_h * 0.03), "rgba(0,50,20,1)", window_h * 0.002)
       max_hp_frame.insert_subframe(utils.some((max_hp_frame_w - max_hp_frame.margin * 2) * model.player.status.hp / model.player.status.max_hp),utils.none<number>(), "rgba(0,200,50,1)")
     }
     // menu mode = items

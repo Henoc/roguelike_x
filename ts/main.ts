@@ -290,13 +290,14 @@ namespace main{
       break
       case "dist":
       let mode = menu_mode.join(">")
-      let dist_props = ["atk","def"]
+      let dist_props = ["atk","def","dex","eva"]
       if(keys.x_key || keys.c_key){
         menu_mode.pop()
         if(menu_mode.length == 0) menu_mode = ["explore"]
       }else if(keys.z_key){
-        model.player.status.atk += point_distributed.atk
-        model.player.status.def += point_distributed.def
+        for(let name of dist_props){
+          model.player.status[name] += point_distributed[name]
+        }
         point_distributed = {atk:0,def:0,dex:0,eva:0,rest:point_distributed.rest}
         battle.dist_point = point_distributed.rest
       }else if(keys.dir_key2.equals(model.dir.down)){

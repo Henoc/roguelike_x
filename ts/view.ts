@@ -11,6 +11,15 @@ namespace view{
     return 0.1 * main.sp60f
   }
 
+  function visual_field_size(){
+    const vf = window_h / 2 * 0.75
+    let vf_rate = 1
+    items.item_entities.forEach(ent => {
+      if("view" in ent.more_props) vf_rate += ent.more_props["view"]
+    })
+    return vf * vf_rate
+  }
+
   /**
    * animation 中なので key 入力をブロック
    * print() 内で更新する
@@ -210,7 +219,7 @@ namespace view{
     }
 
     // 視野
-    ctx.drawImage(utils.reversal_circle(window_h / 2 * 0.75),0,0)
+    ctx.drawImage(utils.reversal_circle(visual_field_size()),0,0)
     
     utils.print_frame(ctx)
     utils.print_tmp_frame(ctx)

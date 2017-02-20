@@ -10,6 +10,15 @@ var view;
         return 0.1 * main.sp60f;
     }
     view.progress_rate = progress_rate;
+    function visual_field_size() {
+        var vf = view.window_h / 2 * 0.75;
+        var vf_rate = 1;
+        items.item_entities.forEach(function (ent) {
+            if ("view" in ent.more_props)
+                vf_rate += ent.more_props["view"];
+        });
+        return vf * vf_rate;
+    }
     /**
      * animation 中なので key 入力をブロック
      * print() 内で更新する
@@ -191,7 +200,7 @@ var view;
             dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F");
         }
         // 視野
-        ctx.drawImage(utils.reversal_circle(view.window_h / 2 * 0.75), 0, 0);
+        ctx.drawImage(utils.reversal_circle(visual_field_size()), 0, 0);
         utils.print_frame(ctx);
         utils.print_tmp_frame(ctx);
         // draw temporal animations

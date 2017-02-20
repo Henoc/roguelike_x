@@ -29,7 +29,8 @@ namespace items{
    * sharpen(x,y) x の確率で武器の攻撃力+y
    * exp(x) xの経験値を得る
    * revive(x) HP x で蘇生
-   * camouflage(x) 装備すると 敵の視力をx%カット の more_props がプレイヤーに着く 
+   * view(x) 所持で視野が x 広がる
+   * camouflage(x) 装備すると 敵の視力を x カット の more_props がプレイヤーに着く 
    */
   export let type = {
     onigiri: new Item("\u304A\u306B\u304E\u308A",["use","put"],battle.Status.of_food(5),"none",
@@ -70,7 +71,7 @@ namespace items{
     lang_dog_paper: new Item("\u6570\u5F0F\u306E\u30E1\u30E2",["decode","put"],battle.Status.zero(),"none",`\u7D19\u4E00\u9762\u306B\u3073\u3063\u3057\u308A\u3068\u8A18\u53F7\u304C\u66F8\u3044\u3066\u3042\u308B`,{exp:30}),
     dead_sacred_slime: new Item("\u8056\u30B9\u30E9\u30A4\u30E0\u306E\u8089", ["use","put"], battle.Status.of_food(1),"none",`\u8B0E\u591A\u304D\u4E0D\u6B7B\u8EAB\u306E\u30B9\u30E9\u30A4\u30E0`),
     revival: new Item("\u8607\u751F\u85AC",["put"],battle.Status.zero(),"none",`\u6301\u3063\u3066\u3044\u308B\u3060\u3051\u30671\u5EA6\u81EA\u52D5\u3067\u8607\u751F\u3067\u304D\u308B`,{revive:10}),
-    candle: new Item("\u308D\u3046\u305D\u304F", ["put"], battle.Status.zero(), "none", `\u706B\u306E\u3064\u3044\u305F\u308D\u3046\u305D\u304F`),
+    candle: new Item("\u308D\u3046\u305D\u304F", ["put"], battle.Status.zero(), "none", `\u706B\u306E\u3064\u3044\u305F\u308D\u3046\u305D\u304F`,{view:0.05}),
     ghost_camouflage: new Item("\u5E7D\u4F53\u8FF7\u5F69", ["equip","put"],new battle.Status(0,0,0,1,0,0),"head",`\u88AB\u308B\u3068\u6575\u306B\u6C17\u3065\u304B\u308C\u306B\u304F\u304F\u306A\u308B`,{camouflage:0.5})
   }
 

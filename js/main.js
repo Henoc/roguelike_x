@@ -269,15 +269,17 @@ var main;
                 break;
             case "dist":
                 var mode = main.menu_mode.join(">");
-                var dist_props = ["atk", "def"];
+                var dist_props = ["atk", "def", "dex", "eva"];
                 if (keys.x_key || keys.c_key) {
                     main.menu_mode.pop();
                     if (main.menu_mode.length == 0)
                         main.menu_mode = ["explore"];
                 }
                 else if (keys.z_key) {
-                    model.player.status.atk += main.point_distributed.atk;
-                    model.player.status.def += main.point_distributed.def;
+                    for (var _i = 0, dist_props_1 = dist_props; _i < dist_props_1.length; _i++) {
+                        var name_1 = dist_props_1[_i];
+                        model.player.status[name_1] += main.point_distributed[name_1];
+                    }
                     main.point_distributed = { atk: 0, def: 0, dex: 0, eva: 0, rest: main.point_distributed.rest };
                     battle.dist_point = main.point_distributed.rest;
                 }

@@ -287,11 +287,11 @@ namespace utils{
 
   export let log : string[] = []
   export function print_log(ctx:CanvasRenderingContext2D){
-    if(log.length >= 20) log.splice(0,log.length - 20 + 1)
+    if(log.length >= 30) log.splice(0,log.length - 30 + 1)
     ctx.font = "normal " + (view.window_h / 40) + "px sans-serif"
     ctx.fillStyle = "white"
     for(let i = log.length - 1; i >= 0; i--){
-      let y = view.window_h * 0.6 - (log.length - 1 - i) * view.window_h / 40 * 1.2
+      let y = view.window_h * 0.9 - (log.length - 1 - i) * view.window_h / 40 * 1.2
       ctx.fillText(log[i], view.window_w * 0.75, y)
       ctx.fillStyle = "gray"
     }

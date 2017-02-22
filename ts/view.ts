@@ -130,14 +130,14 @@ namespace view{
     // menu mode = items
     else if(main.menu_mode[0] == "items"){
       top_frame.move_point_x(0.6)
-      let item_top = top_frame.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(30,30,30,1)")
+      let item_top = top_frame.insert_subframe(utils.none<number>(),utils.some(window_h * 0.8),"rgba(30,30,30,1)")
       
-      let page_size = 20
+      let page_size = 15
       let page_no = Math.floor(main.cursor["items"] / page_size)
       let page_max = Math.floor((main.cursor_max["items"] - 1) / page_size)
       
       item_top.font_size = window_h / 32
-      item_top.insert_text("\u30A2\u30A4\u30C6\u30E0 (\u30DA\u30FC\u30B8 " + (page_no + 1) + "/" + (page_max + 1) + ")")
+      item_top.insert_text("\u30A2\u30A4\u30C6\u30E0 (" + items.item_entities.length + "/" + items.item_entities_max() + ") \u30DA\u30FC\u30B8 " + (page_no + 1) + "/" + (page_max + 1))
       item_top.insert_text("")
       for(let i = page_no * page_size; i < Math.min((page_no + 1) * page_size, items.item_entities.length); i++){
         let itemEntity = items.item_entities[i]
@@ -188,6 +188,7 @@ namespace view{
         if("heal" in item_ent.more_props) message.insert_text("\u81EA\u7136\u6CBB\u7652\u529B +" + item_ent.more_props["heal"])
         if("view" in item_ent.more_props) message.insert_text("\u6240\u6301\u6642 \u8996\u91CE +" + (item_ent.more_props["view"] * 100) + "%")
         if("camouflage" in item_ent.more_props) message.insert_text("\u8996\u8A8D\u6027 -" + (item_ent.more_props["camouflage"] * 100) + "%")
+        if("capacity" in item_ent.more_props) message.insert_text("\u6240\u6301\u6642 \u30A2\u30A4\u30C6\u30E0\u5BB9\u91CF +" + item_ent.more_props["capacity"])
       }
       
       if(main.menu_mode[1] == "command"){

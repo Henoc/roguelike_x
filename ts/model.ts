@@ -4,17 +4,17 @@ namespace model{
   class Tile{
     jp_name:string
     color:string
-    name:string  // 形 画像にするときはこれを Image オブジェクトにする？
+    image_name:string
     isWall:boolean
     isDired:boolean
     status:utils.Option<battle.Status>
     level:number
     drop_list:{name:string,per:number}[]
     more_props:any
-    constructor(jp_name:string, color:string, name:string, isWall:boolean, isDired:boolean, status:utils.Option<battle.Status>, level:number, drop_list:{name:string,per:number}[], more_props:any){
+    constructor(jp_name:string, color:string, image_name:string, isWall:boolean, isDired:boolean, status:utils.Option<battle.Status>, level:number, drop_list:{name:string,per:number}[], more_props:any){
       this.jp_name = jp_name
       this.color = color
-      this.name = name
+      this.image_name = image_name
       this.isWall = isWall
       this.isDired = isDired
       this.status = status
@@ -25,11 +25,21 @@ namespace model{
     print(ctx:CanvasRenderingContext2D, realPos: utils.Pos, direction:"left"|"right"|"up"|"down"|"none", cnt:number){
       ctx.fillStyle = this.color
 
-      let dired_image_name = this.name
-      if(direction != "none") dired_image_name += "_" + direction
-      let frms = main.Asset.image_frames[dired_image_name]
-      ctx.drawImage(main.Asset.images[dired_image_name],
+      let image_name = this.image_name
+      if(image_name == "FLOOR" || image_name == "WALL") image_name = Tile.map_chip_name(image_name)
+      else if(direction != "none") image_name += "_" + direction
+
+      let frms = main.Asset.image_frames[image_name]
+      ctx.drawImage(main.Asset.images[image_name],
         0,(Math.floor(cnt/utils.limit(Math.floor(utils.limit(64/frms/main.sp60f,1,64)),1,64))%frms) * view.unit_size.y,32,32,realPos.x,realPos.y,view.unit_size.x,view.unit_size.y,)
+    }
+
+    /**
+     * FLOOR, WALL は rank に依存した画像名に変換する
+     */
+    static map_chip_name(fw:"FLOOR" | "WALL"):string {
+      if(model.rank < 5) return {FLOOR:"floor",WALL:"wall"}[fw]
+      else return {FLOOR:"soil",WALL:"weed"}[fw]
     }
   }
 
@@ -42,20 +52,26 @@ namespace model{
    * revive(x) HP0になったxターン後に復活
    * hide 移動の間にキャラが表示されない
    * camouflage(x) プレイヤー専用．x%敵の視力が下がる．元は半径4マス．
+   * mimicry 移動しない, 攻撃する 攻撃を受けて解除
    */
-  export let tiles: { [key: string]: Tile; } = {}
-  tiles["floor"] = new Tile("\u5e8a","rgba(20,40,40,1)","floor",false,false,utils.none<battle.Status>(),0,[],{})
-  tiles["wall"] = new Tile("\u58c1","rgba(50,30,10,1)","wall",true,false,utils.none<battle.Status>(),0,[],{})
-  tiles["player"] = new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","player",true,true,utils.some(new battle.Status(10,10,1,0,0,0)),1,[{name:"potion",per:1}],{effi:20, heal:13})
-  tiles["goal"] = new Tile("\u30B4\u30FC\u30EB","","goal",false,false,utils.some(new battle.Status(1,1,0,0,0,0)),0,[],{no_attack:true,no_damage:true})
-  tiles["mame_mouse"] = new Tile("\u8C46\u306D\u305A\u307F","rgba(15,140,15,1)","mame_mouse",true,true,utils.some(new battle.Status(2,2,1,0,0,0)),1,[{name:"soramame_head",per:0.2},{name:"mame_mouse_ibukuro",per:0.05}],{})
-  tiles["lang_dog"] = new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC","","lang_dog",true,true,utils.some(new battle.Status(3,3,1,0,0,0)),2,[{name:"lang_dog_shoes",per:0.2},{name:"lang_dog_paper",per:0.03}],{})
-  tiles["sacred_slime"] = new Tile("\u8056\u30B9\u30E9\u30A4\u30E0","","sacred_slime",true,true,utils.some(new battle.Status(4,4,2,1,0,0)),3,[{name:"dead_sacred_slime",per:1},{name:"potion",per:0.1},{name:"revival",per:0.01}],{revive:5})
-  tiles["violent_ghost"] = new Tile("\u66B4\u308C\u30B4\u30FC\u30B9\u30C8","","violent_ghost",true,true,utils.some(new battle.Status(4,4,3,0,0,2)),4,[{name:"candle",per:0.2},{name:"ghost_camouflage", per: 0.05}],{hide:true})
-  tiles["treasure_box"] = new Tile("\u5B9D\u7BB1","","treasure_box",true,false,utils.some(new battle.Status(10,10,0,4,0,0)),4,[
-    {name:"knife",per:0.3}, {name:"copper_armor", per:0.3}, {name:"silver_knife",per:0.1}, {name:"iron_armor",per:0.1}, {name:"gold_knife",per:0.05}, {name:"gold_armor", per:0.05}, {name:"sharpener", per:0.2},{name:"magic_sharpener", per:0.1},{name:"fairy_sharpener", per:0.05},{name:"dragon_sharpener", per:0.025}
-    ],{no_attack:true})
-  tiles["shadow_bird"] = new Tile("\u602A\u9CE5\u306E\u5F71","","shadow_bird",true,true,utils.some(new battle.Status(4,4,2,0,0,8)),5,[],{buff_floor:new battle.Status(0,0,0,0,0,1)})
+  export let tiles = {
+    floor: new Tile("\u5e8a","rgba(20,40,40,1)","FLOOR" /* 具体的な画像名は Tile.print で判定する */,false,false,utils.none<battle.Status>(),0,[],{}),
+    wall: new Tile("\u58c1","rgba(50,30,10,1)","WALL" /* 具体的な画像名は Tile.print で判定する */,true,false,utils.none<battle.Status>(),0,[],{}),
+
+    player: new Tile("\u30d7\u30ec\u30a4\u30e4\u30fc","rgba(180,110,180,1)","player",true,true,utils.some(new battle.Status(10,10,1,0,0,0)),1,[{name:"potion",per:1}],{effi:20, heal:13}),
+    goal: new Tile("\u30B4\u30FC\u30EB","","goal",false,false,utils.some(new battle.Status(1,1,0,0,0,0)),0,[],{no_attack:true,no_damage:true}),
+    
+    mame_mouse: new Tile("\u8C46\u306D\u305A\u307F","rgba(15,140,15,1)","mame_mouse",true,true,utils.some(new battle.Status(2,2,1,0,0,0)),1,[{name:"soramame_head",per:0.2},{name:"mame_mouse_ibukuro",per:0.05}],{}),
+    lang_dog: new Tile("\u4EBA\u8A9E\u3092\u89E3\u3059\u72AC","","lang_dog",true,true,utils.some(new battle.Status(3,3,1,0,0,0)),2,[{name:"lang_dog_shoes",per:0.2},{name:"lang_dog_paper",per:0.03}],{}),
+    sacred_slime: new Tile("\u8056\u30B9\u30E9\u30A4\u30E0","","sacred_slime",true,true,utils.some(new battle.Status(4,4,2,1,0,0)),3,[{name:"dead_sacred_slime",per:1},{name:"potion",per:0.1},{name:"revival",per:0.01}],{revive:5}),
+    violent_ghost: new Tile("\u66B4\u308C\u30B4\u30FC\u30B9\u30C8","","violent_ghost",true,true,utils.some(new battle.Status(4,4,3,0,0,2)),4,[{name:"candle",per:0.2},{name:"ghost_camouflage", per: 0.05}],{hide:true}),
+    treasure_box: new Tile("\u5B9D\u7BB1","","treasure_box",true,false,utils.some(new battle.Status(10,10,0,4,0,0)),4,[
+      {name:"hamburger", per:0.5},
+      {name:"knife",per:0.3}, {name:"copper_armor", per:0.3}, {name:"silver_knife",per:0.1}, {name:"iron_armor",per:0.1}, {name:"gold_knife",per:0.05}, {name:"gold_armor", per:0.05}, {name:"sharpener", per:0.2},{name:"magic_sharpener", per:0.1},{name:"fairy_sharpener", per:0.05},{name:"dragon_sharpener", per:0.025}
+      ],{no_attack:true}),
+    shadow_bird: new Tile("\u602A\u9CE5\u306E\u5F71","","shadow_bird",true,true,utils.some(new battle.Status(4,4,3,0,0,8)),10,[{name:"shadow_wing",per:0.2}, {name:"black_paint", per:0.03}],{buff_floor:new battle.Status(0,0,0,0,0,1)}),
+    wall_mimic: new Tile("\u30A6\u30A9\u30FC\u30EB\u30DF\u30DF\u30C3\u30AF","","WALL",true,true,utils.some(new battle.Status(6,6,3,5,2,0)),9,[{name:"preserved_food",per:0.3},{name:"gourd",per:0.05}],{mimicry:true})
+  }
 
   // 実際の配置物
   export class Entity{
@@ -89,10 +105,12 @@ namespace model{
         // nothing to show
       }else if(this.status.hp != 0){
         this.tile.print(ctx,realPos,this.direction,cnt)
-        ctx.fillStyle ="white" 
-        let font_size = view.window_h / 40
-        ctx.font = "normal " + font_size + "px sans-serif"
-        utils.fillText_n(ctx,this.tile.jp_name + ( "no_damage" in this.more_props ? "" : "\n" + this.status.hp + "/" + this.status.max_hp), realPos.x, realPos.y - view.unit_size.y, font_size ,font_size)
+        if(!("mimicry" in this.more_props && this.more_props["mimicry"])){
+          ctx.fillStyle ="white" 
+          let font_size = view.window_h / 40
+          ctx.font = "normal " + font_size + "px sans-serif"
+          utils.fillText_n(ctx,this.tile.jp_name + ( "no_damage" in this.more_props ? "" : "\n" + this.status.hp + "/" + this.status.max_hp), realPos.x, realPos.y - view.unit_size.y, font_size ,font_size)
+        }
       }else{
         ctx.drawImage(main.Asset.images["treasure"],0,0,32,32,realPos.x,realPos.y,view.unit_size.x,view.unit_size.y,)
       }
@@ -117,9 +135,9 @@ namespace model{
         this.anim_tasks.push(new view.MoveAnim(this.upos))
         this.upos = moved
         // 落ちているものを拾う
-        if(this.tile.name == "player"){
+        if(this.tile.image_name == "player"){
           let picked_names:string[] = []
-          let picked_max = items.item_entities_max - items.item_entities.length
+          let picked_max = items.item_entities_max() - items.item_entities.length
           let max_flag = false
           for(let dead of delete_entities_at(moved, ent => ent.status.hp == 0)){
             dead.treasures.forEach(t => {
@@ -154,13 +172,13 @@ namespace model{
           entity.status = this.status.attackTo(entity)
 
           // 倒した
-          if(entity.status.hp == 0 && entity.tile.name != "player") {
+          if(entity.status.hp == 0 && entity.tile.image_name != "player") {
             battle.add_exp(Math.floor(1 * Math.pow(1.2,entity.level)))
             // property: buff_floor
             if("buff_floor" in entity.more_props){
               let buff = <battle.Status>entity.more_props["buff_floor"]
               entities.forEach(ent => {
-                if(ent.tile.name != "player") ent.status = ent.status.add(buff)
+                if(ent.tile.image_name != "player") ent.status = ent.status.add(buff)
               })
               let buff_text = ""
               for(let name in battle.status_jp_names){
@@ -217,7 +235,10 @@ namespace model{
   rank_enemy_map[1] = ["mame_mouse",   "lang_dog",    "sacred_slime"]
   rank_enemy_map[2] = ["mame_mouse",   "lang_dog",    "sacred_slime", "treasure_box"]
   rank_enemy_map[3] = ["violent_ghost","lang_dog",    "sacred_slime", "treasure_box"]
+
   rank_enemy_map[4] = ["violent_ghost","shadow_bird", "sacred_slime", "treasure_box"]
+  rank_enemy_map[5] = ["violent_ghost","shadow_bird", "wall_mimic"]
+  rank_enemy_map[6] = ["violent_ghost","shadow_bird", "wall_mimic"]
 
   export function init_entities(){
     map.make_map()
@@ -353,17 +374,19 @@ namespace model{
         }
         continue
       }
-      // property: hide
       if(ent.reach(player)){
         ent.direction = ent.dir_to(player)
         ent.attack()
+        // property: hide
         if("hide" in ent.more_props && ent.more_props["hide"]) {
           ent.more_props["hide"] = false
           utils.log.push(ent.tile.jp_name + "\u304C\u59FF\u3092\u8868\u3057\u305F!")
         }
-        // property: camouflage
-      }else if(ent.near(player,4 * ("camouflage" in player.more_props ? (1 - player.more_props["camouflage"]) : 1))){
+      }else /* property: camoflage */ if(ent.near(player,4 * ("camouflage" in player.more_props ? (1 - player.more_props["camouflage"]) : 1))){
         ent.move(dir[ent.dir_to(player)])
+        if("mimicry" in ent.more_props) ent.more_props["mimicry"] = false
+      }else /* property: mimicry */ if("mimicry" in ent.more_props && ent.more_props["mimicry"]){
+        // not move
       }else{
         ent.move(dir_ary[utils.randInt(4)])
       }
@@ -383,7 +406,7 @@ namespace model{
   export function delete_entities_at(upos:utils.Pos, cond: (entity:Entity) => boolean){
     let ret : Entity[] = []
     for(let i = 0; i< entities.length; i++){
-      if(entities[i].tile.name != "player" && entities[i].upos.equals(upos) && cond(entities[i])){
+      if(entities[i].tile.image_name != "player" && entities[i].upos.equals(upos) && cond(entities[i])){
         ret.push(entities[i])
         entities.splice(i,1)
         i--

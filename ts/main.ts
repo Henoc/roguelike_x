@@ -65,6 +65,9 @@ namespace main{
 
       {type: "image", name: "floor", src: "assets/floor.png", frames:1},
       {type: "image", name: "wall", src: "assets/wall.png", frames:1},
+      {type: "image", name: "soil", src: "assets/soil.png", frames:1},
+      {type: "image", name: "weed", src: "assets/weed.png", frames:1},
+
       {type: "image", name: "goal", src: "assets/goal.png", frames:1},
       {type: "image", name: "player_left", src: "assets/player_left.png", frames:7},
       {type: "image", name: "player_right", src: "assets/player_right.png", frames:7},
@@ -126,22 +129,22 @@ namespace main{
       Asset.image_frames[asset.name] = asset.frames
     })
 
-    model.rank = 1
+    model.rank = 5
 
     // エンティティの配置
     model.init_entities()
 
     // アイテム支給
     items.item_entities = [
-      new items.ItemEntity(items.type.onigiri),
-      new items.ItemEntity(items.type.onigiri),
-      new items.ItemEntity(items.type.onigiri),
+      new items.ItemEntity(items.type.hamburger),
+      new items.ItemEntity(items.type.hamburger),
+      new items.ItemEntity(items.type.hamburger),
       new items.ItemEntity(items.type.potion),
       new items.ItemEntity(items.type.knife),
       new items.ItemEntity(items.type.revival),
       new items.ItemEntity(items.type.sharpener),
       new items.ItemEntity(items.type.sharpener),
-      new items.ItemEntity(items.type.sharpener),
+      new items.ItemEntity(items.type.gourd),
     ]
 
     Asset.loadAssets(() => {

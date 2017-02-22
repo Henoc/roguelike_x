@@ -284,12 +284,12 @@ var utils;
     // }
     utils.log = [];
     function print_log(ctx) {
-        if (utils.log.length >= 20)
-            utils.log.splice(0, utils.log.length - 20 + 1);
+        if (utils.log.length >= 30)
+            utils.log.splice(0, utils.log.length - 30 + 1);
         ctx.font = "normal " + (view.window_h / 40) + "px sans-serif";
         ctx.fillStyle = "white";
         for (var i = utils.log.length - 1; i >= 0; i--) {
-            var y = view.window_h * 0.6 - (utils.log.length - 1 - i) * view.window_h / 40 * 1.2;
+            var y = view.window_h * 0.9 - (utils.log.length - 1 - i) * view.window_h / 40 * 1.2;
             ctx.fillText(utils.log[i], view.window_w * 0.75, y);
             ctx.fillStyle = "gray";
         }

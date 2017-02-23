@@ -133,7 +133,7 @@ namespace main{
       Asset.image_frames[asset.name] = asset.frames
     })
 
-    model.rank = 8
+    model.rank = 1
 
     // エンティティの配置
     model.init_entities()

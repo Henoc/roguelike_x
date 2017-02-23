@@ -70,7 +70,8 @@ namespace model{
       {name:"knife",per:0.3}, {name:"copper_armor", per:0.3}, {name:"silver_knife",per:0.1}, {name:"iron_armor",per:0.1}, {name:"gold_knife",per:0.05}, {name:"gold_armor", per:0.05}, {name:"sharpener", per:0.2},{name:"magic_sharpener", per:0.1},{name:"fairy_sharpener", per:0.05},{name:"dragon_sharpener", per:0.025}
       ],{no_attack:true}),
     shadow_bird: new Tile("\u602A\u9CE5\u306E\u5F71","","shadow_bird",true,true,utils.some(new battle.Status(4,4,3,0,0,8)),10,[{name:"shadow_wing",per:0.2}, {name:"black_paint", per:0.03}],{buff_floor:new battle.Status(0,0,0,0,0,1)}),
-    wall_mimic: new Tile("\u30A6\u30A9\u30FC\u30EB\u30DF\u30DF\u30C3\u30AF","","WALL",true,true,utils.some(new battle.Status(6,6,3,5,2,0)),9,[{name:"preserved_food",per:0.3},{name:"gourd",per:0.05}],{mimicry:true})
+    wall_mimic: new Tile("\u30A6\u30A9\u30FC\u30EB\u30DF\u30DF\u30C3\u30AF","","WALL",true,true,utils.some(new battle.Status(6,6,3,5,2,0)),9,[{name:"preserved_food",per:0.3},{name:"gourd",per:0.05}],{mimicry:true}),
+    trolley_mouse: new Tile("\u767D\u8C46\u306D\u305A\u307F","","trolley_mouse",true,true,utils.some(new battle.Status(4,4,4,4,0,4)),11,[],{fast_approach:true}),
   }
 
   // 実際の配置物
@@ -118,8 +119,9 @@ namespace model{
 
     /**
      * アニメーション挿入，当たり判定もここでやる
+     * @returns is moved
      */
-    move(udelta:utils.Pos){
+    move(udelta:utils.Pos):boolean{
       // change character direction
       if(udelta.x > 0 && udelta.y == 0) this.direction = "right"
       if(udelta.x < 0 && udelta.y == 0) this.direction = "left"
@@ -155,7 +157,27 @@ namespace model{
           }
           if(max_flag) utils.log.push("\u30A2\u30A4\u30C6\u30E0\u304C\u4E00\u676F\u3067\u3059!")
         }
+        return true
       }
+      return false
+    }
+
+    /**
+     * 目的地まで1ターンで動く
+     */
+    move_linear(dest:utils.Pos, direction:"left"|"right"|"up"|"down"){
+      let origin = this.upos
+      let udelta = dir[direction]
+      let is_moved = false
+      while(true){
+        let ret = this.move(udelta)
+        this.anim_tasks.pop()
+        if(!ret) break
+        is_moved = true
+        if((direction == "left" || direction == "right") && dest.x == this.upos.x) break
+        if((direction == "up" || direction == "down") && dest.y == this.upos.y) break
+      }
+      if(is_moved) this.anim_tasks.push(new view.MoveAnim(origin))
     }
 
     attack(){
@@ -239,6 +261,7 @@ namespace model{
   rank_enemy_map[4] = ["violent_ghost","shadow_bird", "sacred_slime", "treasure_box"]
   rank_enemy_map[5] = ["violent_ghost","shadow_bird", "wall_mimic"]
   rank_enemy_map[6] = ["violent_ghost","shadow_bird", "wall_mimic"]
+  rank_enemy_map[7] = ["trolley_mouse"]
 
   export function init_entities(){
     map.make_map()
@@ -383,7 +406,8 @@ namespace model{
           utils.log.push(ent.tile.jp_name + "\u304C\u59FF\u3092\u8868\u3057\u305F!")
         }
       }else /* property: camoflage */ if(ent.near(player,4 * ("camouflage" in player.more_props ? (1 - player.more_props["camouflage"]) : 1))){
-        ent.move(dir[ent.dir_to(player)])
+        if("fast_approach" in ent.more_props) ent.move_linear(player.upos, ent.dir_to(player))
+        else ent.move(dir[ent.dir_to(player)])
         if("mimicry" in ent.more_props) ent.more_props["mimicry"] = false
       }else /* property: mimicry */ if("mimicry" in ent.more_props && ent.more_props["mimicry"]){
         // not move

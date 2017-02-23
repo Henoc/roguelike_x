@@ -45,6 +45,10 @@ var main;
             { type: "image", name: "shadow_bird_right", src: "assets/shadow_bird_right.png", frames: 6 },
             { type: "image", name: "shadow_bird_up", src: "assets/shadow_bird_up.png", frames: 4 },
             { type: "image", name: "shadow_bird_down", src: "assets/shadow_bird_down.png", frames: 4 },
+            { type: "image", name: "trolley_mouse_left", src: "assets/trolley_mouse_left.png", frames: 2 },
+            { type: "image", name: "trolley_mouse_right", src: "assets/trolley_mouse_right.png", frames: 2 },
+            { type: "image", name: "trolley_mouse_up", src: "assets/trolley_mouse_up.png", frames: 2 },
+            { type: "image", name: "trolley_mouse_down", src: "assets/trolley_mouse_down.png", frames: 2 },
             { type: "image", name: "floor", src: "assets/floor.png", frames: 1 },
             { type: "image", name: "wall", src: "assets/wall.png", frames: 1 },
             { type: "image", name: "soil", src: "assets/soil.png", frames: 1 },
@@ -102,7 +106,7 @@ var main;
         Asset.assets.forEach(function (asset) {
             Asset.image_frames[asset.name] = asset.frames;
         });
-        model.rank = 5;
+        model.rank = 8;
         // エンティティの配置
         model.init_entities();
         // アイテム支給

@@ -120,7 +120,7 @@ namespace view{
     if(main.menu_mode[0] == "explore"){
       // hp gage
       top_frame.font_size = window_h / 32
-      top_frame.insert_text(model.rank + "\u968E")
+      top_frame.insert_text(model.rank + "階")
       top_frame.insert_text("level " + model.player.level + "  next " + Math.floor(battle.player_exp) + "/" + battle.max_exp())
       top_frame.insert_text("HP " + model.player.status.hp + "/" + model.player.status.max_hp)
       let max_hp_frame_w = window_w * model.player.status.max_hp / 100
@@ -137,7 +137,7 @@ namespace view{
       let page_max = Math.floor((main.cursor_max["items"] - 1) / page_size)
       
       item_top.font_size = window_h / 32
-      item_top.insert_text("\u30A2\u30A4\u30C6\u30E0 (" + items.item_entities.length + "/" + items.item_entities_max() + ") \u30DA\u30FC\u30B8 " + (page_no + 1) + "/" + (page_max + 1))
+      item_top.insert_text("アイテム (" + items.item_entities.length + "/" + items.item_entities_max() + ") ページ " + (page_no + 1) + "/" + (page_max + 1))
       item_top.insert_text("")
       for(let i = page_no * page_size; i < Math.min((page_no + 1) * page_size, items.item_entities.length); i++){
         let itemEntity = items.item_entities[i]
@@ -146,7 +146,7 @@ namespace view{
 
       top_frame.reset_point()
       let status_frame = top_frame.insert_subframe(utils.some(window_w * 0.3),utils.some(window_h * 0.5),"rgba(30,30,30,1)")
-      status_frame.insert_text("\u30B9\u30C6\u30FC\u30BF\u30B9")
+      status_frame.insert_text("ステータス")
       
       // 装備品と食べ物でステータス変動の計算が異なる（装備品は付け替えることがある）
       let modified_status = battle.Status.zero()
@@ -163,32 +163,32 @@ namespace view{
       }
 
       status_frame.insert_text("HP " + model.player.status.hp + "/" + model.player.status.max_hp 
-        + (delta_status.hp != 0 || delta_status.max_hp != 0 ? " \u2192 " + modified_status.hp + "/" + modified_status.max_hp : "") )
+        + (delta_status.hp != 0 || delta_status.max_hp != 0 ? " → " + modified_status.hp + "/" + modified_status.max_hp : "") )
       status_frame.insert_text(battle.status_jp_names.atk + " " + model.player.status.atk
-        + (delta_status.atk != 0 ? " \u2192 " + modified_status.atk : ""))
+        + (delta_status.atk != 0 ? " → " + modified_status.atk : ""))
       status_frame.insert_text(battle.status_jp_names.def + " " + model.player.status.def
-        + (delta_status.def != 0 ? " \u2192 " + modified_status.def : ""))
-      status_frame.insert_text(battle.status_jp_names.dex + " " + model.player.status.dex + (delta_status.dex != 0 ? " \u2192 " + modified_status.dex : ""))
-      status_frame.insert_text(battle.status_jp_names.eva + " " + model.player.status.eva + (delta_status.eva != 0 ? " \u2192 " + modified_status.eva : ""))
+        + (delta_status.def != 0 ? " → " + modified_status.def : ""))
+      status_frame.insert_text(battle.status_jp_names.dex + " " + model.player.status.dex + (delta_status.dex != 0 ? " → " + modified_status.dex : ""))
+      status_frame.insert_text(battle.status_jp_names.eva + " " + model.player.status.eva + (delta_status.eva != 0 ? " → " + modified_status.eva : ""))
       status_frame.insert_text("")
-      status_frame.insert_text("\u88C5\u5099")
-      status_frame.insert_text("\u982D " + items.equips["head"].map(e => e.item.name).get_or_else(""))
-      status_frame.insert_text("\u4F53 " + items.equips["body"].map(e => e.item.name).get_or_else(""))
-      status_frame.insert_text("\u624B " + items.equips["hand"].map(e => e.item.name).get_or_else(""))
-      status_frame.insert_text("\u8DB3 " + items.equips["foot"].map(e => e.item.name).get_or_else(""))
+      status_frame.insert_text("装備")
+      status_frame.insert_text("頭 " + items.equips["head"].map(e => e.item.name).get_or_else(""))
+      status_frame.insert_text("体 " + items.equips["body"].map(e => e.item.name).get_or_else(""))
+      status_frame.insert_text("手 " + items.equips["hand"].map(e => e.item.name).get_or_else(""))
+      status_frame.insert_text("足 " + items.equips["foot"].map(e => e.item.name).get_or_else(""))
 
       top_frame.move_point_y(0.2)
       let message = top_frame.insert_subframe(utils.some(window_w * 0.5),utils.none<number>(),"rgba(30,30,30,1)")
       if(main.cursor_max["items"] != 0) {
         let item_ent = items.item_entities[main.cursor["items"]]
         message.insert_text(item_ent.item.text)
-        if("equip_level" in item_ent.more_props) message.insert_text("Level " + item_ent.more_props["equip_level"] + " \u4EE5\u4E0A\u3067\u88C5\u5099\u53EF\u80FD")
-        if("sharpen" in item_ent.more_props) message.insert_text("\u6210\u529F\u7387 " + item_ent.more_props["sharpen"][0] + " \u6B66\u5668\u306E\u653B\u6483 \u00B1" + item_ent.more_props["sharpen"][1])
-        if("effi" in item_ent.more_props) message.insert_text("\u71C3\u8CBB +" + item_ent.more_props["effi"])
-        if("heal" in item_ent.more_props) message.insert_text("\u81EA\u7136\u6CBB\u7652\u529B +" + item_ent.more_props["heal"])
-        if("view" in item_ent.more_props) message.insert_text("\u6240\u6301\u6642 \u8996\u91CE +" + (item_ent.more_props["view"] * 100) + "%")
-        if("camouflage" in item_ent.more_props) message.insert_text("\u8996\u8A8D\u6027 -" + (item_ent.more_props["camouflage"] * 100) + "%")
-        if("capacity" in item_ent.more_props) message.insert_text("\u6240\u6301\u6642 \u30A2\u30A4\u30C6\u30E0\u5BB9\u91CF +" + item_ent.more_props["capacity"])
+        if("equip_level" in item_ent.more_props) message.insert_text("Level " + item_ent.more_props["equip_level"] + " 以上で装備可能")
+        if("sharpen" in item_ent.more_props) message.insert_text("成功率 " + item_ent.more_props["sharpen"][0] + " 武器の攻撃 ±" + item_ent.more_props["sharpen"][1])
+        if("effi" in item_ent.more_props) message.insert_text("燃費 +" + item_ent.more_props["effi"])
+        if("heal" in item_ent.more_props) message.insert_text("自然治癒力 +" + item_ent.more_props["heal"])
+        if("view" in item_ent.more_props) message.insert_text("所持時 視野 +" + (item_ent.more_props["view"] * 100) + "%")
+        if("camouflage" in item_ent.more_props) message.insert_text("視認性 -" + (item_ent.more_props["camouflage"] * 100) + "%")
+        if("capacity" in item_ent.more_props) message.insert_text("所持時 アイテム容量 +" + item_ent.more_props["capacity"])
       }
       
       if(main.menu_mode[1] == "command"){
@@ -204,20 +204,20 @@ namespace view{
       top_frame.move_point_y(0.2)
       let dist_frame = top_frame.insert_subframe(utils.some((window_w - top_frame.margin * 2) * 0.6), utils.some((window_h - top_frame.margin * 2) * 0.6), "rgba(30,30,30,1)", window_h * 0.05)
       dist_frame.font_size = window_h / 32
-      dist_frame.insert_text("\u30B9\u30C6\u30FC\u30BF\u30B9\u632F\u308A\u5206\u3051")
+      dist_frame.insert_text("ステータス振り分け")
       dist_frame.insert_text("")
-      dist_frame.insert_text("\u632F\u308A\u5206\u3051\u53EF\u80FD\u30DD\u30A4\u30F3\u30C8 " + main.point_distributed.rest)
+      dist_frame.insert_text("振り分け可能ポイント " + main.point_distributed.rest)
       let status_names = ["atk","def","dex","eva"]
-      let status_names_jp = ["\u653B\u6483","\u9632\u5FA1","\u547D\u4E2D","\u56DE\u907F"]
+      let status_names_jp = ["攻撃","防御","命中","回避"]
       for(let i = 0; i < status_names.length; i++){
         dist_frame.insert_text((main.cursor["dist"] == i ? ">" : " ") + status_names_jp[i] + " " + model.player.status[status_names[i]] + " + " + main.point_distributed[status_names[i]])
       }
       dist_frame.insert_text("")
-      dist_frame.insert_text("\u2190\u2192\u30AD\u30FC\u3067\u632F\u308A\u5206\u3051 Z\u30AD\u30FC\u3067\u6C7A\u5B9A")
+      dist_frame.insert_text("←→キーで振り分け Zキーで決定")
     }else if(main.menu_mode[0] == "dead"){
       let dead_frame = top_frame.insert_subframe(utils.none<number>(),utils.none<number>(),"rgba(30,30,30,0)")
       dead_frame.font_size = window_h / 32
-      dead_frame.insert_text("\u6B7B\u306B\u307E\u3057\u305F")
+      dead_frame.insert_text("死にました")
     }
 
     // 視野

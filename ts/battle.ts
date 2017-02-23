@@ -68,7 +68,7 @@ namespace battle{
     }
   }
 
-  export let status_jp_names = {max_hp:"\u6700\u5927HP",hp:"HP",atk:"\u653B\u6483",def:"\u9632\u5FA1",dex:"\u547D\u4E2D",eva:"\u56DE\u907F"}
+  export let status_jp_names = {max_hp:"最大HP",hp:"HP",atk:"攻撃",def:"防御",dex:"命中",eva:"回避"}
 
   export let player_exp = 0
   export let dist_point = 0
@@ -79,7 +79,7 @@ namespace battle{
       model.player.level++
       dist_point++
       utils.start_anim("level_up",4 / main.sp60f, model.player.upos.sub(new utils.Pos(1,2)).mul(view.unit_size).sub(view.prefix_pos), new utils.Pos(96,96))
-      utils.log.push("\u30EC\u30D9\u30EB\u304C\u4E0A\u304C\u3063\u305F")
+      utils.log.push("レベルが上がった")
     }
   }
   export function max_exp(){

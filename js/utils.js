@@ -147,7 +147,7 @@ var utils;
         return new Some(t);
     }
     utils.some = some;
-    function fillText_n(ctx, text, x, y, font_size, newline_size) {
+    function fillText_n(ctx, text, x, y, newline_size) {
         var strs = text.split("\n");
         for (var i = 0; i < strs.length; i++) {
             ctx.fillText(strs[i], x, y + newline_size * i);
@@ -166,7 +166,12 @@ var utils;
             this.start_points = [this.pos.add(new Pos(margin, margin))];
             this.life = life;
         }
-        Frame.prototype.insert_text = function (text) {
+        /**
+         * @param row_reserved text実行時に取ると思われる行数
+         */
+        Frame.prototype.insert_text = function (text, row_reserved) {
+            if (row_reserved == undefined)
+                row_reserved = 1;
             this.contents.push({
                 type: "text",
                 text: text,
@@ -174,7 +179,7 @@ var utils;
                 color: this.text_color
             });
             var last = this.start_points[this.start_points.length - 1];
-            this.start_points.push(last.add(new Pos(0, this.font_size * 1.2)));
+            this.start_points.push(last.add(new Pos(0, this.font_size * 1.2 * row_reserved)));
         };
         Frame.prototype.insert_subframe = function (width, height, color, margin) {
             if (margin == undefined)
@@ -212,6 +217,19 @@ var utils;
             this.start_points.pop();
             this.start_points.push(this.pos.add(new Pos(this.margin, this.margin)));
         };
+        Frame.prototype.clear_contents = function () {
+            this.contents = [];
+            this.start_points = [this.pos.add(new Pos(this.margin, this.margin))];
+        };
+        Frame.prototype.remove_subframe = function (subframe) {
+            for (var i = 0; i < this.contents.length; i++) {
+                if (this.contents[i].type == "frame" && this.contents[i].frame == subframe) {
+                    this.contents.splice(i, 1);
+                    this.start_points.splice(i + 1, 1);
+                    break;
+                }
+            }
+        };
         Frame.prototype.print = function (ctx) {
             ctx.fillStyle = this.color;
             ctx.fillRect(this.pos.x, this.pos.y, this.wh.x, this.wh.y);
@@ -222,7 +240,7 @@ var utils;
                     case "text":
                         ctx.font = "normal " + content["font_size"] + "px sans-serif";
                         ctx.fillStyle = content["color"];
-                        ctx.fillText(content["text"], pos.x, pos.y);
+                        fillText_n(ctx, content.text(), pos.x, pos.y, this.font_size * 1.2);
                         break;
                     case "frame":
                         var sub_frame = content["frame"];

@@ -78,6 +78,8 @@ namespace items{
 
     preserved_food: new Item("保存食",["use","put"],battle.Status.of_food(6),"none",`持ち歩きやすい携行用保存食`),
     gourd: new Item("ひょうたん",["put"],battle.Status.zero(),"none",`魔法植物を加工して作られた、内部が四次元空間になっているひょうたん`,{capacity:3}),
+    gunpowder: new Item("火薬",["put"],battle.Status.zero(),"none",`容器に詰めると爆弾になる、取り扱い注意の粉`),
+    roller_skates: new Item("ローラースケート",["equip","put"],new battle.Status(0,0,0,0,0,0),"foot",`高速移動できるが軌道を読まれがちな靴`,{effi:7})
   }
 
   /**

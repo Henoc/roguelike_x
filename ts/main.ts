@@ -151,6 +151,9 @@ namespace main{
       new items.ItemEntity(items.type.gourd),
     ]
 
+    mkfrms.set_top_frame()
+    mkfrms.set_explore_frame()
+
     Asset.loadAssets(() => {
       requestAnimationFrame(update)
     })
@@ -187,16 +190,31 @@ namespace main{
           menu_mode = ["items"]
           cursor["items"] = 0
           cursor_max["items"] = items.item_entities.length
+          mkfrms.remove_explore_frame()
+          mkfrms.set_items_frame()
         }else if(keys.c_key){
           menu_mode = ["dist"]
           cursor["dist"] = 0
           cursor_max["dist"] = 4
           point_distributed = {atk:0,def:0,dex:0,eva:0,rest:battle.dist_point}
+          mkfrms.remove_explore_frame()
+          mkfrms.set_dist_frame()
         }
       }
       break
       case "items":
       if(keys.x_key){
+        switch(menu_mode.join(">")){
+          case "items":
+          mkfrms.remove_items_frame()
+          mkfrms.set_explore_frame()
+          break
+          case "items>command":
+          mkfrms.remove_command_frame()
+          break
+          default:
+          throw "default reached"
+        }
         menu_mode.pop()
         if(menu_mode.length == 0) menu_mode = ["explore"]
       }else if(keys.z_key){
@@ -207,6 +225,7 @@ namespace main{
             let mode = menu_mode.join(">")
             cursor[mode] = 0
             cursor_max[mode] = items.item_entities[cursor["items"]].get_valid_commands().length
+            mkfrms.set_command_frame()
           }
           break
           case "items>command":
@@ -226,12 +245,14 @@ namespace main{
             cursor_max["items"]--
             cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
             menu_mode.pop()
+            mkfrms.reflesh_items_frame()
             break
             case "put":
             items.item_entities.splice(cursor["items"],1)
             cursor_max["items"]--
             cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
             menu_mode.pop()
+            mkfrms.reflesh_items_frame()
             break
             case "equip":
             let old_eq : utils.Option<items.ItemEntity> = items.equips[selected.item.equip_region]
@@ -249,6 +270,7 @@ namespace main{
             cursor_max["items"]--
             cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
             menu_mode.pop()
+            mkfrms.reflesh_items_frame()
             break
             case "sharpen":
             let [success_rate, delta_atk] = selected.more_props["sharpen"]
@@ -266,6 +288,7 @@ namespace main{
             cursor_max["items"]--
             cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
             menu_mode.pop()
+            mkfrms.reflesh_items_frame()
             break
             case "decode":
             battle.add_exp(selected.item.more_props["exp"])
@@ -273,6 +296,7 @@ namespace main{
             cursor_max["items"]--
             cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
             menu_mode.pop()
+            mkfrms.reflesh_items_frame()
             break
             default:
             throw "default reached"
@@ -300,7 +324,9 @@ namespace main{
       let dist_props = ["atk","def","dex","eva"]
       if(keys.x_key || keys.c_key){
         menu_mode.pop()
-        if(menu_mode.length == 0) menu_mode = ["explore"]
+        menu_mode = ["explore"]
+        mkfrms.remove_dist_frame()
+        mkfrms.set_explore_frame()
       }else if(keys.z_key){
         for(let name of dist_props){
           model.player.status[name] += point_distributed[name]

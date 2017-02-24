@@ -63,7 +63,9 @@ var items;
         shadow_wing: new Item("黒い翼", ["equip", "put"], new battle.Status(0, 0, 0, 1, 0, 4), "body", "\u7D20\u65E9\u3044\u52D5\u304D\u3067\u76F8\u624B\u3092\u7FFB\u5F04\u3067\u304D\u308B\u7FFC", { equip_level: 5 }),
         black_paint: new Item("黒いペンキ", ["put"], battle.Status.zero(), "none", "\u771F\u3063\u9ED2\u306A\u8272\u306E\u30DA\u30F3\u30AD"),
         preserved_food: new Item("保存食", ["use", "put"], battle.Status.of_food(6), "none", "\u6301\u3061\u6B69\u304D\u3084\u3059\u3044\u643A\u884C\u7528\u4FDD\u5B58\u98DF"),
-        gourd: new Item("ひょうたん", ["put"], battle.Status.zero(), "none", "\u9B54\u6CD5\u690D\u7269\u3092\u52A0\u5DE5\u3057\u3066\u4F5C\u3089\u308C\u305F\u3001\u5185\u90E8\u304C\u56DB\u6B21\u5143\u7A7A\u9593\u306B\u306A\u3063\u3066\u3044\u308B\u3072\u3087\u3046\u305F\u3093", { capacity: 3 })
+        gourd: new Item("ひょうたん", ["put"], battle.Status.zero(), "none", "\u9B54\u6CD5\u690D\u7269\u3092\u52A0\u5DE5\u3057\u3066\u4F5C\u3089\u308C\u305F\u3001\u5185\u90E8\u304C\u56DB\u6B21\u5143\u7A7A\u9593\u306B\u306A\u3063\u3066\u3044\u308B\u3072\u3087\u3046\u305F\u3093", { capacity: 3 }),
+        gunpowder: new Item("火薬", ["put"], battle.Status.zero(), "none", "\u5BB9\u5668\u306B\u8A70\u3081\u308B\u3068\u7206\u5F3E\u306B\u306A\u308B\u3001\u53D6\u308A\u6271\u3044\u6CE8\u610F\u306E\u7C89"),
+        roller_skates: new Item("ローラースケート", ["equip", "put"], new battle.Status(0, 0, 0, 0, 0, 0), "foot", "\u9AD8\u901F\u79FB\u52D5\u3067\u304D\u308B\u304C\u8ECC\u9053\u3092\u8AAD\u307E\u308C\u304C\u3061\u306A\u9774", { effi: 7 })
     };
     /**
      * cond: condition of validating the command

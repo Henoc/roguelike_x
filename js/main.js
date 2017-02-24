@@ -121,6 +121,8 @@ var main;
             new items.ItemEntity(items.type.sharpener),
             new items.ItemEntity(items.type.gourd),
         ];
+        mkfrms.set_top_frame();
+        mkfrms.set_explore_frame();
         Asset.loadAssets(function () {
             requestAnimationFrame(update);
         });
@@ -154,17 +156,32 @@ var main;
                         main.menu_mode = ["items"];
                         main.cursor["items"] = 0;
                         main.cursor_max["items"] = items.item_entities.length;
+                        mkfrms.remove_explore_frame();
+                        mkfrms.set_items_frame();
                     }
                     else if (keys.c_key) {
                         main.menu_mode = ["dist"];
                         main.cursor["dist"] = 0;
                         main.cursor_max["dist"] = 4;
                         main.point_distributed = { atk: 0, def: 0, dex: 0, eva: 0, rest: battle.dist_point };
+                        mkfrms.remove_explore_frame();
+                        mkfrms.set_dist_frame();
                     }
                 }
                 break;
             case "items":
                 if (keys.x_key) {
+                    switch (main.menu_mode.join(">")) {
+                        case "items":
+                            mkfrms.remove_items_frame();
+                            mkfrms.set_explore_frame();
+                            break;
+                        case "items>command":
+                            mkfrms.remove_command_frame();
+                            break;
+                        default:
+                            throw "default reached";
+                    }
                     main.menu_mode.pop();
                     if (main.menu_mode.length == 0)
                         main.menu_mode = ["explore"];
@@ -177,6 +194,7 @@ var main;
                                 var mode_1 = main.menu_mode.join(">");
                                 main.cursor[mode_1] = 0;
                                 main.cursor_max[mode_1] = items.item_entities[main.cursor["items"]].get_valid_commands().length;
+                                mkfrms.set_command_frame();
                             }
                             break;
                         case "items>command":
@@ -199,12 +217,14 @@ var main;
                                         main.cursor_max["items"]--;
                                         main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
                                         main.menu_mode.pop();
+                                        mkfrms.reflesh_items_frame();
                                         break;
                                     case "put":
                                         items.item_entities.splice(main.cursor["items"], 1);
                                         main.cursor_max["items"]--;
                                         main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
                                         main.menu_mode.pop();
+                                        mkfrms.reflesh_items_frame();
                                         break;
                                     case "equip":
                                         var old_eq = items.equips[selected_1.item.equip_region];
@@ -222,6 +242,7 @@ var main;
                                         main.cursor_max["items"]--;
                                         main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
                                         main.menu_mode.pop();
+                                        mkfrms.reflesh_items_frame();
                                         break;
                                     case "sharpen":
                                         var _a = selected_1.more_props["sharpen"], success_rate = _a[0], delta_atk = _a[1];
@@ -240,6 +261,7 @@ var main;
                                         main.cursor_max["items"]--;
                                         main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
                                         main.menu_mode.pop();
+                                        mkfrms.reflesh_items_frame();
                                         break;
                                     case "decode":
                                         battle.add_exp(selected_1.item.more_props["exp"]);
@@ -247,6 +269,7 @@ var main;
                                         main.cursor_max["items"]--;
                                         main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
                                         main.menu_mode.pop();
+                                        mkfrms.reflesh_items_frame();
                                         break;
                                     default:
                                         throw "default reached";
@@ -278,8 +301,9 @@ var main;
                 var dist_props = ["atk", "def", "dex", "eva"];
                 if (keys.x_key || keys.c_key) {
                     main.menu_mode.pop();
-                    if (main.menu_mode.length == 0)
-                        main.menu_mode = ["explore"];
+                    main.menu_mode = ["explore"];
+                    mkfrms.remove_dist_frame();
+                    mkfrms.set_explore_frame();
                 }
                 else if (keys.z_key) {
                     for (var _i = 0, dist_props_1 = dist_props; _i < dist_props_1.length; _i++) {

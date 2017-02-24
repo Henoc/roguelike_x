@@ -91,7 +91,7 @@ var model;
                     ctx.fillStyle = "white";
                     var font_size = view.window_h / 40;
                     ctx.font = "normal " + font_size + "px sans-serif";
-                    utils.fillText_n(ctx, this.tile.jp_name + ("no_damage" in this.more_props ? "" : "\n" + this.status.hp + "/" + this.status.max_hp), realPos.x, realPos.y - view.unit_size.y, font_size, font_size);
+                    utils.fillText_n(ctx, this.tile.jp_name + ("no_damage" in this.more_props ? "" : "\n" + this.status.hp + "/" + this.status.max_hp), realPos.x, realPos.y - view.unit_size.y, font_size);
                 }
             }
             else {

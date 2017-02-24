@@ -131,7 +131,7 @@ namespace utils{
     return new Some(t)
   }
 
-  export function fillText_n(ctx:CanvasRenderingContext2D, text:string, x:number, y:number, font_size:number, newline_size:number){
+  export function fillText_n(ctx:CanvasRenderingContext2D, text:string, x:number, y:number, newline_size:number){
     let strs = text.split("\n")
     for(let i = 0; i < strs.length; i++){
       ctx.fillText(strs[i],x,y + newline_size * i)
@@ -162,7 +162,12 @@ namespace utils{
       this.start_points = [this.pos.add(new Pos(margin,margin))]
       this.life = life
     }
-    insert_text(text:string){
+    
+    /**
+     * @param row_reserved text実行時に取ると思われる行数
+     */
+    insert_text(text:() => string, row_reserved?:number){
+      if(row_reserved == undefined) row_reserved = 1
       this.contents.push({
         type:"text",
         text:text,
@@ -170,7 +175,7 @@ namespace utils{
         color:this.text_color
       })
       let last = this.start_points[this.start_points.length - 1]
-      this.start_points.push(last.add(new Pos(0,this.font_size * 1.2)))
+      this.start_points.push(last.add(new Pos(0,this.font_size * 1.2 * row_reserved)))
     }
     insert_subframe(width:Option<number>,height:Option<number>,color:string,margin?:number){
       if(margin == undefined) margin = this.margin
@@ -213,6 +218,21 @@ namespace utils{
       this.start_points.push(this.pos.add(new Pos(this.margin,this.margin)))
     }
 
+    clear_contents(){
+      this.contents = []
+      this.start_points = [this.pos.add(new Pos(this.margin,this.margin))]
+    }
+
+    remove_subframe(subframe:Frame){
+      for(let i = 0; i < this.contents.length; i++){
+        if(this.contents[i].type == "frame" && this.contents[i].frame == subframe){
+          this.contents.splice(i,1)
+          this.start_points.splice(i+1,1)
+          break
+        }
+      }
+    }
+
     print(ctx:CanvasRenderingContext2D){
       ctx.fillStyle = this.color
       ctx.fillRect(this.pos.x,this.pos.y,this.wh.x,this.wh.y)
@@ -223,7 +243,7 @@ namespace utils{
           case "text":
           ctx.font = "normal " + content["font_size"] + "px sans-serif"
           ctx.fillStyle = content["color"]
-          ctx.fillText(content["text"],pos.x,pos.y)
+          fillText_n(ctx, content.text(), pos.x, pos.y, this.font_size * 1.2)
           break
           case "frame":
           let sub_frame = (<Frame>content["frame"])

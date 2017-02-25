@@ -2,6 +2,8 @@ var mkfrms;
 (function (mkfrms) {
     var top_frame;
     var item_message;
+    var item_top;
+    var status_frame;
     var command;
     var dist_frame;
     function set_top_frame() {
@@ -9,6 +11,14 @@ var mkfrms;
         utils.frame_tasks.push(top_frame);
     }
     mkfrms.set_top_frame = set_top_frame;
+    function hide_subframes_of_top(hide_property) {
+        for (var _i = 0, _a = top_frame.contents; _i < _a.length; _i++) {
+            var content = _a[_i];
+            if (content.type == "frame")
+                content.frame.hide = hide_property;
+        }
+    }
+    mkfrms.hide_subframes_of_top = hide_subframes_of_top;
     function set_explore_frame() {
         top_frame.font_size = view.window_h / 32;
         top_frame.insert_text(function () { return model.rank + "階"; });
@@ -25,7 +35,7 @@ var mkfrms;
     mkfrms.remove_explore_frame = remove_explore_frame;
     function set_items_frame() {
         top_frame.move_point_x(0.6);
-        var item_top = top_frame.insert_subframe(utils.none(), utils.some(view.window_h * 0.8), "rgba(30,30,30,1)");
+        item_top = top_frame.insert_subframe(utils.none(), utils.some(view.window_h * 0.8), "rgba(30,30,30,1)");
         var page_size = 15;
         var page_no = Math.floor(main.cursor["items"] / page_size);
         var page_max = Math.floor((main.cursor_max["items"] - 1) / page_size);
@@ -34,13 +44,13 @@ var mkfrms;
         item_top.insert_text(function () { return ""; });
         var _loop_1 = function (i) {
             var itemEntity = items.item_entities[i];
-            item_top.insert_text(function () { return (main.cursor["items"] == i ? ">" : " ") + itemEntity.item.name; });
+            item_top.insert_text(function () { return (main.cursor["items"] == i ? ">" : " ") + itemEntity.item.name_jp; });
         };
         for (var i = page_no * page_size; i < Math.min((page_no + 1) * page_size, items.item_entities.length); i++) {
             _loop_1(i);
         }
         top_frame.reset_point();
-        var status_frame = top_frame.insert_subframe(utils.some(view.window_w * 0.3), utils.some(view.window_h * 0.5), "rgba(30,30,30,1)");
+        status_frame = top_frame.insert_subframe(utils.some(view.window_w * 0.3), utils.some(view.window_h * 0.5), "rgba(30,30,30,1)");
         status_frame.insert_text(function () { return "ステータス"; });
         // 装備品と食べ物でステータス変動の計算が異なる（装備品は付け替えることがある）
         var modified_status = battle.Status.zero();
@@ -66,10 +76,10 @@ var mkfrms;
         status_frame.insert_text(function () { return battle.status_jp_names.eva + " " + model.player.status.eva + (delta_status.eva != 0 ? " → " + modified_status.eva : ""); });
         status_frame.insert_text(function () { return ""; });
         status_frame.insert_text(function () { return "装備"; });
-        status_frame.insert_text(function () { return "頭 " + items.equips["head"].map(function (e) { return e.item.name; }).get_or_else(""); });
-        status_frame.insert_text(function () { return "体 " + items.equips["body"].map(function (e) { return e.item.name; }).get_or_else(""); });
-        status_frame.insert_text(function () { return "手 " + items.equips["hand"].map(function (e) { return e.item.name; }).get_or_else(""); });
-        status_frame.insert_text(function () { return "足 " + items.equips["foot"].map(function (e) { return e.item.name; }).get_or_else(""); });
+        status_frame.insert_text(function () { return "頭 " + items.equips["head"].map(function (e) { return e.item.name_jp; }).get_or_else(""); });
+        status_frame.insert_text(function () { return "体 " + items.equips["body"].map(function (e) { return e.item.name_jp; }).get_or_else(""); });
+        status_frame.insert_text(function () { return "手 " + items.equips["hand"].map(function (e) { return e.item.name_jp; }).get_or_else(""); });
+        status_frame.insert_text(function () { return "足 " + items.equips["foot"].map(function (e) { return e.item.name_jp; }).get_or_else(""); });
         top_frame.move_point_y(0.2);
         item_message = top_frame.insert_subframe(utils.some(view.window_w * 0.5), utils.none(), "rgba(30,30,30,1)");
         if (main.cursor_max["items"] != 0) {

@@ -128,7 +128,7 @@ var model;
                         dead.treasures.forEach(function (t) {
                             if (picked_names_1.length < picked_max_1) {
                                 items.item_entities.push(new items.ItemEntity(items.type[t]));
-                                picked_names_1.push(items.type[t].name);
+                                picked_names_1.push(items.type[t].name_jp);
                             }
                             else
                                 max_flag_1 = true;
@@ -179,37 +179,64 @@ var model;
                 if (map.field_at_tile(directed).isWall) {
                     map.field_set_by_name(directed, "floor");
                 }
-                var _loop_1 = function (entity) {
-                    if (entity.status.hp == 0 || "no_damage" in entity.more_props)
-                        return "continue";
-                    entity.status = this_1.status.attackTo(entity);
-                    // 倒した
-                    if (entity.status.hp == 0 && entity.tile.image_name != "player") {
-                        battle.add_exp(Math.floor(1 * Math.pow(1.2, entity.level)));
-                        // property: buff_floor
-                        if ("buff_floor" in entity.more_props) {
-                            var buff_1 = entity.more_props["buff_floor"];
-                            model.entities.forEach(function (ent) {
-                                if (ent.tile.image_name != "player")
-                                    ent.status = ent.status.add(buff_1);
-                            });
-                            var buff_text = "";
-                            for (var name_1 in battle.status_jp_names) {
-                                if (buff_1[name_1] != 0)
-                                    buff_text += battle.status_jp_names[name_1] + " +" + buff_1[name_1] + " ";
-                            }
-                            utils.log.push(entity.tile.jp_name + "は遺言を残した", "モンスター全てに " + buff_text);
-                        }
-                    }
-                };
-                var this_1 = this;
                 // 誰かいれば当たる
                 for (var _a = 0, _b = get_entities_at(directed); _a < _b.length; _a++) {
                     var entity = _b[_a];
-                    _loop_1(entity);
+                    if (entity.status.hp == 0 || "no_damage" in entity.more_props)
+                        continue;
+                    entity.status = this.attackTo(entity);
+                    // 倒した
+                    if (entity.status.hp == 0 && entity.tile.image_name != "player") {
+                        entity.monster_dying();
+                    }
                 }
             }
             this.anim_tasks.push(new view.AttackAnim());
+        };
+        /**
+         * that の被弾後ステータスを返す
+         * * 最小1ダメージ
+         * * 最大回避95%
+         */
+        Entity.prototype.attackTo = function (that) {
+            var that_status = that.status;
+            var that_status2 = that_status.copy();
+            var hit_rate = (20 - utils.included_limit(that.status.eva - this.status.dex, 0, 19)) / 20;
+            var damage = Math.random() < hit_rate ?
+                (this.status.atk - that_status.def <= 0 ?
+                    1
+                    : this.status.atk - that_status.def)
+                : "miss";
+            // damage expression
+            utils.start_tmp_num(damage, "red", that.upos.mul(view.unit_size));
+            if (damage != "miss")
+                that_status2.hp = that_status2.hp - damage <= 0 ? 0 : that_status2.hp - damage;
+            return that_status2;
+        };
+        Entity.prototype.self_damaged = function (d) {
+            var this_status = this.status.copy();
+            utils.start_tmp_num(d, "red", this.upos.mul(view.unit_size));
+            this_status.hp = utils.lower_bound(this_status.hp - d, 0);
+            this.status = this_status;
+            if (this.status.hp == 0 && this.tile.image_name != "player")
+                this.monster_dying();
+        };
+        Entity.prototype.monster_dying = function () {
+            battle.add_exp(Math.floor(1 * Math.pow(1.2, this.level)));
+            // property: buff_floor
+            if ("buff_floor" in this.more_props) {
+                var buff_1 = this.more_props["buff_floor"];
+                model.entities.forEach(function (ent) {
+                    if (ent.tile.image_name != "player")
+                        ent.status = ent.status.add(buff_1);
+                });
+                var buff_text = "";
+                for (var name_1 in battle.status_jp_names) {
+                    if (buff_1[name_1] != 0)
+                        buff_text += battle.status_jp_names[name_1] + " +" + buff_1[name_1] + " ";
+                }
+                utils.log.push(this.tile.jp_name + "は遺言を残した", "モンスター全てに " + buff_text);
+            }
         };
         /**
          * that が隣接しているか
@@ -315,6 +342,12 @@ var model;
         on_each_actions();
     }
     model.attack = attack;
+    function throw_attack(ents, d) {
+        ents.forEach(function (ent) { return ent.self_damaged(d); });
+        monsters_action();
+        on_each_actions();
+    }
+    model.throw_attack = throw_attack;
     model.action_counters = {
         effi: 0,
         heal: 0
@@ -344,9 +377,13 @@ var model;
                 if ("revive" in ent.more_props) {
                     model.player.status.max_hp = utils.limit(model.player.status.max_hp, ent.more_props["revive"], model.player.status.max_hp + 1);
                     model.player.status.hp = ent.more_props["revive"];
-                    for (var j = 0; j < 9; j++) {
+                    var _loop_1 = function (j) {
                         var delta_upos = new utils.Pos(j % 3 - 1, Math.floor(j / 3) - 1);
-                        utils.start_anim("twinkle", 2, model.player.upos.add(delta_upos).mul(view.unit_size).sub(view.prefix_pos), new utils.Pos(32, 32), 12);
+                        var player_upos_memo = model.player.upos;
+                        utils.start_anim("twinkle", 2, false, function (frame) { return player_upos_memo.add(delta_upos).mul(view.unit_size); }, new utils.Pos(32, 32), 12);
+                    };
+                    for (var j = 0; j < 9; j++) {
+                        _loop_1(j);
                     }
                     items.item_entities.splice(i, 1);
                     utils.log.push("蘇生薬で生き返った");

@@ -31,26 +31,6 @@ var battle;
         Status.prototype.add = function (that) {
             return new Status(this.max_hp + that.max_hp, utils.limit(this.hp + that.hp, 0, this.max_hp + that.max_hp + 1), this.atk + that.atk, this.def + that.def, this.dex + that.dex, this.eva + that.eva);
         };
-        /**
-         * that の被弾後ステータスを返す
-         * * 最小1ダメージ
-         * * 最大回避95%
-         */
-        Status.prototype.attackTo = function (that) {
-            var that_status = that.status;
-            var that_status2 = that_status.copy();
-            var hit_rate = (20 - utils.included_limit(that.status.eva - this.dex, 0, 19)) / 20;
-            var damage = Math.random() < hit_rate ?
-                (this.atk - that_status.def <= 0 ?
-                    1
-                    : this.atk - that_status.def)
-                : "miss";
-            // damage expression
-            utils.start_tmp_num(damage, "red", that.upos.mul(view.unit_size).sub(view.prefix_pos));
-            if (damage != "miss")
-                that_status2.hp = that_status2.hp - damage <= 0 ? 0 : that_status2.hp - damage;
-            return that_status2;
-        };
         return Status;
     }());
     battle.Status = Status;
@@ -59,12 +39,16 @@ var battle;
     battle.dist_point = 0;
     function add_exp(exp) {
         battle.player_exp += exp;
-        while (battle.player_exp >= max_exp()) {
+        var _loop_1 = function () {
             battle.player_exp -= max_exp();
             model.player.level++;
             battle.dist_point++;
-            utils.start_anim("level_up", 4 / main.sp60f, model.player.upos.sub(new utils.Pos(1, 2)).mul(view.unit_size).sub(view.prefix_pos), new utils.Pos(96, 96));
+            var real_pos = model.player.upos.sub(new utils.Pos(1, 2)).mul(view.unit_size).sub(view.prefix_pos);
+            utils.start_anim("level_up", 4 / main.sp60f, true, function (frame) { return real_pos; }, new utils.Pos(96, 96), 1);
             utils.log.push("レベルが上がった");
+        };
+        while (battle.player_exp >= max_exp()) {
+            _loop_1();
         }
     }
     battle.add_exp = add_exp;

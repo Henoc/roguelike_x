@@ -2,12 +2,20 @@ namespace mkfrms{
 
   let top_frame : utils.Frame
   let item_message : utils.Frame
+  let item_top : utils.Frame
+  let status_frame : utils.Frame
   let command : utils.Frame
   let dist_frame : utils.Frame
 
   export function set_top_frame(){
     top_frame = new utils.Frame(0,0,view.window_w,view.window_h,view.window_h * 0.03,"rgba(0,0,0,0)")
     utils.frame_tasks.push(top_frame)
+  }
+
+  export function hide_subframes_of_top(hide_property:boolean){
+    for(let content of top_frame.contents){
+      if(content.type == "frame") (<utils.Frame>content.frame).hide = hide_property
+    }
   }
 
   export function set_explore_frame(){
@@ -26,7 +34,7 @@ namespace mkfrms{
 
   export function set_items_frame(){
     top_frame.move_point_x(0.6)
-    let item_top = top_frame.insert_subframe(utils.none<number>(),utils.some(view.window_h * 0.8),"rgba(30,30,30,1)")
+    item_top = top_frame.insert_subframe(utils.none<number>(),utils.some(view.window_h * 0.8),"rgba(30,30,30,1)")
     
     let page_size = 15
     let page_no = Math.floor(main.cursor["items"] / page_size)
@@ -37,11 +45,11 @@ namespace mkfrms{
     item_top.insert_text(() => "")
     for(let i = page_no * page_size; i < Math.min((page_no + 1) * page_size, items.item_entities.length); i++){
       let itemEntity = items.item_entities[i]
-      item_top.insert_text(() => (main.cursor["items"] == i ? ">" : " ") + itemEntity.item.name)
+      item_top.insert_text(() => (main.cursor["items"] == i ? ">" : " ") + itemEntity.item.name_jp)
     }
 
     top_frame.reset_point()
-    let status_frame = top_frame.insert_subframe(utils.some(view.window_w * 0.3),utils.some(view.window_h * 0.5),"rgba(30,30,30,1)")
+    status_frame = top_frame.insert_subframe(utils.some(view.window_w * 0.3),utils.some(view.window_h * 0.5),"rgba(30,30,30,1)")
     status_frame.insert_text(() => "ステータス")
 
     // 装備品と食べ物でステータス変動の計算が異なる（装備品は付け替えることがある）
@@ -68,10 +76,10 @@ namespace mkfrms{
     status_frame.insert_text(() => battle.status_jp_names.eva + " " + model.player.status.eva + (delta_status.eva != 0 ? " → " + modified_status.eva : ""))
     status_frame.insert_text(() =>"")
     status_frame.insert_text(() => "装備")
-    status_frame.insert_text(() => "頭 " + items.equips["head"].map(e => e.item.name).get_or_else(""))
-    status_frame.insert_text(() => "体 " + items.equips["body"].map(e => e.item.name).get_or_else(""))
-    status_frame.insert_text(() => "手 " + items.equips["hand"].map(e => e.item.name).get_or_else(""))
-    status_frame.insert_text(() => "足 " + items.equips["foot"].map(e => e.item.name).get_or_else(""))
+    status_frame.insert_text(() => "頭 " + items.equips["head"].map(e => e.item.name_jp).get_or_else(""))
+    status_frame.insert_text(() => "体 " + items.equips["body"].map(e => e.item.name_jp).get_or_else(""))
+    status_frame.insert_text(() => "手 " + items.equips["hand"].map(e => e.item.name_jp).get_or_else(""))
+    status_frame.insert_text(() => "足 " + items.equips["foot"].map(e => e.item.name_jp).get_or_else(""))
 
     top_frame.move_point_y(0.2)
     item_message = top_frame.insert_subframe(utils.some(view.window_w * 0.5),utils.none<number>(),"rgba(30,30,30,1)")

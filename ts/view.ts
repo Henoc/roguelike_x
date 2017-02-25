@@ -71,6 +71,16 @@ namespace view{
     }
   }
 
+  export function print_throw(ctx : CanvasRenderingContext2D, len:number){
+    let pos = model.player.upos
+    ctx.fillStyle = "rgba(255,0,0,0.3)"
+    for(let i = 0; i < len; i++){
+      pos = pos.add(main.cursor["throw"])
+      let real_pos = pos.mul(unit_size).sub(prefix_pos)
+      ctx.fillRect(real_pos.x, real_pos.y, unit_size.x, unit_size.y)
+    }
+  }
+
   export function print(ctx : CanvasRenderingContext2D, cnt:number){
 
     //ctx.clearRect(0,0,window_w,window_h)
@@ -116,6 +126,8 @@ namespace view{
 
     // 視野
     ctx.drawImage(utils.reversal_circle(visual_field_size()),0,0)
+
+    if(main.menu_mode[0] == "throw") print_throw(ctx, 5)
     
     utils.print_log(ctx)
     utils.print_frame(ctx)

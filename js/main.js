@@ -61,6 +61,7 @@ var main;
             { type: "image", name: "level_up", src: "assets/level_up.png", frames: 20 },
             { type: "image", name: "treasure", src: "assets/treasure.png", frames: 1 },
             { type: "image", name: "twinkle", src: "assets/twinkle.png", frames: 5 },
+            { type: "image", name: "bom", src: "assets/bom.png", frames: 5 },
         ];
         Asset.images = {};
         Asset.image_frames = {};
@@ -120,6 +121,8 @@ var main;
             new items.ItemEntity(items.type.sharpener),
             new items.ItemEntity(items.type.sharpener),
             new items.ItemEntity(items.type.gourd),
+            new items.ItemEntity(items.type.gourd),
+            new items.ItemEntity(items.type.gunpowder),
         ];
         mkfrms.set_top_frame();
         mkfrms.set_explore_frame();
@@ -206,7 +209,7 @@ var main;
                                 switch (selected_command_name) {
                                     case "use":
                                         if (selected_1.status.hp > 0)
-                                            utils.start_tmp_num(selected_1.status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos));
+                                            utils.start_tmp_num(selected_1.status.hp, "springgreen", model.player.upos.mul(view.unit_size));
                                         model.player.status = model.player.status.add(selected_1.status);
                                         var more_prop_names = ["effi", "heal"];
                                         more_prop_names.forEach(function (name) {
@@ -248,11 +251,11 @@ var main;
                                         var _a = selected_1.more_props["sharpen"], success_rate = _a[0], delta_atk = _a[1];
                                         if (Math.random() < success_rate) {
                                             items.equips["hand"].get().status.atk += delta_atk;
-                                            utils.log.push(selected_1.item.name + "で武器の強化... 成功! 武器攻撃力 +" + delta_atk);
+                                            utils.log.push(selected_1.item.name_jp + "で武器の強化... 成功! 武器攻撃力 +" + delta_atk);
                                         }
                                         else {
                                             items.equips["hand"].get().status.atk = utils.lower_bound(items.equips["hand"].get().status.atk - delta_atk, 0);
-                                            utils.log.push(selected_1.item.name + "で武器の強化... 失敗! 武器攻撃力 -" + delta_atk);
+                                            utils.log.push(selected_1.item.name_jp + "で武器の強化... 失敗! 武器攻撃力 -" + delta_atk);
                                         }
                                         // 武器のステータスを変えたので装備計算を再度実行
                                         model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum());
@@ -270,6 +273,25 @@ var main;
                                         main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
                                         main.menu_mode.pop();
                                         mkfrms.reflesh_items_frame();
+                                        break;
+                                    case "fill_with_gunpowder":
+                                        var name_1 = selected_1.item.name;
+                                        items.item_entities[main.cursor["items"]] = new items.ItemEntity(items.type[name_1 + "_bom"]);
+                                        for (var i = 0; items.item_entities.length; i++) {
+                                            if (items.item_entities[i].item.name == "gunpowder") {
+                                                items.item_entities.splice(i, 1);
+                                                break;
+                                            }
+                                        }
+                                        main.cursor_max["items"]--;
+                                        main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
+                                        main.menu_mode.pop();
+                                        mkfrms.reflesh_items_frame();
+                                        break;
+                                    case "throw":
+                                        mkfrms.hide_subframes_of_top(true);
+                                        main.menu_mode = ["throw"];
+                                        main.cursor["throw"] = model.dir.left;
                                         break;
                                     default:
                                         throw "default reached";
@@ -307,8 +329,8 @@ var main;
                 }
                 else if (keys.z_key) {
                     for (var _i = 0, dist_props_1 = dist_props; _i < dist_props_1.length; _i++) {
-                        var name_1 = dist_props_1[_i];
-                        model.player.status[name_1] += main.point_distributed[name_1];
+                        var name_2 = dist_props_1[_i];
+                        model.player.status[name_2] += main.point_distributed[name_2];
                     }
                     main.point_distributed = { atk: 0, def: 0, dex: 0, eva: 0, rest: main.point_distributed.rest };
                     battle.dist_point = main.point_distributed.rest;
@@ -330,6 +352,46 @@ var main;
                         main.point_distributed.rest--;
                         main.point_distributed[dist_props[main.cursor[mode]]] += point_dist_rate[dist_props[main.cursor[mode]]];
                     }
+                }
+                break;
+            case "throw":
+                switch (main.menu_mode.join(">")) {
+                    case "throw":
+                        if (keys.z_key) {
+                            var pos_fn = function (frm) { return model.player.upos.add(main.cursor["throw"].mul_bloadcast(frm / 2))
+                                .mul(view.unit_size); };
+                            // 爆弾が当たればアニメーション終了 & throw_attack により1ターン経過
+                            var end_fn = function (pos) {
+                                var bom_upos = utils.pos_to_upos(pos.add(view.unit_size.div_bloadcast(2)));
+                                var ents = model.get_entities_at(bom_upos);
+                                if (Math.abs(bom_upos.x - model.player.upos.x) >= 5 || Math.abs(bom_upos.y - model.player.upos.y) >= 5 || utils.exist(ents, function (ent) { return ent.tile.image_name != "player"; })) {
+                                    model.throw_attack(ents.filter(function (ent) { return ent.tile.image_name != "player"; }), 30);
+                                    mkfrms.remove_items_frame();
+                                    mkfrms.set_explore_frame();
+                                    main.menu_mode = ["explore"];
+                                    return true;
+                                }
+                                return false;
+                            };
+                            utils.start_anim("bom", 4 / main.sp60f, false, pos_fn, view.unit_size, undefined, end_fn);
+                            main.menu_mode.push("away");
+                            items.item_entities.splice(main.cursor["items"], 1);
+                            main.cursor_max["items"]--;
+                            main.cursor["items"] = utils.limit(main.cursor["items"], 0, main.cursor_max["items"]);
+                        }
+                        else if (keys.x_key) {
+                            mkfrms.hide_subframes_of_top(false);
+                            main.menu_mode = ["items", "command"];
+                        }
+                        else if (!keys.dir_key.equals(model.dir.none)) {
+                            main.cursor["throw"] = keys.dir_key;
+                        }
+                        break;
+                    case "throw>away":
+                        // 投げているアニメーションの途中なので待機
+                        break;
+                    default:
+                        throw "default reached";
                 }
                 break;
             default:

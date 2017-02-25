@@ -145,7 +145,7 @@ namespace model{
             dead.treasures.forEach(t => {
               if(picked_names.length < picked_max){
                 items.item_entities.push(new items.ItemEntity(items.type[t]))
-                picked_names.push(items.type[t].name)
+                picked_names.push(items.type[t].name_jp)
               }else max_flag = true
             })
           }
@@ -191,27 +191,60 @@ namespace model{
         // 誰かいれば当たる
         for(let entity of get_entities_at(directed)){
           if(entity.status.hp == 0 || "no_damage" in entity.more_props) continue
-          entity.status = this.status.attackTo(entity)
+          entity.status = this.attackTo(entity)
 
           // 倒した
           if(entity.status.hp == 0 && entity.tile.image_name != "player") {
-            battle.add_exp(Math.floor(1 * Math.pow(1.2,entity.level)))
-            // property: buff_floor
-            if("buff_floor" in entity.more_props){
-              let buff = <battle.Status>entity.more_props["buff_floor"]
-              entities.forEach(ent => {
-                if(ent.tile.image_name != "player") ent.status = ent.status.add(buff)
-              })
-              let buff_text = ""
-              for(let name in battle.status_jp_names){
-                if(buff[name] != 0) buff_text += battle.status_jp_names[name] + " +" + buff[name] + " "
-              }
-              utils.log.push(entity.tile.jp_name + "は遺言を残した", "モンスター全てに " + buff_text)
-            }
+            entity.monster_dying()
           }
         }
       }
       this.anim_tasks.push(new view.AttackAnim())
+    }
+
+    /**
+     * that の被弾後ステータスを返す
+     * * 最小1ダメージ
+     * * 最大回避95%
+     */
+    attackTo(that:model.Entity){
+      let that_status = that.status
+      let that_status2 = that_status.copy()
+      let hit_rate = (20 - utils.included_limit(that.status.eva - this.status.dex, 0, 19)) / 20
+      let damage : number | "miss" = 
+        Math.random() < hit_rate ?
+          (this.status.atk - that_status.def <= 0 ?
+          1
+          : this.status.atk - that_status.def)
+        : "miss"
+      // damage expression
+      utils.start_tmp_num(damage, "red", that.upos.mul(view.unit_size) )
+      if(damage != "miss") that_status2.hp = that_status2.hp - damage <= 0 ? 0 : that_status2.hp - damage
+      return that_status2
+    }
+
+    self_damaged(d:number){
+      let this_status = this.status.copy()
+      utils.start_tmp_num(d, "red", this.upos.mul(view.unit_size) )
+      this_status.hp = utils.lower_bound(this_status.hp - d, 0)
+      this.status = this_status
+      if(this.status.hp == 0 && this.tile.image_name != "player") this.monster_dying()
+    }
+
+    monster_dying(){
+      battle.add_exp(Math.floor(1 * Math.pow(1.2,this.level)))
+      // property: buff_floor
+      if("buff_floor" in this.more_props){
+        let buff = <battle.Status>this.more_props["buff_floor"]
+        entities.forEach(ent => {
+          if(ent.tile.image_name != "player") ent.status = ent.status.add(buff)
+        })
+        let buff_text = ""
+        for(let name in battle.status_jp_names){
+          if(buff[name] != 0) buff_text += battle.status_jp_names[name] + " +" + buff[name] + " "
+        }
+        utils.log.push(this.tile.jp_name + "は遺言を残した", "モンスター全てに " + buff_text)
+      }
     }
 
     /**
@@ -327,6 +360,12 @@ namespace model{
     on_each_actions()
   }
 
+  export function throw_attack(ents:Entity[], d:number){
+    ents.forEach(ent => ent.self_damaged(d))
+    monsters_action()
+    on_each_actions()
+  }
+
   export let action_counters = {
     effi:0,
     heal:0
@@ -358,7 +397,8 @@ namespace model{
           player.status.hp = ent.more_props["revive"]
           for(let j = 0; j < 9; j++){
             let delta_upos = new utils.Pos(j%3-1,Math.floor(j/3)-1)
-            utils.start_anim("twinkle",2,player.upos.add(delta_upos).mul(view.unit_size).sub(view.prefix_pos), new utils.Pos(32,32), 12)
+            let player_upos_memo = player.upos
+            utils.start_anim("twinkle",2,false,(frame) => player_upos_memo.add(delta_upos).mul(view.unit_size), new utils.Pos(32,32), 12)
           }
           items.item_entities.splice(i,1)
           utils.log.push("蘇生薬で生き返った")

@@ -62,6 +62,16 @@ var view;
         return AttackAnim;
     }());
     view.AttackAnim = AttackAnim;
+    function print_throw(ctx, len) {
+        var pos = model.player.upos;
+        ctx.fillStyle = "rgba(255,0,0,0.3)";
+        for (var i = 0; i < len; i++) {
+            pos = pos.add(main.cursor["throw"]);
+            var real_pos = pos.mul(view.unit_size).sub(view.prefix_pos);
+            ctx.fillRect(real_pos.x, real_pos.y, view.unit_size.x, view.unit_size.y);
+        }
+    }
+    view.print_throw = print_throw;
     function print(ctx, cnt) {
         //ctx.clearRect(0,0,window_w,window_h)
         // 画面外は黒
@@ -99,6 +109,8 @@ var view;
         }
         // 視野
         ctx.drawImage(utils.reversal_circle(visual_field_size()), 0, 0);
+        if (main.menu_mode[0] == "throw")
+            print_throw(ctx, 5);
         utils.print_log(ctx);
         utils.print_frame(ctx);
         //utils.print_tmp_frame(ctx)

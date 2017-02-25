@@ -80,6 +80,7 @@ namespace main{
       {type: "image", name: "level_up", src: "assets/level_up.png", frames:20},
       {type: "image", name: "treasure", src: "assets/treasure.png", frames:1},
       {type: "image", name: "twinkle", src: "assets/twinkle.png", frames:5},
+      {type: "image", name: "bom", src: "assets/bom.png", frames:5},
     ];
     export let images = {}
     export let image_frames = {}
@@ -149,6 +150,8 @@ namespace main{
       new items.ItemEntity(items.type.sharpener),
       new items.ItemEntity(items.type.sharpener),
       new items.ItemEntity(items.type.gourd),
+      new items.ItemEntity(items.type.gourd),
+      new items.ItemEntity(items.type.gunpowder),
     ]
 
     mkfrms.set_top_frame()
@@ -235,7 +238,7 @@ namespace main{
             // nothing to do
           }else switch(selected_command_name){
             case "use":
-            if(selected.status.hp > 0) utils.start_tmp_num(selected.status.hp, "springgreen", model.player.upos.mul(view.unit_size).sub(view.prefix_pos))
+            if(selected.status.hp > 0) utils.start_tmp_num(selected.status.hp, "springgreen", model.player.upos.mul(view.unit_size))
             model.player.status = model.player.status.add(selected.status)
             let more_prop_names = ["effi","heal"]
             more_prop_names.forEach(name => {
@@ -276,10 +279,10 @@ namespace main{
             let [success_rate, delta_atk] = selected.more_props["sharpen"]
             if(Math.random() < success_rate) {
               items.equips["hand"].get().status.atk += delta_atk
-              utils.log.push(selected.item.name + "で武器の強化... 成功! 武器攻撃力 +" + delta_atk)
+              utils.log.push(selected.item.name_jp + "で武器の強化... 成功! 武器攻撃力 +" + delta_atk)
             }else{
               items.equips["hand"].get().status.atk = utils.lower_bound(items.equips["hand"].get().status.atk - delta_atk, 0)
-              utils.log.push(selected.item.name + "で武器の強化... 失敗! 武器攻撃力 -" + delta_atk)
+              utils.log.push(selected.item.name_jp + "で武器の強化... 失敗! 武器攻撃力 -" + delta_atk)
             }
             // 武器のステータスを変えたので装備計算を再度実行
             model.player.status = model.tiles["player"].status.get().add(items.equips_status_sum())
@@ -297,6 +300,25 @@ namespace main{
             cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
             menu_mode.pop()
             mkfrms.reflesh_items_frame()
+            break
+            case "fill_with_gunpowder":
+            let name = selected.item.name
+            items.item_entities[cursor["items"]] = new items.ItemEntity(items.type[name + "_bom"])
+            for(let i = 0; items.item_entities.length; i++){
+              if(items.item_entities[i].item.name == "gunpowder") {
+                items.item_entities.splice(i,1)
+                break
+              }
+            }
+            cursor_max["items"]--
+            cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
+            menu_mode.pop()
+            mkfrms.reflesh_items_frame()
+            break
+            case "throw":
+            mkfrms.hide_subframes_of_top(true)
+            menu_mode = ["throw"]
+            cursor["throw"] = model.dir.left
             break
             default:
             throw "default reached"
@@ -347,6 +369,44 @@ namespace main{
           point_distributed.rest--
           point_distributed[dist_props[cursor[mode]]]+=point_dist_rate[dist_props[cursor[mode]]]
         }
+      }
+      break
+      case "throw":
+      switch(menu_mode.join(">")){
+        case "throw":
+        if(keys.z_key){
+          let pos_fn : (frame:number) => utils.Pos = (frm) => model.player.upos.add((<utils.Pos>cursor["throw"]).mul_bloadcast(frm / 2))
+            .mul(view.unit_size)
+          // 爆弾が当たればアニメーション終了 & throw_attack により1ターン経過
+          let end_fn : (pos:utils.Pos) => boolean = (pos) => {
+            let bom_upos = utils.pos_to_upos(pos.add(view.unit_size.div_bloadcast(2)))
+            let ents = model.get_entities_at(bom_upos)
+            if(Math.abs(bom_upos.x - model.player.upos.x) >= 5 || Math.abs(bom_upos.y - model.player.upos.y) >= 5 || utils.exist(ents, ent => ent.tile.image_name != "player")){
+              model.throw_attack(ents.filter(ent => ent.tile.image_name != "player"), 30)
+              mkfrms.remove_items_frame()
+              mkfrms.set_explore_frame()
+              menu_mode = ["explore"]
+              return true
+            }
+            return false
+          }
+          utils.start_anim("bom",4/main.sp60f,false,pos_fn,view.unit_size,undefined,end_fn)
+          menu_mode.push("away")
+          items.item_entities.splice(cursor["items"],1)
+          cursor_max["items"]--
+          cursor["items"] = utils.limit(cursor["items"], 0, cursor_max["items"])
+        }else if(keys.x_key){
+          mkfrms.hide_subframes_of_top(false)
+          menu_mode = ["items","command"]
+        }else if(!keys.dir_key.equals(model.dir.none)){
+          cursor["throw"] = keys.dir_key
+        }
+        break
+        case "throw>away":
+        // 投げているアニメーションの途中なので待機
+        break
+        default:
+        throw "default reached"
       }
       break
       default:

@@ -41,6 +41,9 @@ var utils;
         Pos.prototype.div_bloadcast = function (divisor) {
             return new Pos(this.x / divisor, this.y / divisor);
         };
+        Pos.prototype.div = function (that) {
+            return new Pos(this.x / that.x, this.y / that.y);
+        };
         Pos.prototype.equals = function (that) {
             return this.x == that.x && this.y == that.y;
         };
@@ -165,6 +168,7 @@ var utils;
             this.contents = [];
             this.start_points = [this.pos.add(new Pos(margin, margin))];
             this.life = life;
+            this.hide = false;
         }
         /**
          * @param row_reserved text実行時に取ると思われる行数
@@ -231,28 +235,30 @@ var utils;
             }
         };
         Frame.prototype.print = function (ctx) {
-            ctx.fillStyle = this.color;
-            ctx.fillRect(this.pos.x, this.pos.y, this.wh.x, this.wh.y);
-            for (var i = 0; i < this.contents.length; i++) {
-                var pos = this.start_points[i];
-                var content = this.contents[i];
-                switch (content["type"]) {
-                    case "text":
-                        ctx.font = "normal " + content["font_size"] + "px sans-serif";
-                        ctx.fillStyle = content["color"];
-                        fillText_n(ctx, content.text(), pos.x, pos.y, this.font_size * 1.2);
-                        break;
-                    case "frame":
-                        var sub_frame = content["frame"];
-                        if (sub_frame.life == undefined || sub_frame.life >= 0)
-                            sub_frame.print(ctx);
-                        break;
-                    default:
-                        throw "default reached";
+            if (!this.hide) {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.pos.x, this.pos.y, this.wh.x, this.wh.y);
+                for (var i = 0; i < this.contents.length; i++) {
+                    var pos = this.start_points[i];
+                    var content = this.contents[i];
+                    switch (content["type"]) {
+                        case "text":
+                            ctx.font = "normal " + content["font_size"] + "px sans-serif";
+                            ctx.fillStyle = content["color"];
+                            fillText_n(ctx, content.text(), pos.x, pos.y, this.font_size * 1.2);
+                            break;
+                        case "frame":
+                            var sub_frame = content["frame"];
+                            if (sub_frame.life == undefined || sub_frame.life >= 0)
+                                sub_frame.print(ctx);
+                            break;
+                        default:
+                            throw "default reached";
+                    }
                 }
-            }
-            if (this.life != undefined && this.life >= 0) {
-                this.life -= main.sp60f;
+                if (this.life != undefined && this.life >= 0) {
+                    this.life -= main.sp60f;
+                }
             }
         };
         return Frame;
@@ -322,32 +328,39 @@ var utils;
     }
     utils.shallow_copy = shallow_copy;
     var TmpAnim = (function () {
-        function TmpAnim(name, fps, pos, src_wh, repeat) {
+        function TmpAnim(name, fps, is_real_pos, pos, src_wh, repeat, end_fn) {
             this.name = name;
             this.counter = 0;
             this.fps = fps;
+            this.is_real_pos = is_real_pos;
             this.pos = pos;
             this.src_wh = src_wh;
             this.repeat = repeat;
+            this.end_fn = end_fn;
         }
         TmpAnim.prototype.print = function (ctx) {
             var cnt = Math.floor(this.counter / this.fps) % main.Asset.image_frames[this.name];
-            ctx.drawImage(main.Asset.images[this.name], 0, this.src_wh.y * cnt, this.src_wh.x, this.src_wh.y, this.pos.x, this.pos.y, this.src_wh.x, this.src_wh.y);
+            var pos = this.pos(Math.floor(this.counter / this.fps));
+            var ret = this.end_fn(pos);
+            if (!this.is_real_pos)
+                pos = pos.sub(view.prefix_pos);
+            ctx.drawImage(main.Asset.images[this.name], 0, this.src_wh.y * cnt, this.src_wh.x, this.src_wh.y, pos.x, pos.y, this.src_wh.x, this.src_wh.y);
             this.counter++;
+            return ret;
         };
         return TmpAnim;
     }());
     var tmp_anim_tasks = [];
-    function start_anim(name, fps, pos, src_wh, repeat) {
-        if (repeat == undefined)
-            repeat = 1;
-        tmp_anim_tasks.push(new TmpAnim(name, fps, pos, src_wh, repeat));
+    function start_anim(name, fps, is_real_pos, pos, src_wh, repeat, end_fn) {
+        if (end_fn == undefined)
+            end_fn = function (p) { return false; };
+        tmp_anim_tasks.push(new TmpAnim(name, fps, is_real_pos, pos, src_wh, repeat, end_fn));
     }
     utils.start_anim = start_anim;
     function print_anims(ctx) {
         for (var i = 0; i < tmp_anim_tasks.length; i++) {
-            tmp_anim_tasks[i].print(ctx);
-            if (tmp_anim_tasks[i].counter / tmp_anim_tasks[i].fps >= main.Asset.image_frames[tmp_anim_tasks[i].name] * tmp_anim_tasks[i].repeat) {
+            var end_flag = tmp_anim_tasks[i].print(ctx);
+            if ((tmp_anim_tasks[i].repeat != undefined && tmp_anim_tasks[i].counter / tmp_anim_tasks[i].fps >= main.Asset.image_frames[tmp_anim_tasks[i].name] * tmp_anim_tasks[i].repeat) || end_flag) {
                 tmp_anim_tasks.splice(i, 1);
                 i--;
             }
@@ -363,23 +376,23 @@ var utils;
     }
     utils.start_tmp_num = start_tmp_num;
     function print_tmp_num(ctx) {
-        function print_number(k, pos, cnt) {
+        function print_number(k, real_pos, cnt) {
             if (cnt >= 0) {
                 cnt = limit(cnt, 0, 10 / main.sp60f);
                 var delta = view.window_h / 240;
-                ctx.fillText(k, pos.x, pos.y - (10 / main.sp60f - cnt) * delta);
+                ctx.fillText(k, real_pos.x, real_pos.y - (10 / main.sp60f - cnt) * delta);
             }
             var w = ctx.measureText(k).width;
-            return pos.add(new Pos(w, 0));
+            return real_pos.add(new Pos(w, 0));
         }
         for (var i = 0; i < tmp_num_tasks.length; i++) {
             var tmp_num_task = tmp_num_tasks[i];
             ctx.font = "normal " + (view.window_h / 40) + "px sans-serif";
             ctx.fillStyle = tmp_num_task.color;
             var num_text = tmp_num_task.number + "";
-            var pos = tmp_num_task.pos;
+            var real_pos = tmp_num_task.pos.sub(view.prefix_pos);
             for (var j = 0; j < num_text.length; j++) {
-                pos = print_number(num_text[j], pos, 80 / main.sp60f - tmp_num_task.counter - j * 10 / main.sp60f);
+                real_pos = print_number(num_text[j], real_pos, 80 / main.sp60f - tmp_num_task.counter - j * 10 / main.sp60f);
             }
             tmp_num_task.counter--;
             if (tmp_num_task.counter <= 0) {
@@ -418,4 +431,8 @@ var utils;
         return canvas;
     }
     utils.reversal_circle = reversal_circle;
+    function pos_to_upos(pos) {
+        return pos.div(view.unit_size).map(function (n) { return Math.floor(n); });
+    }
+    utils.pos_to_upos = pos_to_upos;
 })(utils || (utils = {}));

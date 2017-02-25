@@ -37,6 +37,9 @@ namespace utils{
     div_bloadcast(divisor:number){
       return new Pos(this.x / divisor, this.y / divisor)
     }
+    div(that:Pos){
+      return new Pos(this.x / that.x, this.y / that.y)
+    }
     equals(that:Pos){
       return this.x == that.x && this.y == that.y
     }
@@ -151,6 +154,7 @@ namespace utils{
     font_size:number
     text_color:string
     life:number
+    hide:boolean
     constructor(x:number,y:number,w:number,h:number,margin:number,color:string,life?:number){
       this.pos = new Pos(x,y)
       this.wh = new Pos(w,h)
@@ -161,8 +165,9 @@ namespace utils{
       this.contents = []
       this.start_points = [this.pos.add(new Pos(margin,margin))]
       this.life = life
+      this.hide = false
     }
-    
+
     /**
      * @param row_reserved text実行時に取ると思われる行数
      */
@@ -234,27 +239,29 @@ namespace utils{
     }
 
     print(ctx:CanvasRenderingContext2D){
-      ctx.fillStyle = this.color
-      ctx.fillRect(this.pos.x,this.pos.y,this.wh.x,this.wh.y)
-      for(let i = 0; i < this.contents.length; i++){
-        let pos = this.start_points[i]
-        let content = this.contents[i]
-        switch(content["type"]){
-          case "text":
-          ctx.font = "normal " + content["font_size"] + "px sans-serif"
-          ctx.fillStyle = content["color"]
-          fillText_n(ctx, content.text(), pos.x, pos.y, this.font_size * 1.2)
-          break
-          case "frame":
-          let sub_frame = (<Frame>content["frame"])
-          if(sub_frame.life == undefined || sub_frame.life >=0 ) sub_frame.print(ctx)
-          break
-          default:
-          throw "default reached"
+      if(!this.hide){
+        ctx.fillStyle = this.color
+        ctx.fillRect(this.pos.x,this.pos.y,this.wh.x,this.wh.y)
+        for(let i = 0; i < this.contents.length; i++){
+          let pos = this.start_points[i]
+          let content = this.contents[i]
+          switch(content["type"]){
+            case "text":
+            ctx.font = "normal " + content["font_size"] + "px sans-serif"
+            ctx.fillStyle = content["color"]
+            fillText_n(ctx, content.text(), pos.x, pos.y, this.font_size * 1.2)
+            break
+            case "frame":
+            let sub_frame = (<Frame>content["frame"])
+            if(sub_frame.life == undefined || sub_frame.life >=0 ) sub_frame.print(ctx)
+            break
+            default:
+            throw "default reached"
+          }
         }
-      }
-      if(this.life != undefined && this.life >= 0){
-        this.life -= main.sp60f
+        if(this.life != undefined && this.life >= 0){
+          this.life -= main.sp60f
+        }
       }
     }
   }
@@ -329,32 +336,40 @@ namespace utils{
     name:string
     counter:number
     fps:number
-    pos:Pos
+    is_real_pos:boolean
+    pos:(frame:number) => Pos
     src_wh:Pos
     repeat:number
-    constructor(name:string, fps:number, pos:Pos,src_wh:Pos,repeat:number){
+    end_fn:(pos:utils.Pos) => boolean
+    constructor(name:string, fps:number,is_real_pos:boolean, pos:(frame:number) => Pos,src_wh:Pos,repeat:number,end_fn:((pos:utils.Pos) => boolean)){
       this.name = name
       this.counter = 0
       this.fps = fps
+      this.is_real_pos = is_real_pos
       this.pos = pos
       this.src_wh = src_wh
       this.repeat = repeat
+      this.end_fn = end_fn
     }
-    print(ctx:CanvasRenderingContext2D){
+    print(ctx:CanvasRenderingContext2D):boolean{
       let cnt = Math.floor(this.counter / this.fps) % main.Asset.image_frames[this.name]
-      ctx.drawImage(main.Asset.images[this.name],0,this.src_wh.y * cnt,this.src_wh.x,this.src_wh.y,this.pos.x,this.pos.y,this.src_wh.x,this.src_wh.y)
+      let pos = this.pos(Math.floor(this.counter / this.fps))
+      let ret = this.end_fn(pos)
+      if(!this.is_real_pos) pos = pos.sub(view.prefix_pos)
+      ctx.drawImage(main.Asset.images[this.name],0,this.src_wh.y * cnt,this.src_wh.x,this.src_wh.y,pos.x,pos.y,this.src_wh.x,this.src_wh.y)
       this.counter++
+      return ret
     }
   }
   let tmp_anim_tasks:TmpAnim[] = []
-  export function start_anim(name:string, fps:number, pos:Pos, src_wh:Pos, repeat?:number){
-    if(repeat == undefined) repeat = 1
-    tmp_anim_tasks.push(new TmpAnim(name,fps,pos,src_wh,repeat))
+  export function start_anim(name:string, fps:number, is_real_pos:boolean, pos:(frame:number) => Pos, src_wh:Pos, repeat:number, end_fn?:((pos:utils.Pos) => boolean)){
+    if(end_fn == undefined) end_fn = (p) => false
+    tmp_anim_tasks.push(new TmpAnim(name,fps,is_real_pos,pos,src_wh,repeat,end_fn))
   }
   export function print_anims(ctx:CanvasRenderingContext2D){
     for(let i = 0; i < tmp_anim_tasks.length; i++){
-      tmp_anim_tasks[i].print(ctx)
-      if(tmp_anim_tasks[i].counter / tmp_anim_tasks[i].fps >= main.Asset.image_frames[tmp_anim_tasks[i].name] * tmp_anim_tasks[i].repeat) {
+      let end_flag = tmp_anim_tasks[i].print(ctx)
+      if((tmp_anim_tasks[i].repeat != undefined && tmp_anim_tasks[i].counter / tmp_anim_tasks[i].fps >= main.Asset.image_frames[tmp_anim_tasks[i].name] * tmp_anim_tasks[i].repeat) || end_flag) {
         tmp_anim_tasks.splice(i,1)
         i--
       }
@@ -369,14 +384,14 @@ namespace utils{
     tmp_num_tasks.push({number:n, color:color, pos:pos, counter:80 / main.sp60f})
   }
   export function print_tmp_num(ctx:CanvasRenderingContext2D){
-    function print_number(k:string, pos:Pos, cnt:number):Pos{
+    function print_number(k:string, real_pos:Pos, cnt:number):Pos{
       if(cnt >= 0){
         cnt = limit(cnt, 0, 10 / main.sp60f)
         let delta = view.window_h / 240
-        ctx.fillText(k, pos.x, pos.y - (10 / main.sp60f - cnt) * delta)
+        ctx.fillText(k, real_pos.x, real_pos.y - (10 / main.sp60f - cnt) * delta)
       }
       let w = ctx.measureText(k).width
-      return pos.add(new Pos(w,0))
+      return real_pos.add(new Pos(w,0))
     }
 
     for(let i = 0; i < tmp_num_tasks.length; i++){
@@ -384,9 +399,9 @@ namespace utils{
       ctx.font = "normal " + (view.window_h / 40) + "px sans-serif"
       ctx.fillStyle = tmp_num_task.color
       let num_text = tmp_num_task.number + ""
-      let pos = tmp_num_task.pos
+      let real_pos = tmp_num_task.pos.sub(view.prefix_pos)
       for(let j = 0; j < num_text.length; j++){
-        pos = print_number(num_text[j],pos,80 / main.sp60f - tmp_num_task.counter - j * 10 / main.sp60f)
+        real_pos = print_number(num_text[j],real_pos,80 / main.sp60f - tmp_num_task.counter - j * 10 / main.sp60f)
       }
       tmp_num_task.counter--
       if(tmp_num_task.counter <= 0) {
@@ -422,5 +437,9 @@ namespace utils{
     reversal_circle_memo = {} // 以前のものを破棄
     reversal_circle_memo[r] = canvas
     return canvas
+  }
+
+  export function pos_to_upos(pos:Pos):Pos {
+    return pos.div(view.unit_size).map(n => Math.floor(n))
   }
 }
